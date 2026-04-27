@@ -38,7 +38,7 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
 .screen.active{display:flex;}
 .overlay{display:none;height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;background:#f0f4fb;overflow-y:auto;}
 .overlay.active{display:flex;}
-.sbody{flex:1;overflow-y:auto;padding:18px;padding-bottom:30px;-webkit-overflow-scrolling:touch;}
+.sbody{flex:1;overflow-y:auto;padding:18px;padding-bottom:80px;-webkit-overflow-scrolling:touch;}
 
 /* HEADER */
 .hbar{background:var(--navy);padding:16px 20px;flex-shrink:0;}
@@ -270,50 +270,155 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
 
 <!-- ═══════════ HOME ═══════════ -->
 <div class="screen active" id="s-home">
-  <div class="hbar">
-    <div class="hinner">
-      <div class="hlogo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+
+    <!-- HERO FULL -->
+    <div style="background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;">
+
+      <!-- Cercles déco -->
+      <div style="position:absolute;top:-80px;right:-60px;width:260px;height:260px;border-radius:50%;border:1px solid rgba(255,255,255,.04);"></div>
+      <div style="position:absolute;top:-40px;right:-20px;width:160px;height:160px;border-radius:50%;border:1px solid rgba(255,255,255,.06);"></div>
+      <div style="position:absolute;bottom:120px;left:-80px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,.04);"></div>
+
+      <!-- TOP NAV -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 0;position:relative;z-index:2;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:34px;height:34px;background:var(--blue2);border-radius:9px;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          </div>
+          <div>
+            <div style="font-family:var(--font-title);font-size:16px;color:#fff;font-weight:700;letter-spacing:.5px;line-height:1;">YAN TRANSPORT</div>
+            <div style="font-size:8px;color:var(--blue4);letter-spacing:3px;font-weight:500;text-transform:uppercase;margin-top:1px;">Marseille · Service Privé</div>
+          </div>
+        </div>
+        <button onclick="go('s-login')" style="padding:7px 14px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);background:transparent;font-family:var(--font-body);">Admin</button>
       </div>
-      <div><div class="hlogo-text">YAN TRANSPORT</div><div class="hlogo-sub">Service Privé</div></div>
-      <div class="hright"><button class="hbtn" onclick="go('s-login')">Admin</button></div>
-    </div>
-  </div>
-  <div class="hero-block">
-    <div class="ht-pre">Marseille & Région</div>
-    <div class="ht-title">Voyagez avec<br><em>élégance.</em></div>
-    <div class="ht-sub">Transferts gares, aéroports & destinations. Berline et Van 24h/24.</div>
-    <button class="btn-cta" onclick="go('s-booking')">Réserver ma course</button>
-  </div>
-  <div class="sbody">
-    <div class="sec-lbl" style="margin-top:4px">Nos véhicules</div>
-    <div class="veh-grid">
-      <div class="vcard sel" id="hv-b" onclick="homeVeh('berline')">
-        <div class="vcard-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
-        <div class="vcard-name">Berline</div>
-        <div class="vcard-cap">Jusqu'à 4 passagers</div>
-        <div class="vcard-rate" id="hv-b-rate">1.80 €/km</div>
+
+      <!-- HERO CONTENT -->
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 24px 30px;position:relative;z-index:2;">
+        <div style="font-size:9px;letter-spacing:5px;color:var(--blue3);text-transform:uppercase;font-weight:600;margin-bottom:14px;">Chauffeur Privé VTC</div>
+        <div style="font-family:var(--font-title);font-size:44px;color:#fff;font-weight:700;line-height:1.05;margin-bottom:16px;">Votre<br>confort,<br><span style="color:var(--blue3);">notre priorité.</span></div>
+        <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.9;margin-bottom:32px;font-weight:300;max-width:280px;">Transferts premium vers les gares, aéroports et toutes destinations. Disponible 24h/24, 7j/7.</div>
+        <button onclick="go('s-booking')" style="display:block;background:var(--blue2);color:#fff;border:none;padding:18px 24px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:14px;font-family:var(--font-body);width:100%;">Réserver maintenant</button>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" width="14" height="14"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.02z"/></svg>
+          <div style="font-size:11px;color:rgba(255,255,255,.35);font-weight:400;">+33 6 00 00 00 00</div>
+        </div>
       </div>
-      <div class="vcard" id="hv-v" onclick="homeVeh('van')">
-        <div class="vcard-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#546e8a" stroke-width="2" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-        <div class="vcard-name">Van</div>
-        <div class="vcard-cap">Jusqu'à 8 passagers</div>
-        <div class="vcard-rate" id="hv-v-rate">2.50 €/km</div>
+
+      <!-- STATS STRIP -->
+      <div style="display:flex;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:2;">
+        <div style="flex:1;padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.07);">
+          <div style="font-family:var(--font-title);font-size:24px;color:#fff;font-weight:700;">24/7</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Disponible</div>
+        </div>
+        <div style="flex:1;padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.07);">
+          <div style="font-family:var(--font-title);font-size:24px;color:#fff;font-weight:700;">2</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Gammes</div>
+        </div>
+        <div style="flex:1;padding:16px 12px;text-align:center;">
+          <div style="font-family:var(--font-title);font-size:24px;color:#fff;font-weight:700;">0€</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Frais cachés</div>
+        </div>
       </div>
     </div>
-    <div class="rstrip">
-      <div class="rs-ttl">Grille tarifaire</div>
-      <div class="rs-row"><span class="rs-k">Berline — prise en charge</span><span class="rs-v" id="hs-pb">8.00 €</span></div>
-      <div class="rs-row"><span class="rs-k">Berline — prix/km</span><span class="rs-v" id="hs-kb">1.80 €</span></div>
-      <div class="rs-row"><span class="rs-k">Van — prise en charge</span><span class="rs-v" id="hs-pv">12.00 €</span></div>
-      <div class="rs-row"><span class="rs-k">Van — prix/km</span><span class="rs-v" id="hs-kv">2.50 €</span></div>
-      <div class="rs-row"><span class="rs-k">Supplément nuit (22h–6h)</span><span class="rs-v" id="hs-n">+10.00 €</span></div>
-    </div>
-    <div class="cancel-policy">
-      <strong>Politique d'annulation :</strong> Gratuite jusqu'à 24h avant. Entre 24h et 2h : 50%. Moins de 2h ou no-show : 100% dû.
-    </div>
-    <div style="font-size:11px;color:var(--muted);line-height:1.9;text-align:center;padding-bottom:10px;">
-      +33 6 00 00 00 00 · contact@yantransport.fr<br>Marseille & région PACA
+
+    <!-- SERVICES -->
+    <div style="background:#f0f4fb;padding:28px 20px;">
+      <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:18px;">Nos véhicules</div>
+      <div style="display:flex;gap:12px;margin-bottom:24px;">
+        <div style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px 14px;cursor:pointer;" onclick="go('s-booking')">
+          <div style="width:44px;height:44px;background:var(--ice);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="22" height="22"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Berline</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">Jusqu'à 4 passagers<br>Confort premium</div>
+          <div style="margin-top:12px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;">Réserver →</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px 14px;cursor:pointer;" onclick="go('s-booking')">
+          <div style="width:44px;height:44px;background:var(--ice);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="22" height="22"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Van</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.6;">Jusqu'à 8 passagers<br>Grand volume</div>
+          <div style="margin-top:12px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;">Réserver →</div>
+        </div>
+      </div>
+
+      <!-- SERVICES LIST -->
+      <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:14px;">Nos prestations</div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--off);">
+          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Transfert aéroport</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">MRS · Nice · Lyon · Paris</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--off);">
+          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Transfert gare</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">Saint-Charles · Aix TGV</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--off);">
+          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Groupe & événements</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mariages · Séminaires · Soirées</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:16px;">
+          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);">Mise à disposition</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:1px;">À l'heure · À la journée</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POURQUOI NOUS -->
+      <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:14px;">Pourquoi nous choisir</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:20px;margin-bottom:8px;">✓</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Prix fixe</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Connu avant la course, sans surprise</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:20px;margin-bottom:8px;">⏱</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Ponctualité</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Chauffeur toujours à l'heure</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:20px;margin-bottom:8px;">🔒</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Sécurité</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Chauffeurs professionnels certifiés</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
+          <div style="font-size:20px;margin-bottom:8px;">💬</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Suivi</div>
+          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Confirmation par e-mail immédiate</div>
+        </div>
+      </div>
+
+      <!-- CTA BAS -->
+      <div style="background:var(--navy);border-radius:18px;padding:24px;text-align:center;margin-bottom:20px;">
+        <div style="font-family:var(--font-title);font-size:22px;color:#fff;font-weight:700;margin-bottom:8px;">Prêt à partir ?</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.7;">Réservez en 2 minutes.<br>Confirmation immédiate par e-mail.</div>
+        <button onclick="go('s-booking')" style="display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--font-body);">Réserver ma course</button>
+        <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,.3);">+33 6 00 00 00 00 · contact@yantransport.fr</div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -359,9 +464,9 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
       </div>
       <div id="pp-wrap" style="display:none">
         <div class="price-preview">
-          <div class="pp-lbl">Estimation de course</div>
+          <div class="pp-lbl">Prix de votre course</div>
           <div class="pp-amt"><span id="pp-amt">0</span><span class="pp-unit">€</span></div>
-          <div class="pp-lines" id="pp-lines"></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:10px;text-align:center;letter-spacing:.5px;">Prix fixe tout compris · Confirmé à la réservation</div>
         </div>
       </div>
     </div>
@@ -406,8 +511,8 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
       <label for="cgv-chk">J'accepte les <a onclick="go('s-cgv')">Conditions Générales de Vente</a> et la <a onclick="go('s-rgpd')">Politique de confidentialité</a>. *</label>
     </div>
 
-    <button class="btn-primary" id="submit-btn" onclick="submitBooking()">Confirmer la réservation</button>
-    <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:10px;">Confirmation par e-mail immédiate</div>
+    <button class="btn-primary" id="submit-btn" onclick="submitBooking()" style="margin-top:20px;padding:18px;">Confirmer la réservation</button>
+    <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:12px;margin-bottom:40px;">Confirmation par e-mail immédiate</div>
   </div>
 </div>
 
@@ -496,6 +601,7 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
     <button class="atab" id="tab-tarifs" onclick="aTab('tarifs')">Tarifs</button>
     <button class="atab" id="tab-dispos" onclick="aTab('dispos')">Dispos</button>
     <button class="atab" id="tab-rapport" onclick="aTab('rapport')">Rapport</button>
+    <button class="atab" id="tab-equipe" onclick="aTab('equipe')">Équipe</button>
   </div>
 
   <!-- COURSES -->
@@ -575,6 +681,19 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
       <div class="rep-ttl">Clients récurrents</div>
       <div id="rep-recurrent"></div>
     </div>
+  </div>
+  <!-- EQUIPE -->
+  <div id="panel-equipe" class="sbody" style="display:none">
+    <div class="info-box">Ajoutez vos chauffeurs ici. Ils apparaîtront automatiquement dans le dispatch.</div>
+    <div class="sec-lbl">Ajouter un chauffeur</div>
+    <div class="fcard" style="margin-bottom:16px">
+      <div class="frow"><div class="field"><label>Prénom *</label><input type="text" id="drv-new-first" placeholder="Prénom"></div><div class="field"><label>Nom *</label><input type="text" id="drv-new-last" placeholder="Nom"></div></div>
+      <div class="frow"><div class="field"><label>Téléphone</label><input type="tel" id="drv-new-phone" placeholder="06 00 00 00 00"></div><div class="field"><label>Véhicule</label><select id="drv-new-type"><option>Berline</option><option>Van</option></select></div></div>
+      <div class="field"><label>E-mail</label><input type="email" id="drv-new-email" placeholder="chauffeur@email.fr"></div>
+      <button class="btn-primary" onclick="addDriver()" style="margin-top:12px">Ajouter le chauffeur</button>
+    </div>
+    <div class="sec-lbl">Chauffeurs actifs</div>
+    <div id="admin-drivers-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
   </div>
 </div>
 
@@ -680,10 +799,6 @@ function calcP() {
   var r = calcRide(selVehCur, km, night, !!fl, !!tr);
   document.getElementById('pp-wrap').style.display = 'block';
   document.getElementById('pp-amt').textContent = r.total.toFixed(2);
-  document.getElementById('pp-lines').innerHTML =
-    '<div class="pp-row"><span class="pp-k">Prise en charge</span><span class="pp-v">'+r.base.toFixed(2)+' €</span></div>'+
-    '<div class="pp-row"><span class="pp-k">'+km+' km × '+T.km[selVehCur].toFixed(2)+' €</span><span class="pp-v">'+r.kc.toFixed(2)+' €</span></div>'+
-    (r.s>0?'<div class="pp-row"><span class="pp-k">Suppléments</span><span class="pp-v">+'+r.s.toFixed(2)+' €</span></div>':'');
 }
 
 // ═══ NAV ═══
@@ -908,7 +1023,8 @@ function renderRides() {
     return;
   }
 
-  var drivers = ['Marc L.','Karim M.','Sofia R.','Yoann B.'];
+  var {data: driversData} = await sb.from('drivers').select('name').eq('active', true).order('name');
+  var drivers = driversData && driversData.length ? driversData.map(function(d){return d.name;}) : ['Aucun chauffeur'];
   document.getElementById('rides-list').innerHTML = rides.map(function(r,i){
     var bc = statusMap[r.status] || statusMap.new;
     var dopts = drivers.map(function(d){return '<option '+(r.driver===d?'selected':'')+'>'+d+'</option>';}).join('');
@@ -1033,7 +1149,7 @@ function renderRapport() {
 
 // ═══ ADMIN TABS ═══
 function aTab(t) {
-  ['courses','tarifs','dispos','rapport'].forEach(function(x){
+  ['courses','tarifs','dispos','rapport','equipe'].forEach(function(x){
     document.getElementById('panel-'+x).style.display='none';
     document.getElementById('tab-'+x).classList.remove('active');
   });
@@ -1043,6 +1159,69 @@ function aTab(t) {
   if(t==='rapport') renderRapport();
   if(t==='dispos') loadDispos();
   if(t==='courses') loadRides();
+  if(t==='equipe') loadAdminDrivers();
+}
+
+// ═══ GESTION CHAUFFEURS ═══
+async function loadAdminDrivers() {
+  var {data, error} = await sb.from('drivers').select('*').order('name');
+  var el = document.getElementById('admin-drivers-list');
+  if(error || !data || !data.length) {
+    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px;">Aucun chauffeur enregistré.</div>';
+    return;
+  }
+  el.innerHTML = data.map(function(d) {
+    return '<div class="ride-card" style="margin-bottom:10px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:700;color:var(--navy)">' + d.name + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);margin-top:2px;">' + d.vehicle_type + (d.vehicle_plate ? ' · ' + d.vehicle_plate : '') + '</div>' +
+        '</div>' +
+        '<span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:' + (d.active ? 'var(--green-bg)' : 'var(--red-bg)') + ';color:' + (d.active ? 'var(--green)' : 'var(--red)') + '">' + (d.active ? 'Actif' : 'Inactif') + '</span>' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">' + (d.phone || '') + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">' + (d.email || '') + '</div>' +
+      '<div style="display:flex;gap:8px">' +
+        '<button onclick="toggleDriver(\'' + d.id + '\',' + d.active + ')" style="flex:1;padding:9px;font-size:10px;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;border:1.5px solid ' + (d.active ? 'var(--orange)' : 'var(--green)') + ';color:' + (d.active ? 'var(--orange)' : 'var(--green)') + ';background:transparent;">' + (d.active ? 'Désactiver' : 'Activer') + '</button>' +
+        '<button onclick="deleteDriver(\'' + d.id + '\')" style="flex:1;padding:9px;font-size:10px;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;border:1.5px solid var(--red);color:var(--red);background:transparent;">Supprimer</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function addDriver() {
+  var first = document.getElementById('drv-new-first').value.trim();
+  var last = document.getElementById('drv-new-last').value.trim();
+  var phone = document.getElementById('drv-new-phone').value.trim();
+  var email = document.getElementById('drv-new-email').value.trim();
+  var type = document.getElementById('drv-new-type').value;
+  if(!first || !last) { toast('Entrez le prénom et le nom'); return; }
+  var {error} = await sb.from('drivers').insert({
+    name: first + ' ' + last,
+    email: email,
+    phone: phone,
+    vehicle_type: type,
+    active: true
+  });
+  if(error) { toast('Erreur : ' + error.message); return; }
+  document.getElementById('drv-new-first').value = '';
+  document.getElementById('drv-new-last').value = '';
+  document.getElementById('drv-new-phone').value = '';
+  document.getElementById('drv-new-email').value = '';
+  await loadAdminDrivers();
+  toast('Chauffeur ajouté !');
+}
+
+async function toggleDriver(id, currentActive) {
+  await sb.from('drivers').update({active: !currentActive}).eq('id', id);
+  await loadAdminDrivers();
+  toast(currentActive ? 'Chauffeur désactivé' : 'Chauffeur activé');
+}
+
+async function deleteDriver(id) {
+  await sb.from('drivers').delete().eq('id', id);
+  await loadAdminDrivers();
+  toast('Chauffeur supprimé');
 }
 
 // ═══ DRIVER ═══
