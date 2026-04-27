@@ -36,10 +36,10 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
 /* SCREENS */
 .screen{display:none;height:100vh;flex-direction:column;overflow:hidden;}
 .screen.active{display:flex;}
-#s-home{overflow-y:auto;display:none;height:100vh;}
-#s-home.active{display:block;}
 .overlay{display:none;height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;background:#f0f4fb;overflow-y:auto;}
 .overlay.active{display:flex;}
+#s-home{display:none;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;flex-direction:column;}
+#s-home.active{display:block;}
 .sbody{flex:1;overflow-y:auto;padding:18px;padding-bottom:80px;-webkit-overflow-scrolling:touch;}
 
 /* HEADER */
@@ -271,8 +271,7 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
 <div class="toast-bar" id="toast"></div>
 
 <!-- ═══════════ HOME ═══════════ -->
-<div class="screen active" id="s-home">
-  <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+<div id="s-home" class="active">
 
     <!-- HERO FULL -->
     <div style="background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;">
@@ -422,7 +421,6 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
       </div>
 
     </div>
-  </div>
 </div>
 
 <!-- ═══════════ BOOKING ═══════════ -->
