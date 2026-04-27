@@ -36,6 +36,8 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
 /* SCREENS */
 .screen{display:none;height:100vh;flex-direction:column;overflow:hidden;}
 .screen.active{display:flex;}
+#s-home{overflow-y:auto;display:none;height:100vh;}
+#s-home.active{display:block;}
 .overlay{display:none;height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;background:#f0f4fb;overflow-y:auto;}
 .overlay.active{display:flex;}
 .sbody{flex:1;overflow-y:auto;padding:18px;padding-bottom:80px;-webkit-overflow-scrolling:touch;}
@@ -804,7 +806,9 @@ function calcP() {
 // ═══ NAV ═══
 function go(id) {
   document.querySelectorAll('.screen,.overlay').forEach(function(e){ e.classList.remove('active'); });
-  document.getElementById(id).classList.add('active');
+  var el = document.getElementById(id);
+  el.classList.add('active');
+  if(id === 's-home') { el.scrollTop = 0; }
 }
 
 function homeVeh(v) {
