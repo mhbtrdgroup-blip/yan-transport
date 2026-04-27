@@ -4,496 +4,329 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#04132b">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Yan Transport — Service Privé</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- SUPABASE SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- GOOGLE MAPS -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIZc4rsQhqOMLTrwQTqEXaQQTQLoDlg20&libraries=places&callback=initMaps" async defer></script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
-  --navy:#04132b;--navy2:#07203f;--navy3:#0a2d55;
-  --blue:#1565c0;--blue2:#1976d2;--blue3:#42a5f5;--blue4:#90caf9;
-  --white:#fff;--off:#f8faff;--ice:#e8f1fd;
-  --text:#0a0a1a;--muted:#546e8a;--light:#90a4c0;
-  --green-dark:#1b5e20;--green-bg:#e8f5e9;--green:#2e7d32;
-  --orange:#e65100;--orange-bg:#fff3e0;
-  --red-dark:#b71c1c;--red-bg:#ffebee;--red:#c62828;
-  --border:#d0dff0;--border2:#b8cfe8;
-  --font-title:'Cormorant Garamond',serif;
-  --font-body:'Montserrat',sans-serif;
+  --navy:#04132b;--blue2:#1976d2;--blue3:#42a5f5;--blue4:#90caf9;
+  --off:#f8faff;--ice:#e8f1fd;--text:#0a0a1a;--muted:#546e8a;
+  --green:#2e7d32;--green-bg:#e8f5e9;--orange:#e65100;--orange-bg:#fff3e0;
+  --red:#c62828;--red-bg:#ffebee;--border:#d0dff0;--border2:#b8cfe8;
+  --ft:'Cormorant Garamond',serif;--fb:'Montserrat',sans-serif;
 }
-html,body{height:100%;overflow:hidden;}
-body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 auto;color:var(--text);position:relative;}
+html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);max-width:430px;margin:0 auto;color:var(--text);}
 
-/* SCREENS */
-.screen{display:none;height:100vh;flex-direction:column;overflow:hidden;}
-.screen.active{display:flex;}
-.overlay{display:none;height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;background:#f0f4fb;overflow-y:auto;}
-.overlay.active{display:flex;}
-#s-home{display:none;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;flex-direction:column;}
-#s-home.active{display:block;}
-.sbody{flex:1;overflow-y:auto;padding:18px;padding-bottom:80px;-webkit-overflow-scrolling:touch;}
+/* ── PAGES ── */
+.page{display:none;position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#f0f4fb;}
+.page.on{display:block;}
+.page.flex{display:none;flex-direction:column;}
+.page.flex.on{display:flex;}
 
-/* HEADER */
-.hbar{background:var(--navy);padding:16px 20px;flex-shrink:0;}
-.hinner{display:flex;align-items:center;gap:10px;}
-.hlogo-icon{width:36px;height:36px;background:var(--blue2);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.hlogo-icon svg{width:20px;height:20px;}
-.hlogo-text{font-family:var(--font-title);font-size:18px;color:#fff;font-weight:700;letter-spacing:.5px;line-height:1;}
-.hlogo-sub{font-size:9px;color:var(--blue4);letter-spacing:3px;font-weight:500;margin-top:2px;text-transform:uppercase;}
-.hright{margin-left:auto;display:flex;gap:8px;}
-.hbtn{padding:6px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);background:transparent;font-family:var(--font-body);letter-spacing:.5px;}
-.hbtn:active{background:rgba(255,255,255,.1);}
-
-/* TOPBAR */
-.topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.tb-back{font-size:12px;color:var(--blue2);cursor:pointer;border:none;background:none;font-weight:600;font-family:var(--font-body);}
+/* ── COMMUNS ── */
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.tb-back{font-size:12px;color:var(--blue2);cursor:pointer;border:none;background:none;font-weight:600;font-family:var(--fb);}
 .tb-title{font-size:13px;font-weight:600;color:var(--text);}
-
-/* HOME HERO */
-.hero-block{background:var(--navy);padding:26px 20px 30px;flex-shrink:0;}
-.ht-pre{font-size:9px;letter-spacing:4px;color:var(--blue3);text-transform:uppercase;font-weight:600;margin-bottom:8px;}
-.ht-title{font-family:var(--font-title);font-size:30px;color:#fff;font-weight:700;line-height:1.15;margin-bottom:8px;}
-.ht-title em{color:var(--blue3);font-style:normal;}
-.ht-sub{font-size:11px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:20px;font-weight:300;}
-.btn-cta{display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:15px 20px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--font-body);}
-.btn-cta:active{background:var(--navy3);}
-
-/* VEH CARDS */
-.veh-grid{display:flex;gap:10px;margin-bottom:16px;}
-.vcard{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:14px 11px;cursor:pointer;}
-.vcard.sel{border-color:var(--blue2);background:var(--ice);}
-.vcard-ico{width:36px;height:36px;background:var(--ice);border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
-.vcard-ico svg{width:19px;height:19px;}
-.vcard.sel .vcard-ico{background:#ddeeff;}
-.vcard-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
-.vcard-cap{font-size:10px;color:var(--muted);}
-.vcard-rate{font-size:11px;color:var(--blue2);font-weight:600;margin-top:5px;}
-
-/* RATE STRIP */
-.rstrip{background:var(--navy);border-radius:14px;padding:15px 17px;margin-bottom:16px;}
-.rs-ttl{font-size:9px;letter-spacing:3px;color:var(--blue4);text-transform:uppercase;font-weight:600;margin-bottom:11px;}
-.rs-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.rs-row:last-child{border-bottom:none;}
-.rs-k{font-size:11px;color:rgba(255,255,255,.5);}
-.rs-v{font-size:11px;font-weight:600;color:var(--blue3);}
-
-/* CANCEL POLICY */
-.cancel-policy{background:var(--orange-bg);border:1px solid #ffe0b2;border-radius:11px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:var(--orange);line-height:1.7;}
-.cancel-policy strong{font-weight:700;}
-
-/* FORM */
-.fsec-ttl{font-size:9px;letter-spacing:2.5px;color:var(--blue2);text-transform:uppercase;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.fsec-ttl::after{content:'';flex:1;height:1px;background:var(--border);}
-.fcard{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:13px;}
-.field{margin-bottom:11px;}
-.field:last-child{margin-bottom:0;}
-.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
-.field input,.field select,.field textarea{width:100%;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:11px 13px;font-size:13px;font-family:var(--font-body);outline:none;border-radius:10px;-webkit-appearance:none;appearance:none;}
+.sbody{flex:1;overflow-y:auto;padding:18px;padding-bottom:80px;}
+.sec{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:11px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:13px;}
+.field{margin-bottom:11px;}.field:last-child{margin-bottom:0;}
+.field label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;font-weight:600;text-transform:uppercase;}
+.field input,.field select,.field textarea{width:100%;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:11px 13px;font-size:13px;font-family:var(--fb);outline:none;border-radius:10px;-webkit-appearance:none;}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue2);background:#fff;}
 .field textarea{resize:none;height:68px;}
-.frow{display:flex;gap:10px;}
-.frow .field{flex:1;}
+.frow{display:flex;gap:10px;}.frow .field{flex:1;}
+.fsec{font-size:9px;letter-spacing:2.5px;color:var(--blue2);text-transform:uppercase;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.fsec::after{content:'';flex:1;height:1px;background:var(--border);}
+.btn-p{width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);}
+.btn-o{width:100%;background:transparent;color:var(--blue2);border:1.5px solid var(--blue2);padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-top:8px;}
+.btn-d{width:100%;background:transparent;color:var(--red);border:1.5px solid var(--red);padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-top:8px;}
+.info{background:var(--ice);border:1px solid var(--border2);border-radius:11px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:#0c447c;line-height:1.7;font-weight:500;}
+.badge{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
+.b-new{background:var(--ice);color:#0c447c;}.b-assigned{background:var(--orange-bg);color:var(--orange);}
+.b-ongoing{background:var(--green-bg);color:var(--green);}.b-done{background:#f1f8e9;color:#33691e;}
+.b-cancelled,.b-noshow{background:var(--red-bg);color:var(--red);}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--blue4);padding:11px 22px;font-size:10px;letter-spacing:1.5px;font-weight:700;border-radius:20px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999;}
+.toast.on{opacity:1;}
+.dispo-warn{display:none;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px 12px;font-size:11px;color:var(--red);font-weight:600;margin-top:8px;}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.cgv-lnk{color:var(--blue2);text-decoration:none;font-weight:600;cursor:pointer;}
 
-/* VEH FORM */
+/* ── HOME ── */
+.hbar{background:var(--navy);padding:18px 22px;}
+.hinner{display:flex;align-items:center;gap:10px;}
+.hico{width:34px;height:34px;background:var(--blue2);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hico svg{width:18px;height:18px;}
+.hname{font-family:var(--ft);font-size:16px;color:#fff;font-weight:700;line-height:1;}
+.hsub{font-size:8px;color:var(--blue4);letter-spacing:3px;font-weight:500;text-transform:uppercase;margin-top:2px;}
+.hadmin{margin-left:auto;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);background:transparent;font-family:var(--fb);}
+.hero{background:var(--navy);padding:36px 24px 32px;}
+.hero-pre{font-size:9px;letter-spacing:5px;color:var(--blue3);text-transform:uppercase;font-weight:600;margin-bottom:14px;}
+.hero-title{font-family:var(--ft);font-size:42px;color:#fff;font-weight:700;line-height:1.05;margin-bottom:16px;}
+.hero-title em{color:var(--blue3);font-style:normal;}
+.hero-sub{font-size:12px;color:rgba(255,255,255,.45);line-height:1.9;margin-bottom:28px;font-weight:300;}
+.hero-btn{display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:18px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:14px;font-family:var(--fb);}
+.stats-strip{display:flex;border-top:1px solid rgba(255,255,255,.07);background:var(--navy);}
+.stat-s{flex:1;padding:16px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
+.stat-s:last-child{border-right:none;}
+.stat-sn{font-family:var(--ft);font-size:22px;color:#fff;font-weight:700;}
+.stat-sl{font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.vcard-h{flex:1;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px 14px;cursor:pointer;}
+.vcard-h-ico{width:42px;height:42px;background:var(--ice);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:11px;}
+.vcard-h-ico svg{width:20px;height:20px;}
+.svc-row{display:flex;align-items:center;gap:14px;padding:15px;border-bottom:1px solid var(--off);}
+.svc-row:last-child{border-bottom:none;}
+.svc-ico{width:34px;height:34px;background:var(--ice);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.svc-ico svg{width:16px;height:16px;}
+.why-g{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.why-c{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;}
+.cta-bot{background:var(--navy);border-radius:18px;padding:24px;text-align:center;margin-bottom:24px;}
+
+/* ── VÉHICULE FORM ── */
 .vf-grid{display:flex;gap:10px;margin-bottom:13px;}
-.vf-opt{flex:1;background:var(--off);border:1.5px solid var(--border);border-radius:11px;padding:12px 8px;text-align:center;cursor:pointer;color:var(--muted);}
+.vf-opt{flex:1;background:var(--off);border:1.5px solid var(--border);border-radius:11px;padding:13px 8px;text-align:center;cursor:pointer;color:var(--muted);}
 .vf-opt.sel{border-color:var(--blue2);background:var(--ice);color:var(--blue2);}
-.vf-ico{font-size:20px;display:block;margin-bottom:4px;}
+.vf-ico{font-size:20px;display:block;margin-bottom:5px;}
 .vf-nm{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
-.vf-rt{font-size:10px;margin-top:3px;}
-.vf-opt.sel .vf-rt{color:var(--blue2);}
+.price-box{background:var(--navy);border-radius:13px;padding:18px;margin-top:12px;text-align:center;}
+.price-box-lbl{font-size:9px;letter-spacing:3px;color:var(--blue4);text-transform:uppercase;margin-bottom:6px;font-weight:600;}
+.price-box-amt{font-family:var(--ft);font-size:40px;color:#fff;font-weight:700;line-height:1;}
+.price-box-sub{font-size:10px;color:rgba(255,255,255,.35);margin-top:8px;letter-spacing:.5px;}
+.cgv-wrap{display:flex;align-items:flex-start;gap:10px;padding:13px;background:var(--ice);border:1.5px solid var(--border2);border-radius:11px;margin-bottom:13px;}
+.cgv-wrap input[type=checkbox]{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--blue2);}
+.cgv-wrap label{font-size:11px;color:var(--muted);line-height:1.6;cursor:pointer;}
+.cancel-pol{background:var(--orange-bg);border:1px solid #ffe0b2;border-radius:11px;padding:12px 14px;margin-bottom:13px;font-size:11px;color:var(--orange);line-height:1.7;}
 
-/* PRICE PREVIEW */
-.price-preview{background:var(--navy);border-radius:13px;padding:17px;margin-top:12px;}
-.pp-lbl{font-size:9px;letter-spacing:3px;color:var(--blue4);text-transform:uppercase;margin-bottom:4px;font-weight:600;}
-.pp-amt{font-family:var(--font-title);font-size:36px;color:#fff;font-weight:700;line-height:1;}
-.pp-unit{font-size:15px;font-family:var(--font-body);font-weight:300;color:var(--blue4);margin-left:3px;}
-.pp-lines{border-top:1px solid rgba(255,255,255,.1);padding-top:10px;margin-top:11px;}
-.pp-row{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;}
-.pp-k{color:rgba(255,255,255,.4);}
-.pp-v{color:rgba(255,255,255,.8);font-weight:600;}
+/* ── SUCCESS ── */
+.succ-ico{width:68px;height:68px;background:var(--ice);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.succ-ico svg{width:30px;height:30px;}
+.succ-pill{background:var(--navy);color:var(--blue3);padding:6px 18px;border-radius:20px;font-size:10px;letter-spacing:2px;font-weight:700;display:inline-block;margin-bottom:16px;}
+.det-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;text-align:left;width:100%;margin-bottom:16px;}
+.dc-r{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid var(--off);}
+.dc-r:last-child{border-bottom:none;}
+.dc-k{color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;}
+.price-big{font-family:var(--ft);font-size:20px;color:var(--blue2);font-weight:700;}
 
-/* CGV */
-.cgv-check{display:flex;align-items:flex-start;gap:10px;padding:13px;background:var(--ice);border:1.5px solid var(--border2);border-radius:11px;margin-bottom:13px;}
-.cgv-check input[type=checkbox]{width:18px;height:18px;flex-shrink:0;margin-top:1px;accent-color:var(--blue2);}
-.cgv-check label{font-size:11px;color:var(--muted);line-height:1.6;cursor:pointer;}
-.cgv-check label a{color:var(--blue2);text-decoration:none;font-weight:600;}
+/* ── LOGIN ── */
+.login-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:26px 22px;width:100%;max-width:340px;}
+.login-ico{width:50px;height:50px;background:var(--navy);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.login-ico svg{width:24px;height:24px;}
 
-/* BUTTONS */
-.btn-primary{width:100%;background:var(--blue2);color:#fff;border:none;padding:15px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--font-body);margin-top:4px;}
-.btn-primary:active{background:var(--navy3);}
-.btn-outline{width:100%;background:transparent;color:var(--blue2);border:1.5px solid var(--blue2);padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--font-body);margin-top:8px;}
-.btn-danger{width:100%;background:transparent;color:var(--red);border:1.5px solid var(--red);padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--font-body);margin-top:8px;}
-
-/* ADMIN TABS */
-.atabs{background:#fff;border-bottom:1px solid var(--border);display:flex;flex-shrink:0;}
-.atab{flex:1;padding:12px 4px;text-align:center;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;font-weight:700;font-family:var(--font-body);}
-.atab.active{color:var(--blue2);border-bottom-color:var(--blue2);}
-
-/* STATS */
+/* ── ADMIN ── */
+.atabs{background:#fff;border-bottom:1px solid var(--border);display:flex;position:sticky;top:0;z-index:10;}
+.atab{flex:1;padding:12px 2px;text-align:center;font-size:8px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;font-weight:700;font-family:var(--fb);}
+.atab.on{color:var(--blue2);border-bottom-color:var(--blue2);}
 .stats-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px;}
-.stat-box{background:#fff;border:1px solid var(--border);border-radius:13px;padding:13px;}
-.stat-num{font-family:var(--font-title);font-size:26px;font-weight:700;color:var(--text);}
-.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-weight:600;}
-
-/* RIDE CARD */
+.stat-b{background:#fff;border:1px solid var(--border);border-radius:13px;padding:13px;}
+.stat-bn{font-family:var(--ft);font-size:26px;font-weight:700;color:var(--text);}
+.stat-bl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-weight:600;}
 .ride-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
 .rc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .rc-ref{font-size:10px;font-weight:700;color:var(--navy);letter-spacing:1px;}
 .rc-time{font-size:10px;color:var(--muted);margin-top:2px;}
-.badge{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
-.b-new{background:var(--ice);color:#0c447c;}
-.b-assigned{background:var(--orange-bg);color:var(--orange);}
-.b-ongoing{background:var(--green-bg);color:var(--green);}
-.b-done{background:#f1f8e9;color:#33691e;}
-.b-cancelled{background:var(--red-bg);color:var(--red);}
-.b-noshow{background:var(--red-bg);color:var(--red);}
 .rc-route{margin-bottom:8px;}
 .rc-from{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:7px;margin-bottom:3px;}
 .rc-to{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px;}
 .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.dot.b{background:var(--blue2);}
-.dot.g{background:var(--border2);}
+.dot.b{background:var(--blue2);}.dot.g{background:var(--border2);}
 .chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px;}
 .chip{background:var(--off);border:1px solid var(--border);border-radius:20px;padding:3px 8px;font-size:10px;color:var(--muted);font-weight:500;}
 .chip.hl{background:var(--ice);border-color:var(--blue4);color:#0c447c;}
-.rc-footer{display:flex;justify-content:space-between;align-items:center;}
-.rc-name{font-size:11px;color:var(--muted);}
-.rc-price{font-family:var(--font-title);font-size:17px;font-weight:700;color:var(--navy);}
-.dispatch-row{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;}
-.dsel{flex:1;min-width:100px;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:8px 10px;font-size:11px;font-family:var(--font-body);outline:none;border-radius:9px;}
-.abtn{background:var(--blue2);color:#fff;border:none;padding:9px 12px;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:9px;font-weight:700;font-family:var(--font-body);text-transform:uppercase;white-space:nowrap;}
-.sbtn{background:var(--red-bg);color:var(--red);border:none;padding:9px 10px;font-size:9px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
-.nbtn{background:var(--orange-bg);color:var(--orange);border:none;padding:9px 10px;font-size:9px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;}
-
-/* PRICING */
+.rc-foot{display:flex;justify-content:space-between;align-items:center;}
+.rc-price{font-family:var(--ft);font-size:17px;font-weight:700;color:var(--navy);}
+.d-row{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.dsel{flex:1;min-width:90px;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:8px 10px;font-size:11px;font-family:var(--fb);outline:none;border-radius:9px;}
+.abtn{background:var(--blue2);color:#fff;border:none;padding:9px 11px;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:9px;font-weight:700;font-family:var(--fb);text-transform:uppercase;}
+.sbtn{background:var(--red-bg);color:var(--red);border:none;padding:9px 10px;font-size:9px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);text-transform:uppercase;}
+.nbtn{background:var(--orange-bg);color:var(--orange);border:none;padding:9px 10px;font-size:9px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);text-transform:uppercase;}
 .prow{display:flex;align-items:center;gap:10px;padding:11px;background:#fff;border:1px solid var(--border);border-radius:11px;margin-bottom:8px;}
 .prow-ico{width:30px;height:30px;background:var(--ice);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.prow-ico svg{width:15px;height:15px;}
 .prow-lbl{flex:1;font-size:12px;font-weight:600;color:var(--text);}
 .prow-sub{font-size:10px;color:var(--muted);margin-top:1px;font-weight:400;}
-.pinput{width:62px;background:var(--navy);border:none;color:var(--blue3);padding:8px 6px;font-size:14px;font-family:var(--font-title);text-align:center;outline:none;border-radius:7px;font-weight:600;}
-.punit{font-size:10px;color:var(--muted);white-space:nowrap;font-weight:500;}
-
-/* SIMULATOR */
+.pinput{width:64px;background:var(--navy);border:none;color:var(--blue3);padding:8px 6px;font-size:14px;font-family:var(--ft);text-align:center;outline:none;border-radius:7px;font-weight:600;}
+.punit{font-size:10px;color:var(--muted);white-space:nowrap;}
 .sim-box{background:var(--navy);border-radius:14px;padding:15px;margin-bottom:14px;}
 .sim-ttl{font-size:9px;letter-spacing:3px;color:var(--blue4);text-transform:uppercase;font-weight:600;margin-bottom:11px;}
 .sim-fields{display:flex;gap:8px;margin-bottom:10px;}
 .sim-f{flex:1;}
-.sim-f label{font-size:9px;color:rgba(255,255,255,.4);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;}
-.sim-f select,.sim-f input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;padding:9px 10px;font-size:12px;font-family:var(--font-body);outline:none;border-radius:8px;}
+.sim-f label{font-size:9px;color:rgba(255,255,255,.4);display:block;margin-bottom:4px;text-transform:uppercase;}
+.sim-f select,.sim-f input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#fff;padding:9px 10px;font-size:12px;font-family:var(--fb);outline:none;border-radius:8px;}
 .sim-res{border-top:1px solid rgba(255,255,255,.1);padding-top:11px;text-align:center;}
-.sim-total{font-family:var(--font-title);font-size:32px;color:#fff;font-weight:700;}
+.sim-tot{font-family:var(--ft);font-size:30px;color:#fff;font-weight:700;}
 .sim-bd{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;line-height:1.7;}
-
-/* DISPO */
 .dispo-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
-.dispo-day{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 3px;text-align:center;cursor:pointer;}
-.dispo-day.off{background:var(--red-bg);border-color:#ffcdd2;}
-.dispo-dn{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;}
-.dispo-num{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
-.dispo-day.off .dispo-num,.dispo-day.off .dispo-dn{color:var(--red);}
-
-/* RAPPORT */
-.report-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:12px;}
+.dday{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 3px;text-align:center;cursor:pointer;}
+.dday.off{background:var(--red-bg);border-color:#ffcdd2;}
+.dday-n{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;}
+.dday-d{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
+.dday.off .dday-d,.dday.off .dday-n{color:var(--red);}
+.rep-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:12px;}
 .rep-ttl{font-size:9px;letter-spacing:2px;color:var(--blue2);text-transform:uppercase;font-weight:700;margin-bottom:11px;}
 .rep-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--off);font-size:12px;}
 .rep-row:last-child{border-bottom:none;}
 .rep-k{color:var(--muted);}
-.rep-v{font-weight:700;color:var(--text);}
+.rep-v{font-weight:700;}
 .rep-v.pos{color:var(--green);}
-.chart-bar-wrap{margin-bottom:8px;}
-.chart-lbl{font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:500;display:flex;justify-content:space-between;}
-.chart-bg{background:var(--off);border-radius:6px;height:8px;overflow:hidden;}
-.chart-bar{height:8px;border-radius:6px;background:var(--blue2);}
-
-/* DRIVER */
-.da-row{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.da-btn{flex:1;padding:9px 4px;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:8px;font-family:var(--font-body);font-weight:700;border:1.5px solid;background:transparent;}
+.bar-wrap{margin-bottom:8px;}
+.bar-lbl{font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;}
+.bar-bg{background:var(--off);border-radius:6px;height:8px;overflow:hidden;}
+.bar-fill{height:8px;border-radius:6px;background:var(--blue2);}
+.da-btn{flex:1;padding:9px 4px;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:8px;font-family:var(--fb);font-weight:700;border:1.5px solid;background:transparent;}
 .da-ac{color:var(--green);border-color:var(--green);}
 .da-st{color:var(--orange);border-color:var(--orange);}
 .da-fi{color:var(--red);border-color:var(--red);}
-.da-nav{color:var(--blue2);border-color:var(--blue2);text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;}
+.da-nav{color:var(--blue2);border-color:var(--blue2);text-decoration:none;display:flex;align-items:center;justify-content:center;}
 .da-btn:disabled{opacity:.25;cursor:default;}
-
-/* CGV PAGE */
-.cgv-body{padding:18px;padding-bottom:40px;}
-.cgv-art{font-family:var(--font-title);font-size:15px;font-weight:700;color:var(--navy);margin:16px 0 6px;}
+.cgv-art{font-family:var(--ft);font-size:15px;font-weight:700;color:var(--navy);margin:16px 0 6px;}
 .cgv-p{font-size:11px;color:var(--muted);line-height:1.8;margin-bottom:8px;}
-
-/* SUCCESS */
-.succ-ico{width:70px;height:70px;background:var(--ice);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
-.succ-ico svg{width:30px;height:30px;}
-.succ-pill{background:var(--navy);color:var(--blue3);padding:6px 18px;border-radius:20px;font-size:10px;letter-spacing:2px;font-weight:700;display:inline-block;margin-bottom:16px;}
-.det-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;text-align:left;width:100%;margin-bottom:16px;}
-.dc-row{display:flex;justify-content:space-between;padding:6px 0;font-size:12px;border-bottom:1px solid var(--off);}
-.dc-row:last-child{border-bottom:none;}
-.dc-k{color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;}
-.dc-v{color:var(--text);font-weight:600;}
-.price-big{font-family:var(--font-title);font-size:20px;color:var(--blue2);font-weight:700;}
-
-/* INFO BOX */
-.info-box{background:var(--ice);border:1px solid var(--border2);border-radius:11px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:#0c447c;line-height:1.7;font-weight:500;}
-
-/* SEC LABEL */
-.sec-lbl{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:11px;}
-
-/* LOGIN */
-.login-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:26px 22px;width:100%;max-width:340px;}
-.login-ico{width:50px;height:50px;background:var(--navy);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
-.login-ico svg{width:24px;height:24px;}
-.login-ttl{font-family:var(--font-title);font-size:20px;color:var(--navy);font-weight:700;text-align:center;}
-.login-sub{font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:18px;}
-
-/* LOADER */
-.loader{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* TOAST */
-.toast-bar{background:var(--navy);color:var(--blue3);padding:11px 20px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;text-align:center;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;flex-shrink:0;}
-.toast-bar.show{opacity:1;}
-
-/* DISPO WARNING */
-.dispo-warn{display:none;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px 12px;font-size:11px;color:var(--red);font-weight:600;margin-top:8px;}
 </style>
 </head>
 <body>
 
-<div class="toast-bar" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-<!-- ═══════════ HOME ═══════════ -->
-<div id="s-home" class="active">
+<!-- ══════════════════════════════
+     PAGE HOME
+══════════════════════════════ -->
+<div class="page on" id="p-home">
 
-    <!-- HERO FULL -->
-    <div style="background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden;">
+  <!-- NAV -->
+  <div class="hbar">
+    <div class="hinner">
+      <div class="hico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+      <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Service Privé</div></div>
+      <button class="hadmin" onclick="go('p-login')">Admin</button>
+    </div>
+  </div>
 
-      <!-- Cercles déco -->
-      <div style="position:absolute;top:-80px;right:-60px;width:260px;height:260px;border-radius:50%;border:1px solid rgba(255,255,255,.04);"></div>
-      <div style="position:absolute;top:-40px;right:-20px;width:160px;height:160px;border-radius:50%;border:1px solid rgba(255,255,255,.06);"></div>
-      <div style="position:absolute;bottom:120px;left:-80px;width:200px;height:200px;border-radius:50%;border:1px solid rgba(255,255,255,.04);"></div>
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-pre">Chauffeur Privé VTC · Marseille</div>
+    <div class="hero-title">Votre confort,<br><em>notre priorité.</em></div>
+    <div class="hero-sub">Transferts premium vers les gares, aéroports et toutes destinations. Disponible 24h/24, 7j/7.</div>
+    <button class="hero-btn" onclick="go('p-booking')">Réserver maintenant</button>
+  </div>
 
-      <!-- TOP NAV -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 0;position:relative;z-index:2;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:34px;height:34px;background:var(--blue2);border-radius:9px;display:flex;align-items:center;justify-content:center;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" width="18" height="18"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-          </div>
-          <div>
-            <div style="font-family:var(--font-title);font-size:16px;color:#fff;font-weight:700;letter-spacing:.5px;line-height:1;">YAN TRANSPORT</div>
-            <div style="font-size:8px;color:var(--blue4);letter-spacing:3px;font-weight:500;text-transform:uppercase;margin-top:1px;">Marseille · Service Privé</div>
-          </div>
-        </div>
-        <button onclick="go('s-login')" style="padding:7px 14px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);background:transparent;font-family:var(--font-body);">Admin</button>
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-s"><div class="stat-sn">24/7</div><div class="stat-sl">Disponible</div></div>
+    <div class="stat-s"><div class="stat-sn">2</div><div class="stat-sl">Gammes</div></div>
+    <div class="stat-s"><div class="stat-sn">0€</div><div class="stat-sl">Frais cachés</div></div>
+  </div>
+
+  <!-- CONTENU -->
+  <div style="padding:24px 18px;">
+
+    <!-- VÉHICULES -->
+    <div class="sec">Nos véhicules</div>
+    <div style="display:flex;gap:12px;margin-bottom:24px;">
+      <div class="vcard-h" onclick="go('p-booking')">
+        <div class="vcard-h-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="20" height="20"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Berline</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">Jusqu'à 4 passagers<br>Confort premium</div>
+        <div style="margin-top:11px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;">Réserver →</div>
       </div>
-
-      <!-- HERO CONTENT -->
-      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 24px 30px;position:relative;z-index:2;">
-        <div style="font-size:9px;letter-spacing:5px;color:var(--blue3);text-transform:uppercase;font-weight:600;margin-bottom:14px;">Chauffeur Privé VTC</div>
-        <div style="font-family:var(--font-title);font-size:44px;color:#fff;font-weight:700;line-height:1.05;margin-bottom:16px;">Votre<br>confort,<br><span style="color:var(--blue3);">notre priorité.</span></div>
-        <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.9;margin-bottom:32px;font-weight:300;max-width:280px;">Transferts premium vers les gares, aéroports et toutes destinations. Disponible 24h/24, 7j/7.</div>
-        <button onclick="go('s-booking')" style="display:block;background:var(--blue2);color:#fff;border:none;padding:18px 24px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:14px;font-family:var(--font-body);width:100%;">Réserver maintenant</button>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:center;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2" width="14" height="14"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.02z"/></svg>
-          <div style="font-size:11px;color:rgba(255,255,255,.35);font-weight:400;">+33 6 00 00 00 00</div>
-        </div>
-      </div>
-
-      <!-- STATS STRIP -->
-      <div style="display:flex;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:2;">
-        <div style="flex:1;padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.07);">
-          <div style="font-family:var(--font-title);font-size:24px;color:#fff;font-weight:700;">24/7</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Disponible</div>
-        </div>
-        <div style="flex:1;padding:16px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.07);">
-          <div style="font-family:var(--font-title);font-size:24px;color:#fff;font-weight:700;">2</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Gammes</div>
-        </div>
-        <div style="flex:1;padding:16px 12px;text-align:center;">
-          <div style="font-family:var(--font-title);font-size:24px;color:#fff;font-weight:700;">0€</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Frais cachés</div>
-        </div>
+      <div class="vcard-h" onclick="go('p-booking')">
+        <div class="vcard-h-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="20" height="20"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Van</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">Jusqu'à 8 passagers<br>Grand volume</div>
+        <div style="margin-top:11px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;">Réserver →</div>
       </div>
     </div>
 
-    <!-- SERVICES -->
-    <div style="background:#f0f4fb;padding:28px 20px;">
-      <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:18px;">Nos véhicules</div>
-      <div style="display:flex;gap:12px;margin-bottom:24px;">
-        <div style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px 14px;cursor:pointer;" onclick="go('s-booking')">
-          <div style="width:44px;height:44px;background:var(--ice);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="22" height="22"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-          </div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Berline</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.6;">Jusqu'à 4 passagers<br>Confort premium</div>
-          <div style="margin-top:12px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;">Réserver →</div>
-        </div>
-        <div style="flex:1;background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:18px 14px;cursor:pointer;" onclick="go('s-booking')">
-          <div style="width:44px;height:44px;background:var(--ice);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="22" height="22"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-          </div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Van</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.6;">Jusqu'à 8 passagers<br>Grand volume</div>
-          <div style="margin-top:12px;font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:1px;text-transform:uppercase;">Réserver →</div>
-        </div>
-      </div>
-
-      <!-- SERVICES LIST -->
-      <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:14px;">Nos prestations</div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--off);">
-          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);">Transfert aéroport</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:1px;">MRS · Nice · Lyon · Paris</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--off);">
-          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);">Transfert gare</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:1px;">Saint-Charles · Aix TGV</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--off);">
-          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);">Groupe & événements</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:1px;">Mariages · Séminaires · Soirées</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:14px;padding:16px;">
-          <div style="width:36px;height:36px;background:var(--ice);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);">Mise à disposition</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:1px;">À l'heure · À la journée</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- POURQUOI NOUS -->
-      <div style="font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:600;margin-bottom:14px;">Pourquoi nous choisir</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
-        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-size:20px;margin-bottom:8px;">✓</div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Prix fixe</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Connu avant la course, sans surprise</div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-size:20px;margin-bottom:8px;">⏱</div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Ponctualité</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Chauffeur toujours à l'heure</div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-size:20px;margin-bottom:8px;">🔒</div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Sécurité</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Chauffeurs professionnels certifiés</div>
-        </div>
-        <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;">
-          <div style="font-size:20px;margin-bottom:8px;">💬</div>
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px;">Suivi</div>
-          <div style="font-size:10px;color:var(--muted);line-height:1.6;">Confirmation par e-mail immédiate</div>
-        </div>
-      </div>
-
-      <!-- CTA BAS -->
-      <div style="background:var(--navy);border-radius:18px;padding:24px;text-align:center;margin-bottom:20px;">
-        <div style="font-family:var(--font-title);font-size:22px;color:#fff;font-weight:700;margin-bottom:8px;">Prêt à partir ?</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.7;">Réservez en 2 minutes.<br>Confirmation immédiate par e-mail.</div>
-        <button onclick="go('s-booking')" style="display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--font-body);">Réserver ma course</button>
-        <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,.3);">+33 6 00 00 00 00 · contact@yantransport.fr</div>
-      </div>
-
+    <!-- PRESTATIONS -->
+    <div class="sec">Nos prestations</div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:22px;">
+      <div class="svc-row"><div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="16" height="16"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div><div style="font-size:13px;font-weight:600;">Transfert aéroport</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">MRS · Nice · Lyon · Paris</div></div></div>
+      <div class="svc-row"><div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="16" height="16"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div><div><div style="font-size:13px;font-weight:600;">Transfert gare</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">Saint-Charles · Aix TGV</div></div></div>
+      <div class="svc-row"><div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div><div><div style="font-size:13px;font-weight:600;">Groupe & événements</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">Mariages · Séminaires · Soirées</div></div></div>
+      <div class="svc-row"><div class="svc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:13px;font-weight:600;">Mise à disposition</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">À l'heure · À la journée</div></div></div>
     </div>
+
+    <!-- POURQUOI NOUS -->
+    <div class="sec">Pourquoi nous choisir</div>
+    <div class="why-g">
+      <div class="why-c"><div style="font-size:18px;margin-bottom:7px;">✓</div><div style="font-size:12px;font-weight:700;margin-bottom:3px;">Prix fixe</div><div style="font-size:10px;color:var(--muted);line-height:1.6;">Connu avant la course, sans surprise</div></div>
+      <div class="why-c"><div style="font-size:18px;margin-bottom:7px;">⏱</div><div style="font-size:12px;font-weight:700;margin-bottom:3px;">Ponctualité</div><div style="font-size:10px;color:var(--muted);line-height:1.6;">Chauffeur toujours à l'heure</div></div>
+      <div class="why-c"><div style="font-size:18px;margin-bottom:7px;">🔒</div><div style="font-size:12px;font-weight:700;margin-bottom:3px;">Sécurité</div><div style="font-size:10px;color:var(--muted);line-height:1.6;">Chauffeurs professionnels certifiés</div></div>
+      <div class="why-c"><div style="font-size:18px;margin-bottom:7px;">💬</div><div style="font-size:12px;font-weight:700;margin-bottom:3px;">Suivi</div><div style="font-size:10px;color:var(--muted);line-height:1.6;">Confirmation e-mail immédiate</div></div>
+    </div>
+
+    <!-- CTA BAS -->
+    <div class="cta-bot">
+      <div style="font-family:var(--ft);font-size:22px;color:#fff;font-weight:700;margin-bottom:8px;">Prêt à partir ?</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.7;">Réservez en 2 minutes.<br>Confirmation immédiate par e-mail.</div>
+      <button onclick="go('p-booking')" style="display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);">Réserver ma course</button>
+      <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.3);">+33 6 00 00 00 00 · contact@yantransport.fr</div>
+    </div>
+
+  </div>
 </div>
 
-<!-- ═══════════ BOOKING ═══════════ -->
-<div class="screen" id="s-booking">
+<!-- ══════════════════════════════
+     PAGE BOOKING
+══════════════════════════════ -->
+<div class="page flex" id="p-booking">
   <div class="topbar">
-    <button class="tb-back" onclick="go('s-home')">← Retour</button>
+    <button class="tb-back" onclick="go('p-home')">← Retour</button>
     <span class="tb-title">Réservation</span>
     <span style="width:50px"></span>
   </div>
   <div class="sbody">
-    <div class="fsec-ttl">Trajet</div>
-    <div class="fcard">
+    <div class="fsec">Trajet</div>
+    <div class="card">
       <div class="field"><label>Prise en charge *</label><input type="text" id="f-pickup" placeholder="Adresse, gare, aéroport..."></div>
       <div class="field"><label>Lieu de dépose *</label><input type="text" id="f-dropoff" placeholder="Destination..."></div>
       <div class="frow">
         <div class="field"><label>Date *</label><input type="date" id="f-date" onchange="checkDispo()"></div>
         <div class="field"><label>Heure *</label><input type="time" id="f-time"></div>
       </div>
-      <div class="dispo-warn" id="dispo-warn">Cette date est indisponible. Veuillez choisir une autre date ou nous contacter.</div>
+      <div class="dispo-warn" id="dispo-warn">Cette date est indisponible. Contactez-nous.</div>
     </div>
 
-    <div class="fsec-ttl">Véhicule</div>
+    <div class="fsec">Véhicule</div>
     <div class="vf-grid">
-      <div class="vf-opt sel" id="vf-b" onclick="selVeh('berline')">
-        <span class="vf-ico">🚗</span>
-        <div class="vf-nm">Berline</div>
-        <div class="vf-rt" id="vfr-b">1.80 €/km</div>
-      </div>
-      <div class="vf-opt" id="vf-v" onclick="selVeh('van')">
-        <span class="vf-ico">🚐</span>
-        <div class="vf-nm">Van</div>
-        <div class="vf-rt" id="vfr-v">2.50 €/km</div>
-      </div>
+      <div class="vf-opt sel" id="vf-b" onclick="selVeh('berline')"><span class="vf-ico">🚗</span><div class="vf-nm">Berline</div><div style="font-size:10px;margin-top:3px;">1–4 pax</div></div>
+      <div class="vf-opt" id="vf-v" onclick="selVeh('van')"><span class="vf-ico">🚐</span><div class="vf-nm">Van</div><div style="font-size:10px;margin-top:3px;">1–8 pax</div></div>
     </div>
 
-    <div class="fsec-ttl">Distance & estimation</div>
-    <div class="fcard">
-      <div class="field"><label>Distance (km) — calculée auto avec Google Maps *</label><input type="number" id="f-km" placeholder="Entrez les adresses ci-dessus" min="1" oninput="calcP()" readonly></div>
-      <div class="field"><label>Supplément nuit (22h–6h)</label>
-        <select id="f-night" onchange="calcP()"><option value="0">Non — tarif standard</option><option value="1">Oui — supplément nuit</option></select>
+    <div class="fsec">Distance & prix</div>
+    <div class="card">
+      <div class="field"><label>Distance (km) — auto via Google Maps</label><input type="number" id="f-km" placeholder="Renseignez les adresses ci-dessus" min="1" oninput="calcP()" readonly></div>
+      <div class="field"><label>Heure de nuit (22h–6h)</label>
+        <select id="f-night" onchange="calcP()"><option value="0">Non — tarif standard</option><option value="1">Oui</option></select>
       </div>
       <div id="pp-wrap" style="display:none">
-        <div class="price-preview">
-          <div class="pp-lbl">Prix de votre course</div>
-          <div class="pp-amt"><span id="pp-amt">0</span><span class="pp-unit">€</span></div>
-          <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:10px;text-align:center;letter-spacing:.5px;">Prix fixe tout compris · Confirmé à la réservation</div>
+        <div class="price-box">
+          <div class="price-box-lbl">Prix de votre course</div>
+          <div class="price-box-amt"><span id="pp-amt">0</span> €</div>
+          <div class="price-box-sub">Prix fixe tout compris · Confirmé à la réservation</div>
         </div>
       </div>
     </div>
 
-    <div class="fsec-ttl">Passagers & bagages</div>
-    <div class="fcard">
+    <div class="fsec">Passagers & bagages</div>
+    <div class="card">
       <div class="frow">
-        <div class="field"><label>Passagers *</label>
-          <select id="f-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select>
-        </div>
-        <div class="field"><label>Valises</label>
-          <select id="f-bags"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
-        </div>
+        <div class="field"><label>Passagers *</label><select id="f-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+        <div class="field"><label>Valises</label><select id="f-bags"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
       </div>
     </div>
 
-    <div class="fsec-ttl">Vol / Train (optionnel)</div>
-    <div class="fcard">
+    <div class="fsec">Vol / Train (optionnel)</div>
+    <div class="card">
       <div class="frow">
         <div class="field"><label>N° de vol</label><input type="text" id="f-flight" placeholder="AF1234" oninput="calcP()"></div>
         <div class="field"><label>N° de train</label><input type="text" id="f-train" placeholder="TGV 6201" oninput="calcP()"></div>
       </div>
-      <div class="field"><label>Message (optionnel)</label><textarea id="f-msg" placeholder="Siège bébé, heure exacte d'atterrissage..."></textarea></div>
+      <div class="field"><label>Message (optionnel)</label><textarea id="f-msg" placeholder="Siège bébé, infos supplémentaires..."></textarea></div>
     </div>
 
-    <div class="fsec-ttl">Vos coordonnées</div>
-    <div class="fcard">
+    <div class="fsec">Vos coordonnées</div>
+    <div class="card">
       <div class="frow">
         <div class="field"><label>Prénom *</label><input type="text" id="f-first" placeholder="Prénom"></div>
         <div class="field"><label>Nom *</label><input type="text" id="f-last" placeholder="Nom"></div>
@@ -502,316 +335,270 @@ body{background:#f0f4fb;font-family:var(--font-body);max-width:430px;margin:0 au
       <div class="field"><label>E-mail *</label><input type="email" id="f-email" placeholder="vous@email.fr"></div>
     </div>
 
-    <div class="cancel-policy">
-      <strong>Annulation :</strong> Gratuite -24h · 50% entre 24h–2h · 100% moins de 2h ou no-show.
-    </div>
+    <div class="cancel-pol"><strong>Annulation :</strong> Gratuite jusqu'à 24h · 50% entre 24h–2h · 100% moins de 2h ou no-show.</div>
 
-    <div class="cgv-check">
+    <div class="cgv-wrap">
       <input type="checkbox" id="cgv-chk">
-      <label for="cgv-chk">J'accepte les <a onclick="go('s-cgv')">Conditions Générales de Vente</a> et la <a onclick="go('s-rgpd')">Politique de confidentialité</a>. *</label>
+      <label for="cgv-chk">J'accepte les <span class="cgv-lnk" onclick="go('p-cgv')">CGV</span> et la <span class="cgv-lnk" onclick="go('p-rgpd')">Politique de confidentialité</span>. *</label>
     </div>
 
-    <button class="btn-primary" id="submit-btn" onclick="submitBooking()" style="margin-top:20px;padding:18px;">Confirmer la réservation</button>
-    <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:12px;margin-bottom:40px;">Confirmation par e-mail immédiate</div>
+    <button class="btn-p" id="submit-btn" onclick="submitBooking()" style="margin-top:16px;padding:18px;">Confirmer la réservation</button>
+    <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:12px;padding-bottom:20px;">Confirmation par e-mail immédiate</div>
   </div>
 </div>
 
-<!-- ═══════════ SUCCESS ═══════════ -->
-<div class="overlay" id="s-success">
-  <div class="succ-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-  <div style="font-family:var(--font-title);font-size:24px;color:var(--navy);font-weight:700;text-align:center;margin-bottom:5px;">Réservation confirmée</div>
-  <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:13px;">Votre chauffeur sera ponctuel.</div>
-  <div class="succ-pill" id="succ-ref">YAN-0000</div>
-  <div class="det-card" id="succ-detail"></div>
-  <div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:16px;">Confirmation envoyée à <strong id="succ-email" style="color:var(--text)"></strong></div>
-  <button class="btn-primary" onclick="go('s-home')">Retour à l'accueil</button>
-  <button class="btn-danger" onclick="cancelLast()">Annuler cette réservation</button>
+<!-- ══════════════════════════════
+     PAGE SUCCESS
+══════════════════════════════ -->
+<div class="page on" id="p-success" style="display:none;align-items:center;justify-content:center;padding:30px 20px;">
+  <div style="text-align:center;width:100%;">
+    <div class="succ-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div style="font-family:var(--ft);font-size:24px;color:var(--navy);font-weight:700;margin-bottom:5px;">Réservation confirmée</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:13px;">Votre chauffeur sera ponctuel.</div>
+    <div class="succ-pill" id="succ-ref">YAN-0000</div>
+    <div class="det-card" id="succ-detail" style="margin-top:16px;"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Confirmation envoyée à <strong id="succ-email" style="color:var(--text)"></strong></div>
+    <button class="btn-p" onclick="go('p-home')">Retour à l'accueil</button>
+    <button class="btn-d" onclick="cancelLast()">Annuler cette réservation</button>
+  </div>
 </div>
 
-<!-- ═══════════ CGV ═══════════ -->
-<div class="screen" id="s-cgv">
-  <div class="topbar">
-    <button class="tb-back" onclick="go('s-booking')">← Retour</button>
-    <span class="tb-title">Conditions Générales</span>
-    <span style="width:50px"></span>
-  </div>
+<!-- ══════════════════════════════
+     PAGE CGV
+══════════════════════════════ -->
+<div class="page flex" id="p-cgv">
+  <div class="topbar"><button class="tb-back" onclick="go('p-booking')">← Retour</button><span class="tb-title">Conditions Générales</span><span style="width:50px"></span></div>
   <div class="sbody">
-    <div class="cgv-art">1. Objet</div>
-    <div class="cgv-p">Les présentes CGV régissent les conditions de réservation des services de transport avec chauffeur de Yan Transport, exploitant VTC basé à Marseille.</div>
-    <div class="cgv-art">2. Réservation</div>
-    <div class="cgv-p">Toute réservation constitue un contrat ferme dès confirmation par e-mail. Le client s'engage à fournir des informations exactes.</div>
-    <div class="cgv-art">3. Tarification</div>
-    <div class="cgv-p">Prix = Prise en charge fixe + (Distance km × Prix/km) + Suppléments éventuels. Les prix sont TTC.</div>
-    <div class="cgv-art">4. Annulation & no-show</div>
-    <div class="cgv-p">— Annulation gratuite jusqu'à 24h avant la course.<br>— Entre 24h et 2h avant : 50% du montant dû.<br>— Moins de 2h ou absence du client : 100% du montant dû.<br>— Annulation par Yan Transport : remboursement intégral.</div>
-    <div class="cgv-art">5. Responsabilité</div>
-    <div class="cgv-p">Yan Transport s'engage à respecter les horaires dans la limite des aléas de circulation. En cas de retard imprévisible, notre responsabilité ne pourra être engagée.</div>
-    <div class="cgv-art">6. Données personnelles</div>
-    <div class="cgv-p">Les données collectées sont utilisées exclusivement pour l'exécution de la prestation. Conformément au RGPD, vous disposez d'un droit d'accès, rectification et suppression. Contact : contact@yantransport.fr</div>
-    <button class="btn-primary" onclick="go('s-booking')">Retour au formulaire</button>
+    <div class="cgv-art">1. Objet</div><div class="cgv-p">Les présentes CGV régissent les conditions de réservation des services de transport avec chauffeur de Yan Transport, VTC basé à Marseille.</div>
+    <div class="cgv-art">2. Réservation</div><div class="cgv-p">Toute réservation constitue un contrat ferme dès confirmation par e-mail. Le client s'engage à fournir des informations exactes.</div>
+    <div class="cgv-art">3. Tarification</div><div class="cgv-p">Le prix est calculé selon la distance réelle et la gamme choisie. Le prix total est affiché avant confirmation. Les prix sont TTC.</div>
+    <div class="cgv-art">4. Annulation & no-show</div><div class="cgv-p">— Annulation gratuite jusqu'à 24h avant.<br>— Entre 24h et 2h : 50% du montant dû.<br>— Moins de 2h ou absence : 100% du montant dû.<br>— Annulation par Yan Transport : remboursement intégral.</div>
+    <div class="cgv-art">5. Responsabilité</div><div class="cgv-p">Yan Transport s'engage à respecter les horaires dans la limite des aléas de circulation. En cas de retard imprévisible, notre responsabilité ne pourra être engagée.</div>
+    <div class="cgv-art">6. Données personnelles</div><div class="cgv-p">Les données collectées sont utilisées exclusivement pour la prestation. Conformément au RGPD, vous disposez d'un droit d'accès, rectification et suppression. Contact : contact@yantransport.fr</div>
+    <button class="btn-p" onclick="go('p-booking')" style="margin-top:16px;">Retour au formulaire</button>
   </div>
 </div>
 
-<!-- ═══════════ RGPD ═══════════ -->
-<div class="screen" id="s-rgpd">
-  <div class="topbar">
-    <button class="tb-back" onclick="go('s-booking')">← Retour</button>
-    <span class="tb-title">Confidentialité & RGPD</span>
-    <span style="width:50px"></span>
-  </div>
+<!-- ══════════════════════════════
+     PAGE RGPD
+══════════════════════════════ -->
+<div class="page flex" id="p-rgpd">
+  <div class="topbar"><button class="tb-back" onclick="go('p-booking')">← Retour</button><span class="tb-title">Confidentialité & RGPD</span><span style="width:50px"></span></div>
   <div class="sbody">
-    <div class="cgv-art">Responsable du traitement</div>
-    <div class="cgv-p">Yan Transport · contact@yantransport.fr · Marseille, France.</div>
-    <div class="cgv-art">Données collectées</div>
-    <div class="cgv-p">Nom, prénom, e-mail, téléphone, adresses de prise en charge et dépose. Nécessaires à l'exécution de votre réservation.</div>
-    <div class="cgv-art">Durée de conservation</div>
-    <div class="cgv-p">3 ans à compter de votre dernière réservation, conformément aux obligations légales.</div>
-    <div class="cgv-art">Vos droits</div>
-    <div class="cgv-p">Accès, rectification, suppression, portabilité, opposition. Demande à : contact@yantransport.fr. Réclamation possible auprès de la CNIL (cnil.fr).</div>
-    <div class="cgv-art">Partage des données</div>
-    <div class="cgv-p">Aucune donnée n'est vendue. Les chauffeurs reçoivent uniquement le nom, téléphone et adresses nécessaires à la course.</div>
-    <button class="btn-primary" onclick="go('s-booking')">Retour au formulaire</button>
+    <div class="cgv-art">Responsable du traitement</div><div class="cgv-p">Yan Transport · contact@yantransport.fr · Marseille, France.</div>
+    <div class="cgv-art">Données collectées</div><div class="cgv-p">Nom, prénom, e-mail, téléphone, adresses. Nécessaires à l'exécution de la réservation.</div>
+    <div class="cgv-art">Durée de conservation</div><div class="cgv-p">3 ans à compter de la dernière réservation, conformément aux obligations légales.</div>
+    <div class="cgv-art">Vos droits</div><div class="cgv-p">Accès, rectification, suppression, portabilité, opposition. Demande à : contact@yantransport.fr. Réclamation possible auprès de la CNIL (cnil.fr).</div>
+    <div class="cgv-art">Partage des données</div><div class="cgv-p">Aucune donnée n'est vendue. Les chauffeurs reçoivent uniquement les informations nécessaires à la course.</div>
+    <button class="btn-p" onclick="go('p-booking')" style="margin-top:16px;">Retour au formulaire</button>
   </div>
 </div>
 
-<!-- ═══════════ LOGIN ═══════════ -->
-<div class="overlay" id="s-login">
+<!-- ══════════════════════════════
+     PAGE LOGIN
+══════════════════════════════ -->
+<div class="page" id="p-login" style="display:none;align-items:center;justify-content:center;padding:30px 20px;">
   <div class="login-card">
     <div class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#90caf9" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-    <div class="login-ttl">Administration</div>
-    <div class="login-sub">Yan Transport — accès sécurisé</div>
+    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Administration</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:18px;">Yan Transport — accès sécurisé</div>
     <div class="field"><label>Identifiant</label><input type="text" id="al-u" placeholder="admin"></div>
     <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="al-p" placeholder="••••••"></div>
-    <button class="btn-primary" onclick="adminLogin()">Se connecter</button>
-    <button class="btn-outline" onclick="go('s-home')">← Interface client</button>
+    <button class="btn-p" onclick="adminLogin()">Se connecter</button>
+    <button class="btn-o" onclick="go('p-home')">← Interface client</button>
   </div>
 </div>
 
-<!-- ═══════════ ADMIN ═══════════ -->
-<div class="screen" id="s-admin">
+<!-- ══════════════════════════════
+     PAGE ADMIN
+══════════════════════════════ -->
+<div class="page flex" id="p-admin">
   <div class="hbar">
     <div class="hinner">
-      <div class="hlogo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
-      <div><div class="hlogo-text">YAN TRANSPORT</div><div class="hlogo-sub">Administration</div></div>
-      <div class="hright"><button class="hbtn" onclick="go('s-driver')">Chauffeur</button><button class="hbtn" onclick="go('s-home')">Client</button></div>
+      <div class="hico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+      <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Administration</div></div>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="hadmin" onclick="go('p-driver')">Chauffeur</button>
+        <button class="hadmin" onclick="go('p-home')">Client</button>
+      </div>
     </div>
   </div>
   <div class="atabs">
-    <button class="atab active" id="tab-courses" onclick="aTab('courses')">Courses</button>
-    <button class="atab" id="tab-tarifs" onclick="aTab('tarifs')">Tarifs</button>
-    <button class="atab" id="tab-dispos" onclick="aTab('dispos')">Dispos</button>
-    <button class="atab" id="tab-rapport" onclick="aTab('rapport')">Rapport</button>
-    <button class="atab" id="tab-equipe" onclick="aTab('equipe')">Équipe</button>
+    <button class="atab on" id="tab-c" onclick="aTab('c')">Courses</button>
+    <button class="atab" id="tab-t" onclick="aTab('t')">Tarifs</button>
+    <button class="atab" id="tab-d" onclick="aTab('d')">Dispos</button>
+    <button class="atab" id="tab-r" onclick="aTab('r')">Rapport</button>
+    <button class="atab" id="tab-e" onclick="aTab('e')">Équipe</button>
   </div>
+  <div style="flex:1;overflow-y:auto;">
 
-  <!-- COURSES -->
-  <div id="panel-courses" class="sbody">
-    <div class="stats-g">
-      <div class="stat-box"><div class="stat-num" id="st-tot">—</div><div class="stat-lbl">Total courses</div></div>
-      <div class="stat-box"><div class="stat-num" id="st-new" style="color:var(--blue2)">—</div><div class="stat-lbl">En attente</div></div>
-      <div class="stat-box"><div class="stat-num" id="st-act" style="color:var(--orange)">—</div><div class="stat-lbl">En cours</div></div>
-      <div class="stat-box"><div class="stat-num" id="st-rev" style="color:var(--green);font-size:18px">—</div><div class="stat-lbl">CA terminées</div></div>
-    </div>
-    <div class="sec-lbl">Toutes les courses</div>
-    <div id="rides-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
-  </div>
-
-  <!-- TARIFS -->
-  <div id="panel-tarifs" class="sbody" style="display:none">
-    <div class="info-box">Formule : <strong>Prise en charge + (km × Prix/km) + Suppléments</strong></div>
-    <div class="sec-lbl">Prise en charge fixe</div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline<div class="prow-sub">Forfait de départ</div></div><input type="number" class="pinput" id="p-pb" value="8" min="0" step="0.5"><span class="punit">€ fixe</span></div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van<div class="prow-sub">Forfait de départ</div></div><input type="number" class="pinput" id="p-pv" value="12" min="0" step="0.5"><span class="punit">€ fixe</span></div>
-    <div class="sec-lbl" style="margin-top:14px">Prix au kilomètre</div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline<div class="prow-sub">Tarif kilométrique</div></div><input type="number" class="pinput" id="p-kb" value="1.80" min="0" step="0.05"><span class="punit">€/km</span></div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van<div class="prow-sub">Tarif kilométrique</div></div><input type="number" class="pinput" id="p-kv" value="2.50" min="0" step="0.05"><span class="punit">€/km</span></div>
-    <div class="sec-lbl" style="margin-top:14px">Suppléments</div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg></div><div class="prow-lbl">Nuit (22h–6h)<div class="prow-sub">Toutes gammes</div></div><input type="number" class="pinput" id="p-n" value="10" min="0"><span class="punit">€ fixe</span></div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div class="prow-lbl">Aéroport<div class="prow-sub">Accès terminal</div></div><input type="number" class="pinput" id="p-a" value="5" min="0"><span class="punit">€ fixe</span></div>
-    <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" width="15" height="15"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div><div class="prow-lbl">Gare<div class="prow-sub">Accès quai</div></div><input type="number" class="pinput" id="p-g" value="3" min="0"><span class="punit">€ fixe</span></div>
-    <div class="sim-box" style="margin-top:16px">
-      <div class="sim-ttl">Simulateur</div>
-      <div class="sim-fields">
-        <div class="sim-f"><label>Gamme</label><select id="sim-v" onchange="simulate()"><option value="berline">Berline</option><option value="van">Van</option></select></div>
-        <div class="sim-f"><label>Distance km</label><input type="number" id="sim-km" value="20" min="1" oninput="simulate()"></div>
+    <!-- COURSES -->
+    <div id="pan-c" style="padding:16px;">
+      <div class="stats-g">
+        <div class="stat-b"><div class="stat-bn" id="st-tot">—</div><div class="stat-bl">Total</div></div>
+        <div class="stat-b"><div class="stat-bn" id="st-new" style="color:var(--blue2)">—</div><div class="stat-bl">En attente</div></div>
+        <div class="stat-b"><div class="stat-bn" id="st-act" style="color:var(--orange)">—</div><div class="stat-bl">En cours</div></div>
+        <div class="stat-b"><div class="stat-bn" id="st-rev" style="color:var(--green);font-size:18px">—</div><div class="stat-bl">CA terminées</div></div>
       </div>
-      <div class="sim-fields">
-        <div class="sim-f"><label>Nuit</label><select id="sim-n" onchange="simulate()"><option value="0">Non</option><option value="1">Oui</option></select></div>
-        <div class="sim-f"><label>Aéroport</label><select id="sim-a" onchange="simulate()"><option value="0">Non</option><option value="1">Oui</option></select></div>
+      <div class="sec">Toutes les courses</div>
+      <div id="rides-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+    </div>
+
+    <!-- TARIFS -->
+    <div id="pan-t" style="display:none;padding:16px;">
+      <div class="info">Formule : <strong>Prise en charge + (km × Prix/km) + Suppléments</strong></div>
+      <div class="sec">Prise en charge fixe</div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline<div class="prow-sub">Forfait départ</div></div><input type="number" class="pinput" id="p-pb" value="8" min="0" step="0.5"><span class="punit">€</span></div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van<div class="prow-sub">Forfait départ</div></div><input type="number" class="pinput" id="p-pv" value="12" min="0" step="0.5"><span class="punit">€</span></div>
+      <div class="sec" style="margin-top:14px">Prix au kilomètre</div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline<div class="prow-sub">Tarif km</div></div><input type="number" class="pinput" id="p-kb" value="1.80" min="0" step="0.05"><span class="punit">€/km</span></div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van<div class="prow-sub">Tarif km</div></div><input type="number" class="pinput" id="p-kv" value="2.50" min="0" step="0.05"><span class="punit">€/km</span></div>
+      <div class="sec" style="margin-top:14px">Suppléments</div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg></div><div class="prow-lbl">Nuit (22h–6h)<div class="prow-sub">Toutes gammes</div></div><input type="number" class="pinput" id="p-n" value="10" min="0"><span class="punit">€</span></div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div class="prow-lbl">Aéroport<div class="prow-sub">Accès terminal</div></div><input type="number" class="pinput" id="p-a" value="5" min="0"><span class="punit">€</span></div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M3 12h18M3 6h18M3 18h18"/></svg></div><div class="prow-lbl">Gare<div class="prow-sub">Accès quai</div></div><input type="number" class="pinput" id="p-g" value="3" min="0"><span class="punit">€</span></div>
+      <div class="sim-box" style="margin-top:16px">
+        <div class="sim-ttl">Simulateur</div>
+        <div class="sim-fields"><div class="sim-f"><label>Gamme</label><select id="sim-v" onchange="simulate()"><option value="berline">Berline</option><option value="van">Van</option></select></div><div class="sim-f"><label>Km</label><input type="number" id="sim-km" value="20" min="1" oninput="simulate()"></div></div>
+        <div class="sim-fields"><div class="sim-f"><label>Nuit</label><select id="sim-n" onchange="simulate()"><option value="0">Non</option><option value="1">Oui</option></select></div><div class="sim-f"><label>Aéroport</label><select id="sim-a" onchange="simulate()"><option value="0">Non</option><option value="1">Oui</option></select></div></div>
+        <div class="sim-res"><div class="sim-tot" id="sim-tot">—</div><div class="sim-bd" id="sim-bd"></div></div>
       </div>
-      <div class="sim-res"><div class="sim-total" id="sim-tot">—</div><div class="sim-bd" id="sim-bd"></div></div>
+      <button class="btn-p" onclick="savePrices()">Sauvegarder les tarifs</button>
     </div>
-    <button class="btn-primary" onclick="savePrices()">Sauvegarder les tarifs</button>
-  </div>
 
-  <!-- DISPOS -->
-  <div id="panel-dispos" class="sbody" style="display:none">
-    <div class="info-box">Cliquez sur un jour pour le bloquer. Les clients verront une alerte si ils choisissent cette date.</div>
-    <div class="sec-lbl">Avril 2026</div>
-    <div style="display:flex;gap:10px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:3px;background:#fff;border:1px solid var(--border)"></div>Disponible</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:3px;background:var(--red-bg);border:1px solid #ffcdd2"></div>Indisponible</div>
+    <!-- DISPOS -->
+    <div id="pan-d" style="display:none;padding:16px;">
+      <div class="info">Cliquez sur un jour pour le bloquer. Les clients verront une alerte.</div>
+      <div class="sec">Avril 2026</div>
+      <div style="display:flex;gap:10px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:3px;background:#fff;border:1px solid var(--border)"></div>Disponible</div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:3px;background:var(--red-bg);border:1px solid #ffcdd2"></div>Indisponible</div>
+      </div>
+      <div class="dispo-grid" id="dispo-grid"></div>
+      <div class="sec" style="margin-top:8px">Jours bloqués</div>
+      <div id="dispo-list"></div>
     </div>
-    <div class="dispo-grid" id="dispo-grid"></div>
-    <div class="sec-lbl" style="margin-top:8px">Jours bloqués</div>
-    <div id="dispo-list"></div>
-  </div>
 
-  <!-- RAPPORT -->
-  <div id="panel-rapport" class="sbody" style="display:none">
-    <div class="stats-g">
-      <div class="stat-box"><div class="stat-num" style="color:var(--green)" id="rep-ca">—</div><div class="stat-lbl">CA ce mois</div></div>
-      <div class="stat-box"><div class="stat-num" id="rep-nb">—</div><div class="stat-lbl">Courses</div></div>
-      <div class="stat-box"><div class="stat-num" id="rep-moy">—</div><div class="stat-lbl">Panier moyen</div></div>
-      <div class="stat-box"><div class="stat-num" id="rep-ns" style="color:var(--red)">—</div><div class="stat-lbl">No-shows</div></div>
+    <!-- RAPPORT -->
+    <div id="pan-r" style="display:none;padding:16px;">
+      <div class="stats-g">
+        <div class="stat-b"><div class="stat-bn" style="color:var(--green)" id="rep-ca">—</div><div class="stat-bl">CA mois</div></div>
+        <div class="stat-b"><div class="stat-bn" id="rep-nb">—</div><div class="stat-bl">Courses</div></div>
+        <div class="stat-b"><div class="stat-bn" id="rep-moy">—</div><div class="stat-bl">Panier moy.</div></div>
+        <div class="stat-b"><div class="stat-bn" id="rep-ns" style="color:var(--red)">—</div><div class="stat-bl">No-shows</div></div>
+      </div>
+      <div class="rep-card"><div class="rep-ttl">CA par chauffeur</div><div id="rep-chauffeurs"></div></div>
+      <div class="rep-card"><div class="rep-ttl">Par gamme</div><div id="rep-gamme"></div></div>
+      <div class="rep-card"><div class="rep-ttl">Annulations & no-shows</div><div id="rep-cancel"></div></div>
+      <div class="rep-card"><div class="rep-ttl">Clients récurrents</div><div id="rep-recurrent"></div></div>
     </div>
-    <div class="report-card">
-      <div class="rep-ttl">CA par chauffeur</div>
-      <div id="rep-chauffeurs"></div>
+
+    <!-- ÉQUIPE -->
+    <div id="pan-e" style="display:none;padding:16px;">
+      <div class="info">Ajoutez vos chauffeurs. Ils apparaîtront dans le dispatch automatiquement.</div>
+      <div class="sec">Ajouter un chauffeur</div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="frow"><div class="field"><label>Prénom *</label><input type="text" id="drv-new-first" placeholder="Prénom"></div><div class="field"><label>Nom *</label><input type="text" id="drv-new-last" placeholder="Nom"></div></div>
+        <div class="frow"><div class="field"><label>Téléphone</label><input type="tel" id="drv-new-phone" placeholder="06 00 00 00 00"></div><div class="field"><label>Véhicule</label><select id="drv-new-type"><option>Berline</option><option>Van</option></select></div></div>
+        <div class="field"><label>E-mail</label><input type="email" id="drv-new-email" placeholder="chauffeur@email.fr"></div>
+        <button class="btn-p" onclick="addDriver()" style="margin-top:12px;">Ajouter le chauffeur</button>
+      </div>
+      <div class="sec">Chauffeurs enregistrés</div>
+      <div id="admin-drivers-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
     </div>
-    <div class="report-card">
-      <div class="rep-ttl">Répartition par gamme</div>
-      <div id="rep-gamme"></div>
-    </div>
-    <div class="report-card">
-      <div class="rep-ttl">Annulations & no-shows</div>
-      <div id="rep-cancel"></div>
-    </div>
-    <div class="report-card">
-      <div class="rep-ttl">Clients récurrents</div>
-      <div id="rep-recurrent"></div>
-    </div>
-  </div>
-  <!-- EQUIPE -->
-  <div id="panel-equipe" class="sbody" style="display:none">
-    <div class="info-box">Ajoutez vos chauffeurs ici. Ils apparaîtront automatiquement dans le dispatch.</div>
-    <div class="sec-lbl">Ajouter un chauffeur</div>
-    <div class="fcard" style="margin-bottom:16px">
-      <div class="frow"><div class="field"><label>Prénom *</label><input type="text" id="drv-new-first" placeholder="Prénom"></div><div class="field"><label>Nom *</label><input type="text" id="drv-new-last" placeholder="Nom"></div></div>
-      <div class="frow"><div class="field"><label>Téléphone</label><input type="tel" id="drv-new-phone" placeholder="06 00 00 00 00"></div><div class="field"><label>Véhicule</label><select id="drv-new-type"><option>Berline</option><option>Van</option></select></div></div>
-      <div class="field"><label>E-mail</label><input type="email" id="drv-new-email" placeholder="chauffeur@email.fr"></div>
-      <button class="btn-primary" onclick="addDriver()" style="margin-top:12px">Ajouter le chauffeur</button>
-    </div>
-    <div class="sec-lbl">Chauffeurs actifs</div>
-    <div id="admin-drivers-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+
   </div>
 </div>
 
-<!-- ═══════════ DRIVER ═══════════ -->
-<div class="screen" id="s-driver">
+<!-- ══════════════════════════════
+     PAGE DRIVER
+══════════════════════════════ -->
+<div class="page flex" id="p-driver">
   <div class="hbar">
     <div class="hinner">
-      <div class="hlogo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <div><div class="hlogo-text">YAN TRANSPORT</div><div class="hlogo-sub">Espace Chauffeur</div></div>
-      <div class="hright"><button class="hbtn" onclick="go('s-admin')">Admin</button></div>
+      <div class="hico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Espace Chauffeur</div></div>
+      <button class="hadmin" onclick="go('p-admin')" style="margin-left:auto;">Admin</button>
     </div>
   </div>
   <div class="sbody">
-    <div class="sec-lbl">Mes courses assignées</div>
+    <div class="sec">Mes courses assignées</div>
     <div id="driver-rides"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
-    <div class="sec-lbl" style="margin-top:18px">Mon véhicule</div>
-    <div class="fcard">
+    <div class="sec" style="margin-top:18px">Mon véhicule</div>
+    <div class="card">
       <div class="field"><label>Marque & modèle</label><input type="text" id="drv-car" placeholder="Mercedes Classe E"></div>
-      <div class="frow">
-        <div class="field"><label>Immatriculation</label><input type="text" id="drv-plate" placeholder="AB-123-CD"></div>
-        <div class="field"><label>Type</label><select id="drv-type"><option>Berline</option><option>Van</option></select></div>
-      </div>
-      <button class="btn-outline" onclick="saveVehicle()">Enregistrer mon véhicule</button>
+      <div class="frow"><div class="field"><label>Immatriculation</label><input type="text" id="drv-plate" placeholder="AB-123-CD"></div><div class="field"><label>Type</label><select id="drv-type"><option>Berline</option><option>Van</option></select></div></div>
+      <button class="btn-o" onclick="saveVehicle()">Enregistrer mon véhicule</button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══ SUPABASE INIT ═══
-const SUPABASE_URL = 'https://kxwsvdmnoyxblkvrlgar.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ── SUPABASE ──
+var sb = supabase.createClient(
+  'https://kxwsvdmnoyxblkvrlgar.supabase.co',
+  'sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu'
+);
 
-// ═══ STATE ═══
+// ── STATE ──
 var T = {pickup:{berline:8,van:12},km:{berline:1.80,van:2.50},night:10,airport:5,gare:3};
 var selVehCur = 'berline';
 var offDates = new Set();
 var lastRef = '';
-var currentDriverEmail = '';
 var ridesCache = [];
-var ADMIN_EMAIL = 'admin@yantransport.fr';
-var ADMIN_PASS = 'YanAdmin2024!';
 
-// ═══ GOOGLE MAPS AUTOCOMPLETE ═══
-function initMaps() {
-  var pickupInput = document.getElementById('f-pickup');
-  var dropoffInput = document.getElementById('f-dropoff');
-  if(!pickupInput || !dropoffInput) return;
-
-  var opts = {componentRestrictions:{country:'fr'}, fields:['geometry','formatted_address']};
-  var pickupAuto = new google.maps.places.Autocomplete(pickupInput, opts);
-  var dropoffAuto = new google.maps.places.Autocomplete(dropoffInput, opts);
-
-  var pickupPlace = null;
-  var dropoffPlace = null;
-
-  pickupAuto.addListener('place_changed', function(){
-    pickupPlace = pickupAuto.getPlace();
-    if(pickupPlace && dropoffPlace) calcDistance(pickupPlace, dropoffPlace);
-  });
-
-  dropoffAuto.addListener('place_changed', function(){
-    dropoffPlace = dropoffAuto.getPlace();
-    if(pickupPlace && dropoffPlace) calcDistance(pickupPlace, dropoffPlace);
-  });
+// ── NAVIGATION ──
+function go(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  var el = document.getElementById(id);
+  el.classList.add('on');
+  el.scrollTop = 0;
 }
 
-function calcDistance(pickup, dropoff) {
-  var svc = new google.maps.DistanceMatrixService();
-  svc.getDistanceMatrix({
-    origins: [pickup.geometry.location],
-    destinations: [dropoff.geometry.location],
-    travelMode: google.maps.TravelMode.DRIVING,
-    unitSystem: google.maps.UnitSystem.METRIC
-  }, function(response, status){
-    if(status === 'OK') {
-      var distM = response.rows[0].elements[0].distance.value;
-      var km = (distM / 1000).toFixed(1);
-      document.getElementById('f-km').value = km;
+// ── GOOGLE MAPS ──
+function initMaps() {
+  var pi = document.getElementById('f-pickup');
+  var di = document.getElementById('f-dropoff');
+  if(!pi || !di) return;
+  var opts = {componentRestrictions:{country:'fr'},fields:['geometry','formatted_address']};
+  var pa = new google.maps.places.Autocomplete(pi, opts);
+  var da = new google.maps.places.Autocomplete(di, opts);
+  var pp = null, dp = null;
+  pa.addListener('place_changed', function(){ pp = pa.getPlace(); if(pp&&dp) calcDist(pp,dp); });
+  da.addListener('place_changed', function(){ dp = da.getPlace(); if(pp&&dp) calcDist(pp,dp); });
+}
+
+function calcDist(p, d) {
+  new google.maps.DistanceMatrixService().getDistanceMatrix({
+    origins:[p.geometry.location], destinations:[d.geometry.location],
+    travelMode:google.maps.TravelMode.DRIVING, unitSystem:google.maps.UnitSystem.METRIC
+  }, function(res, status){
+    if(status==='OK'){
+      document.getElementById('f-km').value = (res.rows[0].elements[0].distance.value/1000).toFixed(1);
       calcP();
     }
   });
 }
 
-// ═══ PRICE CALC ═══
-function calcRide(veh, km, night, hasFlight, hasTrain) {
+// ── PRICE ──
+function calcRide(veh, km, night, fl, tr) {
   var v = veh.toLowerCase();
-  var base = T.pickup[v] || 8;
-  var kc = (T.km[v] || 1.8) * km;
+  var base = T.pickup[v]||8;
+  var kc = (T.km[v]||1.8)*km;
   var s = 0;
-  if(night) s += T.night;
-  if(hasFlight) s += T.airport;
-  if(hasTrain) s += T.gare;
+  if(night) s+=T.night;
+  if(fl) s+=T.airport;
+  if(tr) s+=T.gare;
   return {base:base, kc:kc, s:s, total:base+kc+s};
 }
 
 function calcP() {
   var km = parseFloat(document.getElementById('f-km').value);
-  if(!km || km < 1) { document.getElementById('pp-wrap').style.display='none'; return; }
-  var night = parseInt(document.getElementById('f-night').value);
-  var fl = document.getElementById('f-flight').value;
-  var tr = document.getElementById('f-train').value;
-  var r = calcRide(selVehCur, km, night, !!fl, !!tr);
+  if(!km||km<1){ document.getElementById('pp-wrap').style.display='none'; return; }
+  var r = calcRide(selVehCur, km, parseInt(document.getElementById('f-night').value),
+    document.getElementById('f-flight').value, document.getElementById('f-train').value);
   document.getElementById('pp-wrap').style.display = 'block';
   document.getElementById('pp-amt').textContent = r.total.toFixed(2);
-}
-
-// ═══ NAV ═══
-function go(id) {
-  document.querySelectorAll('.screen,.overlay').forEach(function(e){ e.classList.remove('active'); });
-  var el = document.getElementById(id);
-  el.classList.add('active');
-  if(id === 's-home') { el.scrollTop = 0; }
-}
-
-function homeVeh(v) {
-  document.getElementById('hv-b').classList.toggle('sel', v==='berline');
-  document.getElementById('hv-v').classList.toggle('sel', v==='van');
 }
 
 function selVeh(v) {
@@ -821,436 +608,306 @@ function selVeh(v) {
   calcP();
 }
 
-// ═══ CHECK DISPO ═══
+// ── DISPO CHECK ──
 async function checkDispo() {
   var d = document.getElementById('f-date').value;
   if(!d) return;
-  var warn = document.getElementById('dispo-warn');
   var {data} = await sb.from('unavailable_dates').select('date').eq('date', d);
-  warn.style.display = (data && data.length) ? 'block' : 'none';
+  document.getElementById('dispo-warn').style.display = (data&&data.length)?'block':'none';
 }
 
-// ═══ SUBMIT BOOKING ═══
+// ── SUBMIT ──
 async function submitBooking() {
-  var pickup = document.getElementById('f-pickup').value.trim();
-  var dropoff = document.getElementById('f-dropoff').value.trim();
-  var date = document.getElementById('f-date').value;
-  var time = document.getElementById('f-time').value;
-  var km = parseFloat(document.getElementById('f-km').value);
-  var fn = document.getElementById('f-first').value.trim();
-  var ln = document.getElementById('f-last').value.trim();
-  var ph = document.getElementById('f-phone').value.trim();
-  var em = document.getElementById('f-email').value.trim();
-  var cgv = document.getElementById('cgv-chk').checked;
-
+  var pickup=document.getElementById('f-pickup').value.trim();
+  var dropoff=document.getElementById('f-dropoff').value.trim();
+  var date=document.getElementById('f-date').value;
+  var time=document.getElementById('f-time').value;
+  var km=parseFloat(document.getElementById('f-km').value);
+  var fn=document.getElementById('f-first').value.trim();
+  var ln=document.getElementById('f-last').value.trim();
+  var ph=document.getElementById('f-phone').value.trim();
+  var em=document.getElementById('f-email').value.trim();
+  var cgv=document.getElementById('cgv-chk').checked;
   if(!pickup||!dropoff||!date||!time||!km||!fn||!ln||!ph||!em){ toast('Remplissez tous les champs requis'); return; }
   if(!cgv){ toast('Acceptez les CGV pour continuer'); return; }
-
-  var night = parseInt(document.getElementById('f-night').value);
-  var fl = document.getElementById('f-flight').value.trim();
-  var tr = document.getElementById('f-train').value.trim();
-  var msg = document.getElementById('f-msg').value.trim();
-  var r = calcRide(selVehCur, km, night, !!fl, !!tr);
-
-  var ref = 'YAN-' + Date.now().toString().slice(-6);
-  lastRef = ref;
-
-  var btn = document.getElementById('submit-btn');
-  btn.innerHTML = '<span class="loader"></span>Envoi en cours...';
-  btn.disabled = true;
-
-  var {error} = await sb.from('bookings').insert({
-    ref: ref,
-    pickup: pickup,
-    dropoff: dropoff,
-    date: date,
-    time: time,
-    vehicle: selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1),
-    km: km,
-    pax: parseInt(document.getElementById('f-pax').value),
-    bags: parseInt(document.getElementById('f-bags').value),
-    flight: fl,
-    train: tr,
-    night: !!night,
-    price: r.total,
-    name: fn+' '+ln,
-    phone: ph,
-    email: em,
-    message: msg,
-    status: 'new'
-  });
-
-  btn.innerHTML = 'Confirmer la réservation';
-  btn.disabled = false;
-
+  var night=parseInt(document.getElementById('f-night').value);
+  var fl=document.getElementById('f-flight').value.trim();
+  var tr=document.getElementById('f-train').value.trim();
+  var msg=document.getElementById('f-msg').value.trim();
+  var r=calcRide(selVehCur,km,night,fl,tr);
+  var ref='YAN-'+Date.now().toString().slice(-6);
+  lastRef=ref;
+  var btn=document.getElementById('submit-btn');
+  btn.innerHTML='<span class="loader"></span>Envoi...';
+  btn.disabled=true;
+  var {error}=await sb.from('bookings').insert({ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,vehicle:selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1),km:km,pax:parseInt(document.getElementById('f-pax').value),bags:parseInt(document.getElementById('f-bags').value),flight:fl,train:tr,night:!!night,price:r.total,name:fn+' '+ln,phone:ph,email:em,message:msg,status:'new'});
+  btn.innerHTML='Confirmer la réservation';
+  btn.disabled=false;
   if(error){ toast('Erreur : '+error.message); return; }
-
-  document.getElementById('succ-ref').textContent = ref;
-  document.getElementById('succ-email').textContent = em;
-  document.getElementById('succ-detail').innerHTML =
-    '<div class="dc-row"><span class="dc-k">Prise en charge</span><span class="dc-v">'+pickup+'</span></div>'+
-    '<div class="dc-row"><span class="dc-k">Destination</span><span class="dc-v">'+dropoff+'</span></div>'+
-    '<div class="dc-row"><span class="dc-k">Date & heure</span><span class="dc-v">'+date.split('-').reverse().join('/')+' à '+time+'</span></div>'+
-    '<div class="dc-row"><span class="dc-k">Véhicule</span><span class="dc-v">'+selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1)+' · '+document.getElementById('f-pax').value+' pax</span></div>'+
-    '<div class="dc-row"><span class="dc-k">Distance</span><span class="dc-v">'+km+' km</span></div>'+
-    (fl?'<div class="dc-row"><span class="dc-k">Vol</span><span class="dc-v">'+fl+'</span></div>':'')+
-    (tr?'<div class="dc-row"><span class="dc-k">Train</span><span class="dc-v">'+tr+'</span></div>':'')+
-    '<div class="dc-row"><span class="dc-k">Prix estimé</span><span class="dc-v price-big">'+r.total.toFixed(2)+' €</span></div>';
-  go('s-success');
+  document.getElementById('succ-ref').textContent=ref;
+  document.getElementById('succ-email').textContent=em;
+  document.getElementById('succ-detail').innerHTML=
+    '<div class="dc-r"><span class="dc-k">Prise en charge</span><span>'+pickup+'</span></div>'+
+    '<div class="dc-r"><span class="dc-k">Destination</span><span>'+dropoff+'</span></div>'+
+    '<div class="dc-r"><span class="dc-k">Date & heure</span><span>'+date.split('-').reverse().join('/')+' à '+time+'</span></div>'+
+    '<div class="dc-r"><span class="dc-k">Véhicule</span><span>'+selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1)+' · '+document.getElementById('f-pax').value+' pax</span></div>'+
+    (fl?'<div class="dc-r"><span class="dc-k">Vol</span><span>'+fl+'</span></div>':'')+
+    (tr?'<div class="dc-r"><span class="dc-k">Train</span><span>'+tr+'</span></div>':'')+
+    '<div class="dc-r"><span class="dc-k">Prix total</span><span class="price-big">'+r.total.toFixed(2)+' €</span></div>';
+  go('p-success');
 }
 
 async function cancelLast() {
   if(!lastRef) return;
-  await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par le client immédiatement après réservation'}).eq('ref', lastRef);
+  await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé immédiatement par le client'}).eq('ref',lastRef);
   toast('Réservation annulée');
-  go('s-home');
+  go('p-home');
 }
 
-// ═══ ADMIN LOGIN ═══
+// ── ADMIN LOGIN ──
 async function adminLogin() {
-  var u = document.getElementById('al-u').value.trim();
-  var p = document.getElementById('al-p').value.trim();
-  if(u === 'admin' && p === 'YanAdmin2024!') {
-    await loadPricing();
-    await loadRides();
-    loadDispos();
-    simulate();
-    go('s-admin');
-  } else {
-    toast('Identifiants incorrects');
-  }
+  var u=document.getElementById('al-u').value.trim();
+  var p=document.getElementById('al-p').value.trim();
+  if(u==='admin'&&p==='YanAdmin2024!'){
+    await loadPricing(); await loadRides(); loadDispos(); simulate();
+    go('p-admin');
+  } else { toast('Identifiants incorrects'); }
 }
 
-// ═══ LOAD PRICING ═══
+// ── PRICING ──
 async function loadPricing() {
-  var {data} = await sb.from('pricing').select('*').eq('id', 1).single();
-  if(data) {
-    T.pickup.berline = data.pickup_berline;
-    T.pickup.van = data.pickup_van;
-    T.km.berline = data.km_berline;
-    T.km.van = data.km_van;
-    T.night = data.supplement_night;
-    T.airport = data.supplement_airport;
-    T.gare = data.supplement_gare;
-    updatePriceDisplays();
-    document.getElementById('p-pb').value = T.pickup.berline;
-    document.getElementById('p-pv').value = T.pickup.van;
-    document.getElementById('p-kb').value = T.km.berline;
-    document.getElementById('p-kv').value = T.km.van;
-    document.getElementById('p-n').value = T.night;
-    document.getElementById('p-a').value = T.airport;
-    document.getElementById('p-g').value = T.gare;
+  var {data}=await sb.from('pricing').select('*').eq('id',1).single();
+  if(data){
+    T.pickup.berline=data.pickup_berline; T.pickup.van=data.pickup_van;
+    T.km.berline=data.km_berline; T.km.van=data.km_van;
+    T.night=data.supplement_night; T.airport=data.supplement_airport; T.gare=data.supplement_gare;
+    document.getElementById('p-pb').value=T.pickup.berline;
+    document.getElementById('p-pv').value=T.pickup.van;
+    document.getElementById('p-kb').value=T.km.berline;
+    document.getElementById('p-kv').value=T.km.van;
+    document.getElementById('p-n').value=T.night;
+    document.getElementById('p-a').value=T.airport;
+    document.getElementById('p-g').value=T.gare;
   }
 }
 
-function updatePriceDisplays() {
-  document.getElementById('hv-b-rate').textContent = T.km.berline.toFixed(2)+' €/km';
-  document.getElementById('hv-v-rate').textContent = T.km.van.toFixed(2)+' €/km';
-  document.getElementById('vfr-b').textContent = T.km.berline.toFixed(2)+' €/km';
-  document.getElementById('vfr-v').textContent = T.km.van.toFixed(2)+' €/km';
-  document.getElementById('hs-pb').textContent = T.pickup.berline.toFixed(2)+' €';
-  document.getElementById('hs-kb').textContent = T.km.berline.toFixed(2)+' €';
-  document.getElementById('hs-pv').textContent = T.pickup.van.toFixed(2)+' €';
-  document.getElementById('hs-kv').textContent = T.km.van.toFixed(2)+' €';
-  document.getElementById('hs-n').textContent = '+'+T.night.toFixed(2)+' €';
-}
-
-// ═══ SAVE PRICES ═══
 async function savePrices() {
-  T.pickup.berline = parseFloat(document.getElementById('p-pb').value)||8;
-  T.pickup.van = parseFloat(document.getElementById('p-pv').value)||12;
-  T.km.berline = parseFloat(document.getElementById('p-kb').value)||1.80;
-  T.km.van = parseFloat(document.getElementById('p-kv').value)||2.50;
-  T.night = parseFloat(document.getElementById('p-n').value)||10;
-  T.airport = parseFloat(document.getElementById('p-a').value)||5;
-  T.gare = parseFloat(document.getElementById('p-g').value)||3;
-
-  var {error} = await sb.from('pricing').upsert({
-    id:1,
-    pickup_berline:T.pickup.berline,
-    pickup_van:T.pickup.van,
-    km_berline:T.km.berline,
-    km_van:T.km.van,
-    supplement_night:T.night,
-    supplement_airport:T.airport,
-    supplement_gare:T.gare,
-    updated_at: new Date().toISOString()
-  });
-
-  if(error){ toast('Erreur sauvegarde : '+error.message); return; }
-  updatePriceDisplays();
-  simulate();
-  toast('Tarifs sauvegardés');
+  T.pickup.berline=parseFloat(document.getElementById('p-pb').value)||8;
+  T.pickup.van=parseFloat(document.getElementById('p-pv').value)||12;
+  T.km.berline=parseFloat(document.getElementById('p-kb').value)||1.80;
+  T.km.van=parseFloat(document.getElementById('p-kv').value)||2.50;
+  T.night=parseFloat(document.getElementById('p-n').value)||10;
+  T.airport=parseFloat(document.getElementById('p-a').value)||5;
+  T.gare=parseFloat(document.getElementById('p-g').value)||3;
+  var {error}=await sb.from('pricing').upsert({id:1,pickup_berline:T.pickup.berline,pickup_van:T.pickup.van,km_berline:T.km.berline,km_van:T.km.van,supplement_night:T.night,supplement_airport:T.airport,supplement_gare:T.gare,updated_at:new Date().toISOString()});
+  if(error){ toast('Erreur : '+error.message); return; }
+  simulate(); toast('Tarifs sauvegardés');
 }
 
 function simulate() {
-  var v = document.getElementById('sim-v') ? document.getElementById('sim-v').value : 'berline';
-  var km = parseFloat(document.getElementById('sim-km') ? document.getElementById('sim-km').value : 20)||20;
-  var n = parseInt(document.getElementById('sim-n') ? document.getElementById('sim-n').value : 0);
-  var a = parseInt(document.getElementById('sim-a') ? document.getElementById('sim-a').value : 0);
-  var r = calcRide(v, km, n, a, false);
-  var el = document.getElementById('sim-tot');
-  var bd = document.getElementById('sim-bd');
-  if(el) el.textContent = r.total.toFixed(2)+' €';
-  if(bd) bd.innerHTML = 'Prise en charge '+r.base.toFixed(2)+'€ + '+km+' km × '+T.km[v].toFixed(2)+'€ = '+r.kc.toFixed(2)+'€'+(r.s>0?' + supp. '+r.s.toFixed(2)+'€':'');
+  var v=document.getElementById('sim-v')?document.getElementById('sim-v').value:'berline';
+  var km=parseFloat(document.getElementById('sim-km')?document.getElementById('sim-km').value:20)||20;
+  var n=parseInt(document.getElementById('sim-n')?document.getElementById('sim-n').value:0);
+  var a=parseInt(document.getElementById('sim-a')?document.getElementById('sim-a').value:0);
+  var r=calcRide(v,km,n,a,false);
+  var el=document.getElementById('sim-tot'); var bd=document.getElementById('sim-bd');
+  if(el) el.textContent=r.total.toFixed(2)+' €';
+  if(bd) bd.innerHTML='Base '+r.base.toFixed(2)+'€ + '+km+'km × '+T.km[v].toFixed(2)+'€ = '+r.kc.toFixed(2)+'€'+(r.s>0?' + supp. '+r.s.toFixed(2)+'€':'');
 }
 
-// ═══ LOAD RIDES ═══
+// ── RIDES ──
 async function loadRides() {
-  var {data, error} = await sb.from('bookings').select('*').order('created_at', {ascending:false});
-  if(error){ toast('Erreur chargement courses'); return; }
-  ridesCache = data || [];
+  var {data}=await sb.from('bookings').select('*').order('created_at',{ascending:false});
+  ridesCache=data||[];
   renderRides();
 }
 
-var statusMap = {
-  new:['b-new','Nouveau'],
-  assigned:['b-assigned','Assigné'],
-  ongoing:['b-ongoing','En route'],
-  done:['b-done','Terminé'],
-  cancelled:['b-cancelled','Annulé'],
-  noshow:['b-noshow','No-show']
-};
+var SM={new:['b-new','Nouveau'],assigned:['b-assigned','Assigné'],ongoing:['b-ongoing','En route'],done:['b-done','Terminé'],cancelled:['b-cancelled','Annulé'],noshow:['b-noshow','No-show']};
 
 function renderRides() {
-  var rides = ridesCache;
-  document.getElementById('st-tot').textContent = rides.length;
-  document.getElementById('st-new').textContent = rides.filter(function(r){return r.status==='new';}).length;
-  document.getElementById('st-act').textContent = rides.filter(function(r){return r.status==='assigned'||r.status==='ongoing';}).length;
-  var rev = rides.filter(function(r){return r.status==='done';}).reduce(function(a,r){return a+(r.price||0);},0);
-  document.getElementById('st-rev').textContent = rev.toFixed(0)+'€';
-
-  if(!rides.length){
-    document.getElementById('rides-list').innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Aucune réservation pour le moment.</div>';
-    return;
-  }
-
-  var {data: driversData} = await sb.from('drivers').select('name').eq('active', true).order('name');
-  var drivers = driversData && driversData.length ? driversData.map(function(d){return d.name;}) : ['Aucun chauffeur'];
-  document.getElementById('rides-list').innerHTML = rides.map(function(r,i){
-    var bc = statusMap[r.status] || statusMap.new;
-    var dopts = drivers.map(function(d){return '<option '+(r.driver===d?'selected':'')+'>'+d+'</option>';}).join('');
-    var showActions = r.status!=='done' && r.status!=='cancelled' && r.status!=='noshow';
+  var rides=ridesCache;
+  document.getElementById('st-tot').textContent=rides.length;
+  document.getElementById('st-new').textContent=rides.filter(function(r){return r.status==='new';}).length;
+  document.getElementById('st-act').textContent=rides.filter(function(r){return r.status==='assigned'||r.status==='ongoing';}).length;
+  var rev=rides.filter(function(r){return r.status==='done';}).reduce(function(a,r){return a+(r.price||0);},0);
+  document.getElementById('st-rev').textContent=rev.toFixed(0)+'€';
+  if(!rides.length){document.getElementById('rides-list').innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Aucune réservation.</div>';return;}
+  var driverNames=ridesCache.map(function(r){return r.driver;}).filter(Boolean);
+  document.getElementById('rides-list').innerHTML=rides.map(function(r,i){
+    var bc=SM[r.status]||SM.new;
+    var dopts=[''].concat(driverNames).filter(function(v,i,a){return a.indexOf(v)===i;}).map(function(d){return '<option '+(r.driver===d?'selected':'')+'>'+d+'</option>';}).join('');
+    var sa=r.status!=='done'&&r.status!=='cancelled'&&r.status!=='noshow';
     return '<div class="ride-card">'+
-      '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+' · '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
+      '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'): '')+' · '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
       '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
       '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+(r.night?'<span class="chip hl">Nuit</span>':'')+'</div>'+
-      '<div class="rc-footer"><span class="rc-name">'+r.name+' · '+r.phone+'</span><span class="rc-price">'+(r.price||0).toFixed(2)+' €</span></div>'+
+      '<div class="rc-foot"><span style="font-size:11px;color:var(--muted)">'+r.name+' · '+r.phone+'</span><span class="rc-price">'+(r.price||0).toFixed(2)+' €</span></div>'+
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
-      (showActions?'<div class="dispatch-row"><select class="dsel" id="ds-'+i+'">'+dopts+'</select><button class="abtn" onclick="assignRide(\''+r.ref+'\','+i+')">Assigner</button><button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button><button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button></div>':'')+
+      (sa?'<div class="d-row"><select class="dsel" id="ds-'+i+'" onchange="updateDriverSel(\''+r.ref+'\',this.value)"><option value="">— Chauffeur —</option></select><button class="abtn" onclick="assignRide(\''+r.ref+'\','+i+')">Assigner</button><button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button><button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button></div>':'')+
     '</div>';
   }).join('');
+  loadDriversForDispatch();
+  loadDriverRides();
 }
 
-async function assignRide(ref, i) {
-  var sel = document.getElementById('ds-'+i);
-  var driver = sel.value;
-  await sb.from('bookings').update({status:'assigned',driver:driver}).eq('ref', ref);
-  await loadRides();
-  toast('Assigné à '+driver);
+async function loadDriversForDispatch() {
+  var {data}=await sb.from('drivers').select('name').eq('active',true).order('name');
+  var names=(data||[]).map(function(d){return d.name;});
+  document.querySelectorAll('.dsel').forEach(function(sel){
+    var cur=sel.getAttribute('data-current')||'';
+    sel.innerHTML='<option value="">— Chauffeur —</option>'+names.map(function(n){return '<option '+(cur===n?'selected':'')+'>'+n+'</option>';}).join('');
+  });
 }
 
-async function cancelRide(ref) {
-  await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par l\'administrateur'}).eq('ref', ref);
-  await loadRides();
-  toast('Course annulée');
+function updateDriverSel(ref,val){}
+
+async function assignRide(ref,i){
+  var sel=document.getElementById('ds-'+i);
+  if(!sel||!sel.value){toast('Sélectionnez un chauffeur');return;}
+  await sb.from('bookings').update({status:'assigned',driver:sel.value}).eq('ref',ref);
+  await loadRides(); toast('Assigné à '+sel.value);
 }
 
-async function markNoShow(ref) {
-  await sb.from('bookings').update({status:'noshow',noshow:true,cancel_reason:'Client absent — no-show'}).eq('ref', ref);
-  await loadRides();
-  toast('No-show enregistré');
+async function cancelRide(ref){
+  await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par l\'administrateur'}).eq('ref',ref);
+  await loadRides(); toast('Course annulée');
 }
 
-// ═══ DISPOS ═══
-async function loadDispos() {
-  var {data} = await sb.from('unavailable_dates').select('date');
-  offDates = new Set((data||[]).map(function(d){return d.date;}));
+async function markNoShow(ref){
+  await sb.from('bookings').update({status:'noshow',noshow:true,cancel_reason:'No-show — client absent'}).eq('ref',ref);
+  await loadRides(); toast('No-show enregistré');
+}
+
+// ── TABS ──
+function aTab(t){
+  ['c','t','d','r','e'].forEach(function(x){
+    document.getElementById('pan-'+x).style.display='none';
+    document.getElementById('tab-'+x).classList.remove('on');
+  });
+  document.getElementById('pan-'+t).style.display='block';
+  document.getElementById('tab-'+t).classList.add('on');
+  if(t==='t') simulate();
+  if(t==='r') renderRapport();
+  if(t==='d') loadDispos();
+  if(t==='c') loadRides();
+  if(t==='e') loadAdminDrivers();
+}
+
+// ── DISPOS ──
+async function loadDispos(){
+  var {data}=await sb.from('unavailable_dates').select('date');
+  offDates=new Set((data||[]).map(function(d){return d.date;}));
   renderDispos();
 }
 
-function renderDispos() {
-  var dayNames = ['L','M','M','J','V','S','D'];
-  var days = [27,28,29,30,1,2,3];
-  var dates = ['2026-04-27','2026-04-28','2026-04-29','2026-04-30','2026-05-01','2026-05-02','2026-05-03'];
-
-  document.getElementById('dispo-grid').innerHTML = days.map(function(n,i){
-    var off = offDates.has(dates[i]);
-    return '<div class="dispo-day'+(off?' off':'')+'" onclick="toggleDay(\''+dates[i]+'\','+n+')"><div class="dispo-dn">'+dayNames[i]+'</div><div class="dispo-num">'+n+'</div></div>';
+function renderDispos(){
+  var dn=['L','M','M','J','V','S','D'];
+  var dates=['2026-04-27','2026-04-28','2026-04-29','2026-04-30','2026-05-01','2026-05-02','2026-05-03'];
+  var nums=[27,28,29,30,1,2,3];
+  document.getElementById('dispo-grid').innerHTML=dates.map(function(d,i){
+    var off=offDates.has(d);
+    return '<div class="dday'+(off?' off':'')+'" onclick="toggleDay(\''+d+'\')"><div class="dday-n">'+dn[i]+'</div><div class="dday-d">'+nums[i]+'</div></div>';
   }).join('');
-
-  var list = document.getElementById('dispo-list');
-  if(offDates.size === 0){
-    list.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun jour bloqué.</div>';
-    return;
-  }
-  list.innerHTML = Array.from(offDates).map(function(d){
+  var list=document.getElementById('dispo-list');
+  if(!offDates.size){list.innerHTML='<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun jour bloqué.</div>';return;}
+  list.innerHTML=Array.from(offDates).map(function(d){
     return '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;padding:10px 13px;margin-bottom:8px;">'+
       '<span style="font-size:12px;font-weight:600;color:var(--red);">'+d.split('-').reverse().join('/')+' — Indisponible</span>'+
-      '<button onclick="toggleDay(\''+d+'\')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:700;font-family:var(--font-body);">Retirer</button>'+
-    '</div>';
+      '<button onclick="toggleDay(\''+d+'\')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:700;font-family:var(--fb);">Retirer</button></div>';
   }).join('');
 }
 
-async function toggleDay(dateStr) {
-  if(offDates.has(dateStr)){
-    await sb.from('unavailable_dates').delete().eq('date', dateStr);
-    offDates.delete(dateStr);
-    toast('Disponible');
-  } else {
-    await sb.from('unavailable_dates').insert({date:dateStr});
-    offDates.add(dateStr);
-    toast('Jour bloqué');
-  }
+async function toggleDay(d){
+  if(offDates.has(d)){await sb.from('unavailable_dates').delete().eq('date',d);offDates.delete(d);toast('Disponible');}
+  else{await sb.from('unavailable_dates').insert({date:d});offDates.add(d);toast('Jour bloqué');}
   renderDispos();
 }
 
-// ═══ RAPPORT ═══
-function renderRapport() {
-  var rides = ridesCache;
-  var done = rides.filter(function(r){return r.status==='done';});
-  var cancelled = rides.filter(function(r){return r.status==='cancelled';});
-  var noshows = rides.filter(function(r){return r.status==='noshow';});
-  var ca = done.reduce(function(a,r){return a+(r.price||0);},0);
-  var moy = done.length ? ca/done.length : 0;
-
-  document.getElementById('rep-ca').textContent = ca.toFixed(0)+'€';
-  document.getElementById('rep-nb').textContent = done.length;
-  document.getElementById('rep-moy').textContent = moy.toFixed(0)+'€';
-  document.getElementById('rep-ns').textContent = noshows.length;
-
-  var byDrv = {};
-  var maxCa = 0;
+// ── RAPPORT ──
+function renderRapport(){
+  var done=ridesCache.filter(function(r){return r.status==='done';});
+  var cancelled=ridesCache.filter(function(r){return r.status==='cancelled';});
+  var noshows=ridesCache.filter(function(r){return r.status==='noshow';});
+  var ca=done.reduce(function(a,r){return a+(r.price||0);},0);
+  var moy=done.length?ca/done.length:0;
+  document.getElementById('rep-ca').textContent=ca.toFixed(0)+'€';
+  document.getElementById('rep-nb').textContent=done.length;
+  document.getElementById('rep-moy').textContent=moy.toFixed(0)+'€';
+  document.getElementById('rep-ns').textContent=noshows.length;
+  var byDrv={};var maxCa=0;
   done.forEach(function(r){if(r.driver){byDrv[r.driver]=(byDrv[r.driver]||0)+(r.price||0);}});
   Object.values(byDrv).forEach(function(v){if(v>maxCa)maxCa=v;});
-  document.getElementById('rep-chauffeurs').innerHTML = Object.entries(byDrv).length ?
-    Object.entries(byDrv).map(function(e){
-      var pct = maxCa>0 ? Math.round(e[1]/maxCa*100) : 0;
-      return '<div class="chart-bar-wrap"><div class="chart-lbl"><span>'+e[0]+'</span><span style="font-weight:700;color:var(--text)">'+e[1].toFixed(0)+' €</span></div><div class="chart-bg"><div class="chart-bar" style="width:'+pct+'%"></div></div></div>';
-    }).join('') : '<div style="font-size:11px;color:var(--muted)">Aucune course terminée.</div>';
-
-  var bCA = done.filter(function(r){return r.vehicle==='Berline';}).reduce(function(a,r){return a+(r.price||0);},0);
-  var vCA = done.filter(function(r){return r.vehicle==='Van';}).reduce(function(a,r){return a+(r.price||0);},0);
-  var tot = bCA+vCA||1;
-  document.getElementById('rep-gamme').innerHTML =
-    '<div class="chart-bar-wrap"><div class="chart-lbl"><span>Berline</span><span style="font-weight:700;color:var(--text)">'+bCA.toFixed(0)+' € ('+Math.round(bCA/tot*100)+'%)</span></div><div class="chart-bg"><div class="chart-bar" style="width:'+Math.round(bCA/tot*100)+'%"></div></div></div>'+
-    '<div class="chart-bar-wrap" style="margin-top:8px"><div class="chart-lbl"><span>Van</span><span style="font-weight:700;color:var(--text)">'+vCA.toFixed(0)+' € ('+Math.round(vCA/tot*100)+'%)</span></div><div class="chart-bg"><div class="chart-bar" style="width:'+Math.round(vCA/tot*100)+'%;background:var(--navy3)"></div></div></div>';
-
-  document.getElementById('rep-cancel').innerHTML =
-    '<div class="rep-row"><span class="rep-k">Annulations</span><span class="rep-v">'+cancelled.length+'</span></div>'+
-    '<div class="rep-row"><span class="rep-k">No-shows</span><span class="rep-v" style="color:var(--red)">'+noshows.length+'</span></div>'+
-    '<div class="rep-row"><span class="rep-k">Pénalités estimées</span><span class="rep-v pos">'+noshows.reduce(function(a,r){return a+(r.price||0);},0).toFixed(0)+' €</span></div>';
-
-  var clients = {};
-  rides.forEach(function(r){clients[r.name]=(clients[r.name]||0)+1;});
-  var recur = Object.entries(clients).filter(function(e){return e[1]>1;});
-  document.getElementById('rep-recurrent').innerHTML = recur.length ?
-    recur.map(function(e){return '<div class="rep-row"><span class="rep-k">'+e[0]+'</span><span class="rep-v pos">'+e[1]+' courses</span></div>';}).join('') :
-    '<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun client récurrent détecté.</div>';
+  document.getElementById('rep-chauffeurs').innerHTML=Object.entries(byDrv).length?Object.entries(byDrv).map(function(e){var pct=maxCa>0?Math.round(e[1]/maxCa*100):0;return '<div class="bar-wrap"><div class="bar-lbl"><span>'+e[0]+'</span><span style="font-weight:700;color:var(--text)">'+e[1].toFixed(0)+' €</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+pct+'%"></div></div></div>';}).join(''):'<div style="font-size:11px;color:var(--muted)">Aucune course terminée.</div>';
+  var bCA=done.filter(function(r){return r.vehicle==='Berline';}).reduce(function(a,r){return a+(r.price||0);},0);
+  var vCA=done.filter(function(r){return r.vehicle==='Van';}).reduce(function(a,r){return a+(r.price||0);},0);
+  var tot=bCA+vCA||1;
+  document.getElementById('rep-gamme').innerHTML='<div class="bar-wrap"><div class="bar-lbl"><span>Berline</span><span style="font-weight:700">'+bCA.toFixed(0)+'€ ('+Math.round(bCA/tot*100)+'%)</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(bCA/tot*100)+'%"></div></div></div><div class="bar-wrap" style="margin-top:8px"><div class="bar-lbl"><span>Van</span><span style="font-weight:700">'+vCA.toFixed(0)+'€ ('+Math.round(vCA/tot*100)+'%)</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(vCA/tot*100)+'%;background:#0a2d55"></div></div></div>';
+  document.getElementById('rep-cancel').innerHTML='<div class="rep-row"><span class="rep-k">Annulations</span><span class="rep-v">'+cancelled.length+'</span></div><div class="rep-row"><span class="rep-k">No-shows</span><span class="rep-v" style="color:var(--red)">'+noshows.length+'</span></div><div class="rep-row"><span class="rep-k">Pénalités estimées</span><span class="rep-v pos">'+noshows.reduce(function(a,r){return a+(r.price||0);},0).toFixed(0)+' €</span></div>';
+  var clients={};
+  ridesCache.forEach(function(r){clients[r.name]=(clients[r.name]||0)+1;});
+  var recur=Object.entries(clients).filter(function(e){return e[1]>1;});
+  document.getElementById('rep-recurrent').innerHTML=recur.length?recur.map(function(e){return '<div class="rep-row"><span class="rep-k">'+e[0]+'</span><span class="rep-v pos">'+e[1]+' courses</span></div>';}).join(''):'<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun client récurrent.</div>';
 }
 
-// ═══ ADMIN TABS ═══
-function aTab(t) {
-  ['courses','tarifs','dispos','rapport','equipe'].forEach(function(x){
-    document.getElementById('panel-'+x).style.display='none';
-    document.getElementById('tab-'+x).classList.remove('active');
-  });
-  document.getElementById('panel-'+t).style.display='block';
-  document.getElementById('tab-'+t).classList.add('active');
-  if(t==='tarifs') simulate();
-  if(t==='rapport') renderRapport();
-  if(t==='dispos') loadDispos();
-  if(t==='courses') loadRides();
-  if(t==='equipe') loadAdminDrivers();
-}
-
-// ═══ GESTION CHAUFFEURS ═══
-async function loadAdminDrivers() {
-  var {data, error} = await sb.from('drivers').select('*').order('name');
-  var el = document.getElementById('admin-drivers-list');
-  if(error || !data || !data.length) {
-    el.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px;">Aucun chauffeur enregistré.</div>';
-    return;
-  }
-  el.innerHTML = data.map(function(d) {
-    return '<div class="ride-card" style="margin-bottom:10px">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">' +
-        '<div>' +
-          '<div style="font-size:13px;font-weight:700;color:var(--navy)">' + d.name + '</div>' +
-          '<div style="font-size:10px;color:var(--muted);margin-top:2px;">' + d.vehicle_type + (d.vehicle_plate ? ' · ' + d.vehicle_plate : '') + '</div>' +
-        '</div>' +
-        '<span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:' + (d.active ? 'var(--green-bg)' : 'var(--red-bg)') + ';color:' + (d.active ? 'var(--green)' : 'var(--red)') + '">' + (d.active ? 'Actif' : 'Inactif') + '</span>' +
-      '</div>' +
-      '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">' + (d.phone || '') + '</div>' +
-      '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">' + (d.email || '') + '</div>' +
-      '<div style="display:flex;gap:8px">' +
-        '<button onclick="toggleDriver(\'' + d.id + '\',' + d.active + ')" style="flex:1;padding:9px;font-size:10px;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;border:1.5px solid ' + (d.active ? 'var(--orange)' : 'var(--green)') + ';color:' + (d.active ? 'var(--orange)' : 'var(--green)') + ';background:transparent;">' + (d.active ? 'Désactiver' : 'Activer') + '</button>' +
-        '<button onclick="deleteDriver(\'' + d.id + '\')" style="flex:1;padding:9px;font-size:10px;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--font-body);letter-spacing:.5px;text-transform:uppercase;border:1.5px solid var(--red);color:var(--red);background:transparent;">Supprimer</button>' +
-      '</div>' +
+// ── DRIVERS ADMIN ──
+async function loadAdminDrivers(){
+  var {data}=await sb.from('drivers').select('*').order('name');
+  var el=document.getElementById('admin-drivers-list');
+  if(!data||!data.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px;">Aucun chauffeur enregistré.</div>';return;}
+  el.innerHTML=data.map(function(d){
+    return '<div class="ride-card">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">'+
+        '<div><div style="font-size:13px;font-weight:700;color:var(--navy)">'+d.name+'</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">'+d.vehicle_type+(d.vehicle_plate?' · '+d.vehicle_plate:'')+'</div></div>'+
+        '<span style="font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;background:'+(d.active?'var(--green-bg)':'var(--red-bg)')+';color:'+(d.active?'var(--green)':'var(--red)')+'">'+(d.active?'Actif':'Inactif')+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--muted);">'+(d.phone||'')+(d.email?' · '+d.email:'')+'</div>'+
+      '<div style="display:flex;gap:8px;margin-top:10px;">'+
+        '<button onclick="toggleDriver(\''+d.id+'\','+d.active+')" style="flex:1;padding:9px;font-size:10px;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--fb);border:1.5px solid '+(d.active?'var(--orange)':'var(--green)')+';color:'+(d.active?'var(--orange)':'var(--green)')+';background:transparent;">'+(d.active?'Désactiver':'Activer')+'</button>'+
+        '<button onclick="deleteDriver(\''+d.id+'\')" style="flex:1;padding:9px;font-size:10px;font-weight:700;border-radius:8px;cursor:pointer;font-family:var(--fb);border:1.5px solid var(--red);color:var(--red);background:transparent;">Supprimer</button>'+
+      '</div>'+
     '</div>';
   }).join('');
 }
 
-async function addDriver() {
-  var first = document.getElementById('drv-new-first').value.trim();
-  var last = document.getElementById('drv-new-last').value.trim();
-  var phone = document.getElementById('drv-new-phone').value.trim();
-  var email = document.getElementById('drv-new-email').value.trim();
-  var type = document.getElementById('drv-new-type').value;
-  if(!first || !last) { toast('Entrez le prénom et le nom'); return; }
-  var {error} = await sb.from('drivers').insert({
-    name: first + ' ' + last,
-    email: email,
-    phone: phone,
-    vehicle_type: type,
-    active: true
-  });
-  if(error) { toast('Erreur : ' + error.message); return; }
-  document.getElementById('drv-new-first').value = '';
-  document.getElementById('drv-new-last').value = '';
-  document.getElementById('drv-new-phone').value = '';
-  document.getElementById('drv-new-email').value = '';
-  await loadAdminDrivers();
-  toast('Chauffeur ajouté !');
+async function addDriver(){
+  var first=document.getElementById('drv-new-first').value.trim();
+  var last=document.getElementById('drv-new-last').value.trim();
+  if(!first||!last){toast('Entrez le prénom et le nom');return;}
+  var {error}=await sb.from('drivers').insert({name:first+' '+last,email:document.getElementById('drv-new-email').value.trim(),phone:document.getElementById('drv-new-phone').value.trim(),vehicle_type:document.getElementById('drv-new-type').value,active:true});
+  if(error){toast('Erreur : '+error.message);return;}
+  document.getElementById('drv-new-first').value='';
+  document.getElementById('drv-new-last').value='';
+  document.getElementById('drv-new-phone').value='';
+  document.getElementById('drv-new-email').value='';
+  await loadAdminDrivers(); toast('Chauffeur ajouté !');
 }
 
-async function toggleDriver(id, currentActive) {
-  await sb.from('drivers').update({active: !currentActive}).eq('id', id);
-  await loadAdminDrivers();
-  toast(currentActive ? 'Chauffeur désactivé' : 'Chauffeur activé');
+async function toggleDriver(id,active){
+  await sb.from('drivers').update({active:!active}).eq('id',id);
+  await loadAdminDrivers(); toast(active?'Désactivé':'Activé');
 }
 
-async function deleteDriver(id) {
-  await sb.from('drivers').delete().eq('id', id);
-  await loadAdminDrivers();
-  toast('Chauffeur supprimé');
+async function deleteDriver(id){
+  await sb.from('drivers').delete().eq('id',id);
+  await loadAdminDrivers(); toast('Chauffeur supprimé');
 }
 
-// ═══ DRIVER ═══
-async function loadDriverRides() {
-  var {data} = await sb.from('bookings').select('*')
-    .eq('driver', 'Marc L.')
-    .not('status', 'in', '("done","cancelled","noshow")')
-    .order('date', {ascending:true});
-  renderDriverRides(data||[]);
-}
-
-function renderDriverRides(rides) {
-  var el = document.getElementById('driver-rides');
-  if(!el) return;
-  if(!rides.length){
-    el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée.</div>';
-    return;
-  }
-  el.innerHTML = rides.map(function(r){
-    var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
+// ── DRIVER ──
+async function loadDriverRides(){
+  var {data}=await sb.from('bookings').select('*').in('status',['assigned','accepted','ongoing']).order('date',{ascending:true});
+  var el=document.getElementById('driver-rides');
+  if(!el)return;
+  var mine=(data||[]);
+  if(!mine.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée.</div>';return;}
+  el.innerHTML=mine.map(function(r){
+    var mapsUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
     return '<div class="ride-card">'+
-      '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'): '')+' · '+r.time+'</div></div><span style="font-family:var(--font-title);font-size:17px;font-weight:700;color:var(--navy)">'+(r.price||0).toFixed(2)+' €</span></div>'+
+      '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span style="font-family:var(--ft);font-size:17px;font-weight:700;color:var(--navy)">'+(r.price||0).toFixed(2)+' €</span></div>'+
       '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
-      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+(r.night?'<span class="chip hl">Nuit</span>':'')+'</div>'+
-      '<div style="font-size:11px;color:var(--muted);margin-bottom:2px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
+      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
       (r.message?'<div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:4px;">'+r.message+'</div>':'')+
-      '<div class="da-row">'+
+      '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
         '<button class="da-btn da-ac" onclick="dAct(\''+r.ref+'\',\'accepted\')" '+(r.status!=='assigned'?'disabled':'')+'>Accepter</button>'+
         '<button class="da-btn da-st" onclick="dAct(\''+r.ref+'\',\'ongoing\')" '+(r.status!=='accepted'?'disabled':'')+'>Démarrer</button>'+
         '<button class="da-btn da-fi" onclick="dAct(\''+r.ref+'\',\'done\')" '+(r.status!=='ongoing'?'disabled':'')+'>Terminer</button>'+
@@ -1260,35 +917,31 @@ function renderDriverRides(rides) {
   }).join('');
 }
 
-async function dAct(ref, status) {
-  await sb.from('bookings').update({status:status}).eq('ref', ref);
-  var msgs = {accepted:'Course acceptée',ongoing:'Démarrée — Bon trajet !',done:'Course terminée'};
-  toast(msgs[status]||'Mis à jour');
-  await loadDriverRides();
+async function dAct(ref,s){
+  await sb.from('bookings').update({status:s}).eq('ref',ref);
+  var m={accepted:'Course acceptée',ongoing:'Démarrée !',done:'Course terminée'};
+  toast(m[s]||'Mis à jour'); await loadDriverRides();
 }
 
-async function saveVehicle() {
-  var c = document.getElementById('drv-car').value;
-  var p = document.getElementById('drv-plate').value;
-  if(!c||!p){ toast('Complétez les infos véhicule'); return; }
+function saveVehicle(){
+  var c=document.getElementById('drv-car').value;
+  var p=document.getElementById('drv-plate').value;
+  if(!c||!p){toast('Complétez les infos');return;}
   toast('Véhicule enregistré : '+c+' · '+p);
 }
 
-// ═══ TOAST ═══
-function toast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 2600);
+// ── TOAST ──
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('on');
+  setTimeout(function(){t.classList.remove('on');},2500);
 }
 
-// ═══ INIT ═══
-document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+// ── INIT ──
+document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
 loadPricing();
-
-// Réaltime — nouvelles réservations
-sb.channel('bookings').on('postgres_changes', {event:'INSERT',schema:'public',table:'bookings'}, function(){
-  if(document.getElementById('s-admin').classList.contains('active')) loadRides();
+sb.channel('bookings').on('postgres_changes',{event:'INSERT',schema:'public',table:'bookings'},function(){
+  if(document.getElementById('p-admin').classList.contains('on')) loadRides();
 }).subscribe();
 </script>
 </body>
