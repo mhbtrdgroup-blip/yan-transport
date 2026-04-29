@@ -463,6 +463,51 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
         <div class="stat-b"><div class="stat-bn" id="st-act" style="color:var(--orange)">—</div><div class="stat-bl">En cours</div></div>
         <div class="stat-b"><div class="stat-bn" id="st-rev" style="color:var(--green);font-size:18px">—</div><div class="stat-bl">CA terminées</div></div>
       </div>
+
+      <!-- BOUTON CRÉER COURSE -->
+      <button onclick="toggleNewRide()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-bottom:14px;">+ Créer une course manuellement</button>
+
+      <!-- FORMULAIRE NOUVELLE COURSE -->
+      <div id="new-ride-form" style="display:none;background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:16px;">
+        <div class="sec">Nouvelle course</div>
+        <div class="field"><label>Prise en charge *</label><input type="text" id="nr-pickup" placeholder="Adresse de départ"></div>
+        <div class="field"><label>Dépose *</label><input type="text" id="nr-dropoff" placeholder="Adresse d'arrivée"></div>
+        <div style="display:flex;gap:10px;margin-bottom:11px;">
+          <div class="field" style="flex:1"><label>Date *</label><input type="date" id="nr-date"></div>
+          <div class="field" style="flex:1"><label>Heure *</label><input type="time" id="nr-time"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:11px;">
+          <div class="field" style="flex:1"><label>Véhicule</label>
+            <select id="nr-veh"><option value="Berline">Berline</option><option value="Van">Van</option></select>
+          </div>
+          <div class="field" style="flex:1"><label>Distance km</label><input type="number" id="nr-km" placeholder="km" min="1" oninput="calcNR()"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:11px;">
+          <div class="field" style="flex:1"><label>Passagers</label>
+            <select id="nr-pax"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select>
+          </div>
+          <div class="field" style="flex:1"><label>Valises</label>
+            <select id="nr-bags"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-bottom:11px;">
+          <div class="field" style="flex:1"><label>N° vol</label><input type="text" id="nr-flight" placeholder="AF1234"></div>
+          <div class="field" style="flex:1"><label>N° train</label><input type="text" id="nr-train" placeholder="TGV 6201"></div>
+        </div>
+        <div class="field"><label>Nuit (22h–6h)</label>
+          <select id="nr-night"><option value="0">Non</option><option value="1">Oui</option></select>
+        </div>
+        <div class="field"><label>Nom client *</label><input type="text" id="nr-name" placeholder="Prénom Nom"></div>
+        <div class="field"><label>Téléphone *</label><input type="tel" id="nr-phone" placeholder="06 00 00 00 00"></div>
+        <div class="field"><label>E-mail</label><input type="email" id="nr-email" placeholder="client@email.fr"></div>
+        <div id="nr-price-box" style="display:none;background:var(--navy);border-radius:10px;padding:12px;text-align:center;margin:10px 0;">
+          <div style="font-size:9px;letter-spacing:2px;color:var(--blue4);text-transform:uppercase;margin-bottom:4px;">Prix calculé</div>
+          <div style="font-family:var(--ft);font-size:28px;color:#fff;font-weight:700;"><span id="nr-price-val">0</span> €</div>
+        </div>
+        <button class="btn-p" onclick="createRideAdmin()" style="margin-top:8px;">Créer la course</button>
+        <button onclick="toggleNewRide()" style="width:100%;background:transparent;color:var(--muted);border:none;padding:10px;font-size:11px;cursor:pointer;font-family:var(--fb);margin-top:6px;">Annuler</button>
+      </div>
+
       <div class="sec">Toutes les courses</div>
       <div id="rides-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
     </div>
@@ -978,7 +1023,12 @@ async function addDriver(){
   document.getElementById('drv-new-phone').value='';
   document.getElementById('drv-new-email').value='';
   await loadAdminDrivers();
-  toast('Chauffeur ajouté ! Invitez-le manuellement depuis Supabase Auth.');
+  toast('Chauffeur ajouté !');
+  // Ouvrir Supabase pour envoyer l'invitation
+  if(email) {
+    var open = confirm('Chauffeur ajouté !\n\nVoulez-vous ouvrir Supabase pour envoyer l\'invitation par email à '+email+' ?');
+    if(open) window.open('https://supabase.com/dashboard/project/kxwsvdmnoyxblkvrlgar/auth/users', '_blank');
+  }
 }
 
 async function toggleDriver(id,active){
@@ -1031,6 +1081,56 @@ function saveVehicle(){
   var p=document.getElementById('drv-plate').value;
   if(!c||!p){toast('Complétez les infos');return;}
   toast('Véhicule enregistré : '+c+' · '+p);
+}
+
+// ── CRÉER COURSE ADMIN ──
+function toggleNewRide() {
+  var f = document.getElementById('new-ride-form');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  if(f.style.display === 'block') {
+    document.getElementById('nr-date').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+function calcNR() {
+  var km = parseFloat(document.getElementById('nr-km').value);
+  if(!km||km<1){ document.getElementById('nr-price-box').style.display='none'; return; }
+  var veh = document.getElementById('nr-veh').value.toLowerCase();
+  var night = parseInt(document.getElementById('nr-night').value);
+  var fl = document.getElementById('nr-flight').value;
+  var tr = document.getElementById('nr-train').value;
+  var r = calcRide(veh, km, night, !!fl, !!tr);
+  document.getElementById('nr-price-box').style.display = 'block';
+  document.getElementById('nr-price-val').textContent = r.total.toFixed(2);
+}
+
+async function createRideAdmin() {
+  var pickup = document.getElementById('nr-pickup').value.trim();
+  var dropoff = document.getElementById('nr-dropoff').value.trim();
+  var date = document.getElementById('nr-date').value;
+  var time = document.getElementById('nr-time').value;
+  var name = document.getElementById('nr-name').value.trim();
+  var phone = document.getElementById('nr-phone').value.trim();
+  if(!pickup||!dropoff||!date||!time||!name||!phone){ toast('Remplissez les champs obligatoires'); return; }
+  var veh = document.getElementById('nr-veh').value;
+  var km = parseFloat(document.getElementById('nr-km').value)||0;
+  var night = parseInt(document.getElementById('nr-night').value);
+  var fl = document.getElementById('nr-flight').value.trim();
+  var tr = document.getElementById('nr-train').value.trim();
+  var r = calcRide(veh.toLowerCase(), km, night, !!fl, !!tr);
+  var ref = 'YAN-' + Date.now().toString().slice(-6);
+  var {error} = await sb.from('bookings').insert({
+    ref:ref, pickup:pickup, dropoff:dropoff, date:date, time:time,
+    vehicle:veh, km:km, pax:parseInt(document.getElementById('nr-pax').value),
+    bags:parseInt(document.getElementById('nr-bags').value),
+    flight:fl, train:tr, night:!!night, price:r.total,
+    name:name, phone:phone, email:document.getElementById('nr-email').value.trim(),
+    message:'Course créée manuellement par l\'admin', status:'new'
+  });
+  if(error){ toast('Erreur : '+error.message); return; }
+  document.getElementById('new-ride-form').style.display = 'none';
+  await loadRides();
+  toast('Course créée : '+ref);
 }
 
 // ── TOAST ──
