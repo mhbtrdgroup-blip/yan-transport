@@ -24,6 +24,8 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
+#p-login.on{display:flex;}
+#p-success.on{display:flex;}
 
 /* ── COMMUNS ── */
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
@@ -350,7 +352,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 <!-- ══════════════════════════════
      PAGE SUCCESS
 ══════════════════════════════ -->
-<div class="page on" id="p-success" style="display:none;align-items:center;justify-content:center;padding:30px 20px;">
+<div class="page" id="p-success" style="align-items:center;justify-content:center;padding:30px 20px;">
   <div style="text-align:center;width:100%;">
     <div class="succ-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div style="font-family:var(--ft);font-size:24px;color:var(--navy);font-weight:700;margin-bottom:5px;">Réservation confirmée</div>
@@ -397,7 +399,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 <!-- ══════════════════════════════
      PAGE LOGIN
 ══════════════════════════════ -->
-<div class="page" id="p-login" style="display:none;align-items:center;justify-content:center;padding:30px 20px;">
+<div class="page" id="p-login" style="align-items:center;justify-content:center;padding:30px 20px;">
   <div class="login-card">
     <div class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#90caf9" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
     <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Administration</div>
