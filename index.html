@@ -262,7 +262,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <div style="font-family:var(--ft);font-size:22px;color:#fff;font-weight:700;margin-bottom:8px;">Prêt à partir ?</div>
       <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.7;">Réservez en 2 minutes.<br>Confirmation immédiate par e-mail.</div>
       <button onclick="go('p-booking')" style="display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);">Réserver ma course</button>
-      <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.3);">+33 6 00 00 00 00 · contact@yantransport.fr</div>
+      <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.3);">04 65 84 65 16 · contact@yantransport.fr</div>
     </div>
 
   </div>
@@ -402,12 +402,31 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 <div class="page" id="p-login" style="align-items:center;justify-content:center;padding:30px 20px;">
   <div class="login-card">
     <div class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#90caf9" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Administration</div>
-    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:18px;">Yan Transport — accès sécurisé</div>
-    <div class="field"><label>Identifiant</label><input type="text" id="al-u" placeholder="admin"></div>
-    <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="al-p" placeholder="••••••"></div>
-    <button class="btn-p" onclick="adminLogin()">Se connecter</button>
-    <button class="btn-o" onclick="go('p-home')">← Interface client</button>
+    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Yan Transport</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:20px;">Accès sécurisé</div>
+
+    <!-- TOGGLE RÔLE -->
+    <div style="display:flex;background:var(--off);border-radius:10px;padding:4px;margin-bottom:20px;">
+      <button id="role-admin-btn" onclick="switchRole('admin')" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);background:var(--navy);color:#fff;transition:all .2s;">Admin</button>
+      <button id="role-driver-btn" onclick="switchRole('driver')" style="flex:1;padding:9px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);background:transparent;color:var(--muted);transition:all .2s;">Chauffeur</button>
+    </div>
+
+    <!-- ADMIN FORM -->
+    <div id="form-admin">
+      <div class="field"><label>Identifiant</label><input type="text" id="al-u" placeholder="admin"></div>
+      <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="al-p" placeholder="••••••"></div>
+      <button class="btn-p" onclick="adminLogin()">Se connecter</button>
+    </div>
+
+    <!-- DRIVER FORM -->
+    <div id="form-driver" style="display:none">
+      <div class="field"><label>E-mail</label><input type="email" id="drv-login-email" placeholder="votre@email.fr"></div>
+      <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="drv-login-pass" placeholder="••••••"></div>
+      <button class="btn-p" onclick="driverLogin()">Se connecter</button>
+      <div id="drv-login-err" style="display:none;margin-top:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px;font-size:11px;color:var(--red);text-align:center;"></div>
+    </div>
+
+    <button class="btn-o" onclick="go('p-home')" style="margin-top:8px">← Interface client</button>
   </div>
 </div>
 
@@ -519,8 +538,8 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
   <div class="hbar">
     <div class="hinner">
       <div class="hico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-      <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Espace Chauffeur</div></div>
-      <button class="hadmin" onclick="go('p-admin')" style="margin-left:auto;">Admin</button>
+      <div><div class="hname" id="drv-welcome">Bonjour</div><div class="hsub">Espace Chauffeur</div></div>
+      <button class="hadmin" onclick="driverLogout()" style="margin-left:auto;">Déconnexion</button>
     </div>
   </div>
   <div class="sbody">
@@ -666,6 +685,17 @@ async function cancelLast() {
   go('p-home');
 }
 
+// ── ROLE SWITCH ──
+function switchRole(role) {
+  var isAdmin = role === 'admin';
+  document.getElementById('form-admin').style.display = isAdmin ? 'block' : 'none';
+  document.getElementById('form-driver').style.display = isAdmin ? 'none' : 'block';
+  document.getElementById('role-admin-btn').style.background = isAdmin ? 'var(--navy)' : 'transparent';
+  document.getElementById('role-admin-btn').style.color = isAdmin ? '#fff' : 'var(--muted)';
+  document.getElementById('role-driver-btn').style.background = isAdmin ? 'transparent' : 'var(--navy)';
+  document.getElementById('role-driver-btn').style.color = isAdmin ? 'var(--muted)' : '#fff';
+}
+
 // ── ADMIN LOGIN ──
 async function adminLogin() {
   var u=document.getElementById('al-u').value.trim();
@@ -674,6 +704,58 @@ async function adminLogin() {
     await loadPricing(); await loadRides(); loadDispos(); simulate();
     go('p-admin');
   } else { toast('Identifiants incorrects'); }
+}
+
+// ── DRIVER LOGIN ──
+var currentDriverName = '';
+var currentDriverEmail = '';
+
+async function driverLogin() {
+  var email = document.getElementById('drv-login-email').value.trim();
+  var pass = document.getElementById('drv-login-pass').value.trim();
+  var errEl = document.getElementById('drv-login-err');
+  errEl.style.display = 'none';
+  if(!email||!pass){ toast('Remplissez email et mot de passe'); return; }
+  var btn = document.querySelector('#form-driver .btn-p');
+  btn.innerHTML = '<span class="loader"></span>Connexion...';
+  btn.disabled = true;
+  var {data, error} = await sb.auth.signInWithPassword({email:email, password:pass});
+  btn.innerHTML = 'Se connecter';
+  btn.disabled = false;
+  if(error){
+    errEl.textContent = 'Email ou mot de passe incorrect';
+    errEl.style.display = 'block';
+    return;
+  }
+  currentDriverEmail = email;
+  var {data:drvData} = await sb.from('drivers').select('name').eq('email', email).single();
+  currentDriverName = drvData ? drvData.name : email;
+  document.getElementById('drv-welcome').textContent = 'Bonjour, ' + currentDriverName.split(' ')[0];
+  await loadDriverRides();
+  go('p-driver');
+}
+
+async function driverLogout() {
+  await sb.auth.signOut();
+  currentDriverName = '';
+  currentDriverEmail = '';
+  go('p-home');
+  toast('Déconnecté');
+}
+
+// ── CHECK SESSION AU DÉMARRAGE ──
+async function checkSession() {
+  var {data:{session}} = await sb.auth.getSession();
+  if(session) {
+    currentDriverEmail = session.user.email;
+    var {data:drvData} = await sb.from('drivers').select('name').eq('email', currentDriverEmail).single();
+    if(drvData) {
+      currentDriverName = drvData.name;
+      document.getElementById('drv-welcome').textContent = 'Bonjour, ' + currentDriverName.split(' ')[0];
+      await loadDriverRides();
+      go('p-driver');
+    }
+  }
 }
 
 // ── PRICING ──
@@ -874,14 +956,27 @@ async function loadAdminDrivers(){
 async function addDriver(){
   var first=document.getElementById('drv-new-first').value.trim();
   var last=document.getElementById('drv-new-last').value.trim();
+  var email=document.getElementById('drv-new-email').value.trim();
+  var phone=document.getElementById('drv-new-phone').value.trim();
+  var type=document.getElementById('drv-new-type').value;
   if(!first||!last){toast('Entrez le prénom et le nom');return;}
-  var {error}=await sb.from('drivers').insert({name:first+' '+last,email:document.getElementById('drv-new-email').value.trim(),phone:document.getElementById('drv-new-phone').value.trim(),vehicle_type:document.getElementById('drv-new-type').value,active:true});
+  if(!email){toast('L\'e-mail est requis pour créer un compte chauffeur');return;}
+
+  // 1. Créer dans la table drivers
+  var {error}=await sb.from('drivers').insert({name:first+' '+last,email:email,phone:phone,vehicle_type:type,active:true});
   if(error){toast('Erreur : '+error.message);return;}
+
+  // 2. Envoyer invitation Supabase Auth (le chauffeur reçoit un email pour créer son mot de passe)
+  var {error:authErr}=await sb.auth.admin ? 
+    {error:null} : // admin API not available client-side
+    await sb.functions.invoke('invite-driver', {body:{email:email,name:first+' '+last}}).catch(function(){return {error:null};});
+
   document.getElementById('drv-new-first').value='';
   document.getElementById('drv-new-last').value='';
   document.getElementById('drv-new-phone').value='';
   document.getElementById('drv-new-email').value='';
-  await loadAdminDrivers(); toast('Chauffeur ajouté !');
+  await loadAdminDrivers();
+  toast('Chauffeur ajouté ! Invitez-le manuellement depuis Supabase Auth.');
 }
 
 async function toggleDriver(id,active){
@@ -896,11 +991,15 @@ async function deleteDriver(id){
 
 // ── DRIVER ──
 async function loadDriverRides(){
-  var {data}=await sb.from('bookings').select('*').in('status',['assigned','accepted','ongoing']).order('date',{ascending:true});
   var el=document.getElementById('driver-rides');
   if(!el)return;
+  if(!currentDriverName){ el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Non connecté.</div>'; return; }
+  var {data}=await sb.from('bookings').select('*')
+    .eq('driver', currentDriverName)
+    .in('status',['assigned','accepted','ongoing'])
+    .order('date',{ascending:true});
   var mine=(data||[]);
-  if(!mine.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée.</div>';return;}
+  if(!mine.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée pour le moment.</div>';return;}
   el.innerHTML=mine.map(function(r){
     var mapsUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
     return '<div class="ride-card">'+
@@ -942,6 +1041,7 @@ function toast(msg){
 // ── INIT ──
 document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
 loadPricing();
+checkSession();
 sb.channel('bookings').on('postgres_changes',{event:'INSERT',schema:'public',table:'bookings'},function(){
   if(document.getElementById('p-admin').classList.contains('on')) loadRides();
 }).subscribe();
