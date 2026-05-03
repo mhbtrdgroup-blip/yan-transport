@@ -992,7 +992,8 @@ function simulate(){
 // ── LOAD RIDES ──
 async function loadRides(){
   var {data}=await sb.from('bookings').select('*').order('created_at',{ascending:false});
-  ridesCache=data||[];renderRides();
+  ridesCache=data||[];
+  renderRides();
 }
 
 // ── FILTER ──
@@ -1055,11 +1056,11 @@ async function updatePrice(ref){
   if(!newPrice||newPrice<=0){toast('Prix invalide');return;}
   var {error}=await sb.from('bookings').update({price:newPrice,price_modified:true}).eq('ref',ref);
   if(error){toast('Erreur : '+error.message);return;}
+  // Mettre à jour directement dans le cache sans rechargement
+  var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
+  if(idx>-1){ridesCache[idx].price=newPrice;ridesCache[idx].price_modified=true;}
+  renderRides();
   toast('Prix mis à jour : '+fmt(newPrice)+' €');
-  currentFilter='all';
-  filterRides('all');
-  await loadRides();
-}
 }
 
 async function assignRide(ref){
@@ -1067,22 +1068,36 @@ async function assignRide(ref){
   if(!sel||!sel.value){toast('Sélectionnez un chauffeur');return;}
   var driver=sel.value;
   await sb.from('bookings').update({status:'assigned',driver:driver}).eq('ref',ref);
-  await loadRides();toast('Assigné à '+driver);
+  var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
+  if(idx>-1){ridesCache[idx].status='assigned';ridesCache[idx].driver=driver;}
+  renderRides();
+  toast('Assigné à '+driver);
 }
+
 async function cancelRide(ref){
   await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par l\'administrateur'}).eq('ref',ref);
-  currentFilter='all';
-  await loadRides();
-  filterRides('cancelled');
+  var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
+  if(idx>-1){ridesCache[idx].status='cancelled';ridesCache[idx].cancel_reason='Annulé par l\'administrateur';}
+  currentFilter='cancelled';
+  document.querySelectorAll('.stat-b').forEach(function(b){b.classList.remove('active-filter');});
+  var sf=document.getElementById('sf-cancelled');if(sf)sf.classList.add('active-filter');
+  document.getElementById('rides-section-title').textContent='Annulées & No-shows';
+  renderRides();
   toast('Course annulée');
 }
+
 async function markNoShow(ref){
   await sb.from('bookings').update({status:'noshow',noshow:true,cancel_reason:'No-show — client absent'}).eq('ref',ref);
-  currentFilter='all';
-  await loadRides();
-  filterRides('cancelled');
+  var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
+  if(idx>-1){ridesCache[idx].status='noshow';ridesCache[idx].noshow=true;ridesCache[idx].cancel_reason='No-show — client absent';}
+  currentFilter='cancelled';
+  document.querySelectorAll('.stat-b').forEach(function(b){b.classList.remove('active-filter');});
+  var sf=document.getElementById('sf-cancelled');if(sf)sf.classList.add('active-filter');
+  document.getElementById('rides-section-title').textContent='Annulées & No-shows';
+  renderRides();
   toast('No-show enregistré');
 }
+
 async function loadDriversForDispatch(){
   var {data}=await sb.from('drivers').select('name').eq('active',true).order('name');
   var names=(data||[]).map(function(d){return d.name;});
