@@ -902,13 +902,17 @@ function renderRides(){
 
 // ── MODIFIER PRIX ──
 async function updatePrice(ref, idx, clientEmail){
-  var input=document.getElementById('pedit-'+idx);
-  var newPrice=parseFloat(input.value);
-  if(!newPrice||newPrice<0){toast('Prix invalide');return;}
-  var {error}=await sb.from('bookings').update({price:newPrice,price_modified:true,status:'assigned'}).eq('ref',ref);
-  if(error){toast('Erreur : '+error.message);return;}
-  await loadRides();
+  var input = document.getElementById('pedit-'+idx);
+  if(!input){ toast('Erreur : champ introuvable'); return; }
+  var newPrice = parseFloat(input.value);
+  if(!newPrice || newPrice <= 0){ toast('Prix invalide'); return; }
+  var {error} = await sb.from('bookings')
+    .update({price: newPrice, price_modified: true})
+    .eq('ref', ref);
+  if(error){ toast('Erreur : '+error.message); return; }
   toast('Prix mis à jour : '+fmt(newPrice)+' €');
+  await loadRides();
+}
 }
 
 async function assignRide(ref,i){
