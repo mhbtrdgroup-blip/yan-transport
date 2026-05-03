@@ -1056,7 +1056,10 @@ async function updatePrice(ref){
   var {error}=await sb.from('bookings').update({price:newPrice,price_modified:true}).eq('ref',ref);
   if(error){toast('Erreur : '+error.message);return;}
   toast('Prix mis à jour : '+fmt(newPrice)+' €');
+  currentFilter='all';
+  filterRides('all');
   await loadRides();
+}
 }
 
 async function assignRide(ref){
@@ -1068,11 +1071,17 @@ async function assignRide(ref){
 }
 async function cancelRide(ref){
   await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par l\'administrateur'}).eq('ref',ref);
-  await loadRides();toast('Course annulée');
+  currentFilter='all';
+  await loadRides();
+  filterRides('cancelled');
+  toast('Course annulée');
 }
 async function markNoShow(ref){
   await sb.from('bookings').update({status:'noshow',noshow:true,cancel_reason:'No-show — client absent'}).eq('ref',ref);
-  await loadRides();toast('No-show enregistré');
+  currentFilter='all';
+  await loadRides();
+  filterRides('cancelled');
+  toast('No-show enregistré');
 }
 async function loadDriversForDispatch(){
   var {data}=await sb.from('drivers').select('name').eq('active',true).order('name');
