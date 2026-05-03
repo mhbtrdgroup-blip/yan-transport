@@ -1,0 +1,22 @@
+{
+  "name": "Yan Transport",
+  "short_name": "Yan Transport",
+  "description": "Service de voiture avec chauffeur — Marseille",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#04132b",
+  "theme_color": "#04132b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
