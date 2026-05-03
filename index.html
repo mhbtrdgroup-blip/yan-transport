@@ -386,7 +386,10 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <input type="checkbox" id="cgv-chk">
       <label for="cgv-chk">J'accepte les <span style="color:var(--blue2);cursor:pointer;font-weight:600" onclick="go('p-cgv')">CGV</span> et la <span style="color:var(--blue2);cursor:pointer;font-weight:600" onclick="go('p-rgpd')">Politique de confidentialité</span>. *</label>
     </div>
-    <button class="btn-p" id="submit-btn" onclick="submitBooking()" style="margin-top:16px;padding:18px;">Confirmer la réservation</button>
+    <div style="display:flex;gap:10px;margin-top:16px;">
+      <button class="btn-p" id="submit-btn" onclick="submitBooking(false)" style="flex:1;padding:16px;">Réserver sans payer</button>
+      <button style="flex:1;background:#635bff;color:#fff;border:none;padding:16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);" id="pay-btn" onclick="submitBooking(true)">💳 Payer maintenant</button>
+    </div>
     <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:12px;padding-bottom:20px;">Confirmation par e-mail immédiate</div>
   </div>
 </div>
@@ -943,7 +946,7 @@ async function checkDispo(){
 }
 
 // ── SUBMIT BOOKING ──
-async function submitBooking(){
+async function submitBooking(withPayment){
   var pickup=document.getElementById('f-pickup').value.trim();
   var dropoff=document.getElementById('f-dropoff').value.trim();
   var date=document.getElementById('f-date').value;
@@ -962,13 +965,59 @@ async function submitBooking(){
   var priceEl=document.getElementById('pp-amt');
   var price=priceEl?parseFloat(priceEl.textContent)||0:0;
   if(!price&&km>0){var r=calcRide(selVehCur,km,0,fl,tr);price=r.total;}
+  if(withPayment&&!price){toast('Le prix doit être calculé pour payer en ligne');return;}
   var ref='YAN-'+Date.now().toString().slice(-6);
   lastRef=ref;
-  var btn=document.getElementById('submit-btn');
-  btn.innerHTML='<span class="loader"></span>Envoi...';btn.disabled=true;
-  var {error}=await sb.from('bookings').insert({ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,vehicle:selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1),km:km,pax:parseInt(document.getElementById('f-pax').value),bags:parseInt(document.getElementById('f-bags').value),flight:fl,train:tr,night:false,price:price,name:fn+' '+ln,phone:ph,email:em,message:msg,status:'new',price_modified:false});
-  btn.innerHTML='Confirmer la réservation';btn.disabled=false;
+
+  var btn=withPayment?document.getElementById('pay-btn'):document.getElementById('submit-btn');
+  btn.innerHTML='<span class="loader"></span>'+(withPayment?'Redirection...':'Envoi...');
+  btn.disabled=true;
+  document.getElementById('submit-btn').disabled=true;
+  document.getElementById('pay-btn').disabled=true;
+
+  var {error}=await sb.from('bookings').insert({
+    ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,
+    vehicle:selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1),
+    km:km,pax:parseInt(document.getElementById('f-pax').value),
+    bags:parseInt(document.getElementById('f-bags').value),
+    flight:fl,train:tr,night:false,price:price,
+    name:fn+' '+ln,phone:ph,email:em,message:msg,
+    status:'new',price_modified:false,
+    paid: withPayment ? false : null
+  });
+
+  document.getElementById('submit-btn').innerHTML='Réserver sans payer';
+  document.getElementById('pay-btn').innerHTML='💳 Payer maintenant';
+  document.getElementById('submit-btn').disabled=false;
+  document.getElementById('pay-btn').disabled=false;
+
   if(error){toast('Erreur : '+error.message);return;}
+
+  // Si paiement → rediriger vers Stripe
+  if(withPayment){
+    var res = await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/stripe-payment', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu'},
+      body:JSON.stringify({
+        amount:price,
+        currency:'eur',
+        booking_ref:ref,
+        customer_email:em,
+        customer_name:fn+' '+ln,
+        description:'Course Yan Transport — '+pickup+' → '+dropoff
+      })
+    });
+    var data = await res.json();
+    if(data.url){
+      window.location.href = data.url;
+      return;
+    } else {
+      toast('Erreur paiement : '+(data.error||'Réessayez'));
+      return;
+    }
+  }
+
+  // Sans paiement → page succès
   document.getElementById('succ-ref').textContent=ref;
   document.getElementById('succ-email').textContent=em;
   document.getElementById('succ-detail').innerHTML=
@@ -1136,6 +1185,7 @@ function renderRides(){
       '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+(r.night?'<span class="chip hl">Nuit</span>':'')+'</div>'+
       '<div class="rc-foot"><span style="font-size:11px;color:var(--muted)">'+r.name+' · '+r.phone+'</span><span class="rc-price">'+fmt(r.price||0)+' €</span></div>'+
       (r.price_modified?'<div style="margin-top:4px;"><span class="price-modified-badge">Prix modifié par l\'admin</span></div>':'')+
+      (r.paid?'<div style="margin-top:4px;"><span style="background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">✓ Payé en ligne</span></div>':'')+
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
       (sa?
         '<div class="price-edit-box"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\')">Valider</button></div></div>'+
@@ -1656,11 +1706,32 @@ renderForfaits();
 var section=document.getElementById('forfait-section');
 if(section)section.style.display='none';
 
+// Gérer retour Stripe
+var urlParams = new URLSearchParams(window.location.search);
+var paymentStatus = urlParams.get('payment');
+var paymentRef = urlParams.get('ref');
+if(paymentStatus === 'success' && paymentRef) {
+  // Marquer comme payé dans Supabase
+  sb.from('bookings').update({paid: true}).eq('ref', paymentRef).then(function(){
+    toast('✓ Paiement confirmé — '+paymentRef);
+  });
+  // Nettoyer l'URL
+  window.history.replaceState({}, '', '/');
+  // Afficher message succès
+  setTimeout(function(){
+    document.getElementById('succ-ref').textContent = paymentRef;
+    document.getElementById('succ-email').textContent = '';
+    document.getElementById('succ-detail').innerHTML = '<div class="dc-r"><span class="dc-k">Statut paiement</span><span style="color:var(--green);font-weight:700;">✓ Payé par carte</span></div>';
+    go('p-success');
+  }, 500);
+} else if(paymentStatus === 'cancel') {
+  window.history.replaceState({}, '', '/');
+  setTimeout(function(){ toast('Paiement annulé — réservation conservée sans paiement'); }, 500);
+}
+
 // PWA Service Worker
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').then(function(){
-    console.log('SW registered');
-  }).catch(function(e){ console.log('SW error', e); });
+  navigator.serviceWorker.register('/sw.js').catch(function(e){ console.log('SW error', e); });
 }
 
 // Realtime
@@ -1668,7 +1739,6 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   if(document.getElementById('p-admin').classList.contains('on')) loadRides();
   if(document.getElementById('p-client-dash').classList.contains('on')) loadClientRides();
   if(document.getElementById('p-driver').classList.contains('on')) loadDriverRides();
-  // Suivi temps réel — mise à jour position chauffeur
   if(payload.new && payload.new.ref && document.getElementById('tracking-'+payload.new.ref)){
     updateTrackingStatus(payload.new);
   }
