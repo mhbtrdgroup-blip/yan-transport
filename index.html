@@ -593,14 +593,63 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <button class="hadmin" onclick="driverLogout()" style="margin-left:auto;">Déconnexion</button>
     </div>
   </div>
-  <div class="sbody">
-    <div class="sec">Mes courses assignées</div>
-    <div id="driver-rides"></div>
-    <div class="sec" style="margin-top:18px">Mon véhicule</div>
-    <div class="card">
-      <div class="field"><label>Marque & modèle</label><input type="text" id="drv-car" placeholder="Mercedes Classe E"></div>
-      <div class="frow"><div class="field"><label>Immatriculation</label><input type="text" id="drv-plate" placeholder="AB-123-CD"></div><div class="field"><label>Type</label><select id="drv-type"><option>Berline</option><option>Van</option></select></div></div>
-      <button class="btn-o" onclick="saveVehicle()">Enregistrer mon véhicule</button>
+
+  <!-- STATS CHAUFFEUR -->
+  <div style="background:var(--navy);padding:16px 18px;display:flex;gap:10px;flex-shrink:0;">
+    <div style="flex:1;background:rgba(255,255,255,.07);border-radius:12px;padding:12px;text-align:center;">
+      <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:#fff;" id="drv-st-pending">—</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">À accepter</div>
+    </div>
+    <div style="flex:1;background:rgba(255,255,255,.07);border-radius:12px;padding:12px;text-align:center;">
+      <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:var(--orange);" id="drv-st-ongoing">—</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">En cours</div>
+    </div>
+    <div style="flex:1;background:rgba(255,255,255,.07);border-radius:12px;padding:12px;text-align:center;">
+      <div style="font-family:Arial,sans-serif;font-size:18px;font-weight:700;color:#4caf50;" id="drv-st-ca">—</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Mon CA</div>
+    </div>
+  </div>
+
+  <!-- TABS CHAUFFEUR -->
+  <div style="background:#fff;border-bottom:1px solid var(--border);display:flex;flex-shrink:0;">
+    <button class="atab on" id="drv-tab-active" onclick="drvTab('active')">En attente</button>
+    <button class="atab" id="drv-tab-ongoing" onclick="drvTab('ongoing')">En route</button>
+    <button class="atab" id="drv-tab-done" onclick="drvTab('done')">Terminées</button>
+    <button class="atab" id="drv-tab-vehicle" onclick="drvTab('vehicle')">Véhicule</button>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;">
+    <!-- COURSES ACTIVES -->
+    <div id="drv-pan-active" style="padding:16px;">
+      <div id="driver-rides"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+    </div>
+
+    <!-- EN ROUTE -->
+    <div id="drv-pan-ongoing" style="display:none;padding:16px;">
+      <div id="driver-rides-ongoing"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+    </div>
+
+    <!-- TERMINÉES -->
+    <div id="drv-pan-done" style="display:none;padding:16px;">
+      <div style="background:var(--navy);border-radius:14px;padding:16px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:9px;letter-spacing:3px;color:var(--blue4);text-transform:uppercase;margin-bottom:4px;">Total gagné</div>
+        <div style="font-family:Arial,sans-serif;font-size:36px;color:#fff;font-weight:700;" id="drv-ca-total">0.00 €</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;" id="drv-ca-count">0 course(s) terminée(s)</div>
+      </div>
+      <div id="driver-rides-done"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+    </div>
+
+    <!-- VÉHICULE -->
+    <div id="drv-pan-vehicle" style="display:none;padding:16px;">
+      <div class="sec">Mon véhicule</div>
+      <div class="card">
+        <div class="field"><label>Marque & modèle</label><input type="text" id="drv-car" placeholder="Mercedes Classe E"></div>
+        <div class="frow">
+          <div class="field"><label>Immatriculation</label><input type="text" id="drv-plate" placeholder="AB-123-CD"></div>
+          <div class="field"><label>Type</label><select id="drv-type"><option>Berline</option><option>Van</option></select></div>
+        </div>
+        <button class="btn-o" onclick="saveVehicle()">Enregistrer mon véhicule</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1253,37 +1302,108 @@ async function deleteDriver(id){
   await loadAdminDrivers();toast('Chauffeur supprimé');
 }
 
-// ── DRIVER RIDES ──
-async function loadDriverRides(){
-  var el=document.getElementById('driver-rides');
-  if(!el)return;
-  if(!currentDriverName){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Non connecté.</div>';return;}
-  var {data}=await sb.from('bookings').select('*').eq('driver',currentDriverName).in('status',['assigned','accepted','ongoing']).order('date',{ascending:true});
-  var mine=data||[];
-  if(!mine.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée.</div>';return;}
-  el.innerHTML=mine.map(function(r){
-    var mapsUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
-    return '<div class="ride-card">'+
-      '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span style="font-family:Arial,sans-serif;font-size:17px;font-weight:700;color:var(--navy)">'+fmt(r.price||0)+' €</span></div>'+
-      '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
-      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
-      '<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
-      (r.message?'<div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:4px;">'+r.message+'</div>':'')+
-      (r.price_modified?'<div style="margin-bottom:5px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
-      '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
-        '<button class="da-btn da-ac" onclick="dAct(\''+r.ref+'\',\'accepted\')" '+(r.status!=='assigned'?'disabled':'')+'>Accepter</button>'+
-        '<button class="da-btn da-st" onclick="dAct(\''+r.ref+'\',\'ongoing\')" '+(r.status!=='accepted'?'disabled':'')+'>Démarrer</button>'+
-        '<button class="da-btn da-fi" onclick="dAct(\''+r.ref+'\',\'done\')" '+(r.status!=='ongoing'?'disabled':'')+'>Terminer</button>'+
-        '<a href="'+mapsUrl+'" class="da-btn da-nav" target="_blank">Nav.</a>'+
-      '</div>'+
-    '</div>';
-  }).join('');
+// ── DRIVER TABS ──
+function drvTab(t){
+  ['active','ongoing','done','vehicle'].forEach(function(x){
+    document.getElementById('drv-pan-'+x).style.display='none';
+    document.getElementById('drv-tab-'+x).classList.remove('on');
+  });
+  document.getElementById('drv-pan-'+t).style.display='block';
+  document.getElementById('drv-tab-'+t).classList.add('on');
+  if(t==='done') loadDriverRidesDone();
 }
+
+function drvRideCard(r, showActions){
+  var mapsUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
+  var actions = '';
+  if(showActions){
+    actions = '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
+      '<button class="da-btn da-ac" onclick="dAct(\''+r.ref+'\',\'accepted\')" '+(r.status!=='assigned'?'disabled':'')+'>Accepter</button>'+
+      '<button class="da-btn da-st" onclick="dAct(\''+r.ref+'\',\'ongoing\')" '+(r.status!=='accepted'?'disabled':'')+'>Démarrer</button>'+
+      '<button class="da-btn da-fi" onclick="dAct(\''+r.ref+'\',\'done\')" '+(r.status!=='ongoing'?'disabled':'')+'>Terminer</button>'+
+      '<a href="'+mapsUrl+'" class="da-btn da-nav" target="_blank">Nav.</a>'+
+    '</div>';
+  } else {
+    actions = '<div style="margin-top:8px;display:flex;justify-content:flex-end;"><span class="badge b-done">Terminée</span></div>';
+  }
+  return '<div class="ride-card">'+
+    '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span style="font-family:Arial,sans-serif;font-size:17px;font-weight:700;color:var(--navy)">'+fmt(r.price||0)+' €</span></div>'+
+    '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
+    '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
+    '<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
+    (r.message?'<div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:4px;">'+r.message+'</div>':'')+
+    (r.price_modified?'<div style="margin-bottom:5px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
+    actions+
+  '</div>';
+}
+
+// ── DRIVER RIDES (actives + en route) ──
+async function loadDriverRides(){
+  if(!currentDriverName) return;
+
+  // Stats globales
+  var {data:allData}=await sb.from('bookings').select('price,status').eq('driver',currentDriverName);
+  var all=allData||[];
+  var pending=all.filter(function(r){return r.status==='assigned'||r.status==='accepted';});
+  var ongoing=all.filter(function(r){return r.status==='ongoing';});
+  var done=all.filter(function(r){return r.status==='done';});
+  var ca=done.reduce(function(a,r){return a+(r.price||0);},0);
+  var stPending=document.getElementById('drv-st-pending');
+  var stOngoing=document.getElementById('drv-st-ongoing');
+  var stCa=document.getElementById('drv-st-ca');
+  if(stPending)stPending.textContent=pending.length;
+  if(stOngoing)stOngoing.textContent=ongoing.length;
+  if(stCa)stCa.textContent=fmt(ca)+' €';
+
+  // Courses à accepter/démarrer
+  var el=document.getElementById('driver-rides');
+  if(!el) return;
+  var {data}=await sb.from('bookings').select('*').eq('driver',currentDriverName).in('status',['assigned','accepted']).order('date',{ascending:true});
+  var mine=data||[];
+  if(!mine.length){
+    el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course en attente.</div>';
+  } else {
+    el.innerHTML=mine.map(function(r){return drvRideCard(r, true);}).join('');
+  }
+
+  // Courses en route
+  var el2=document.getElementById('driver-rides-ongoing');
+  if(!el2) return;
+  var {data:ongoingData}=await sb.from('bookings').select('*').eq('driver',currentDriverName).eq('status','ongoing').order('date',{ascending:true});
+  var ongoingRides=ongoingData||[];
+  if(!ongoingRides.length){
+    el2.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course en route.</div>';
+  } else {
+    el2.innerHTML=ongoingRides.map(function(r){return drvRideCard(r, true);}).join('');
+  }
+}
+
+async function loadDriverRidesDone(){
+  if(!currentDriverName) return;
+  var el=document.getElementById('driver-rides-done');
+  if(!el) return;
+  var {data}=await sb.from('bookings').select('*').eq('driver',currentDriverName).eq('status','done').order('date',{ascending:false});
+  var rides=data||[];
+  var ca=rides.reduce(function(a,r){return a+(r.price||0);},0);
+  var caEl=document.getElementById('drv-ca-total');
+  var countEl=document.getElementById('drv-ca-count');
+  if(caEl)caEl.textContent=fmt(ca)+' €';
+  if(countEl)countEl.textContent=rides.length+' course(s) terminée(s)';
+  if(!rides.length){
+    el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course terminée.</div>';
+    return;
+  }
+  el.innerHTML=rides.map(function(r){return drvRideCard(r, false);}).join('');
+}
+
 async function dAct(ref,s){
   await sb.from('bookings').update({status:s}).eq('ref',ref);
-  var m={accepted:'Course acceptée',ongoing:'Démarrée !',done:'Course terminée'};
-  toast(m[s]||'Mis à jour');await loadDriverRides();
+  var m={accepted:'Course acceptée ✓',ongoing:'Course démarrée !',done:'Course terminée ✓'};
+  toast(m[s]||'Mis à jour');
+  await loadDriverRides();
+  if(s==='done') drvTab('done');
 }
+
 function saveVehicle(){
   var c=document.getElementById('drv-car').value;
   var p=document.getElementById('drv-plate').value;
