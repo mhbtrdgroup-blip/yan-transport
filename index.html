@@ -22,7 +22,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
-#p-login.on,#p-success.on{display:flex;}
+#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on{display:flex;}
 
 /* COMMUNS */
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
@@ -42,6 +42,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .btn-p{width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);}
 .btn-o{width:100%;background:transparent;color:var(--blue2);border:1.5px solid var(--blue2);padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-top:8px;}
 .btn-d{width:100%;background:transparent;color:var(--red);border:1.5px solid var(--red);padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-top:8px;}
+.btn-navy{width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-top:8px;}
 .info{background:var(--ice);border:1px solid var(--border2);border-radius:11px;padding:12px 14px;margin-bottom:14px;font-size:11px;color:#0c447c;line-height:1.7;font-weight:500;}
 .badge{font-size:9px;font-weight:700;letter-spacing:.5px;padding:3px 9px;border-radius:20px;text-transform:uppercase;}
 .b-new{background:var(--ice);color:#0c447c;}
@@ -60,12 +61,13 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .hinner{display:flex;align-items:center;gap:10px;}
 .hname{font-family:var(--ft);font-size:16px;color:#fff;font-weight:700;line-height:1;}
 .hsub{font-size:8px;color:var(--blue4);letter-spacing:3px;font-weight:500;text-transform:uppercase;margin-top:2px;}
-.hadmin{margin-left:auto;padding:6px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);background:transparent;font-family:var(--fb);}
+.hadmin{padding:6px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);background:transparent;font-family:var(--fb);}
 .hero{background:var(--navy);padding:32px 22px 28px;}
 .hero-title{font-family:var(--ft);font-size:40px;color:#fff;font-weight:700;line-height:1.05;margin-bottom:14px;}
 .hero-title em{color:var(--blue3);font-style:normal;}
 .hero-sub{font-size:12px;color:rgba(255,255,255,.45);line-height:1.9;margin-bottom:26px;font-weight:300;}
 .hero-btn{display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:17px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:14px;font-family:var(--fb);}
+.hero-btn2{display:block;width:100%;background:transparent;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.25);padding:13px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:14px;font-family:var(--fb);margin-top:10px;}
 .stats-strip{display:flex;border-top:1px solid rgba(255,255,255,.07);background:var(--navy);}
 .stat-s{flex:1;padding:15px 10px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
 .stat-s:last-child{border-right:none;}
@@ -114,15 +116,11 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .atabs{background:#fff;border-bottom:1px solid var(--border);display:flex;position:sticky;top:0;z-index:10;}
 .atab{flex:1;padding:12px 2px;text-align:center;font-size:8px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;font-weight:700;font-family:var(--fb);}
 .atab.on{color:var(--blue2);border-bottom-color:var(--blue2);}
-
-/* STAT CARDS CLIQUABLES */
-.stats-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px;}
-.stat-b{background:#fff;border:1px solid var(--border);border-radius:13px;padding:13px;cursor:pointer;transition:border-color .2s;}
-.stat-b:active,.stat-b.active-filter{border-color:var(--blue2);background:var(--ice);}
-.stat-bn{font-family:Arial,sans-serif;font-size:26px;font-weight:700;color:var(--text);}
+.stats-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px;}
+.stat-b{background:#fff;border:1px solid var(--border);border-radius:13px;padding:13px;cursor:pointer;}
+.stat-b.active-filter{border-color:var(--blue2);background:var(--ice);}
+.stat-bn{font-family:Arial,sans-serif;font-size:24px;font-weight:700;color:var(--text);}
 .stat-bl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;font-weight:600;}
-
-/* RIDE CARDS */
 .ride-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
 .rc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .rc-ref{font-size:10px;font-weight:700;color:var(--navy);letter-spacing:1px;}
@@ -142,16 +140,12 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .abtn{background:var(--blue2);color:#fff;border:none;padding:9px 11px;font-size:9px;letter-spacing:1px;cursor:pointer;border-radius:9px;font-weight:700;font-family:var(--fb);text-transform:uppercase;}
 .sbtn{background:var(--red-bg);color:var(--red);border:none;padding:9px 10px;font-size:9px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);text-transform:uppercase;}
 .nbtn{background:var(--orange-bg);color:var(--orange);border:none;padding:9px 10px;font-size:9px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);text-transform:uppercase;}
-
-/* EDIT PRIX */
-.price-edit-box{background:var(--ice);border:1.5px solid var(--blue2);border-radius:11px;padding:13px;margin-top:10px;}
+.price-edit-box{background:var(--ice);border:1.5px solid var(--blue2);border-radius:11px;padding:12px;margin-top:10px;}
 .price-edit-box label{font-size:10px;color:var(--blue2);font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;}
 .price-edit-row{display:flex;gap:8px;align-items:center;}
 .price-edit-input{flex:1;background:#fff;border:1.5px solid var(--blue2);color:var(--navy);padding:10px 13px;font-size:16px;font-family:Arial,sans-serif;font-weight:700;outline:none;border-radius:9px;}
 .price-edit-btn{background:var(--navy);color:#fff;border:none;padding:10px 14px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
-.price-modified-badge{display:inline-block;background:#fff3e0;border:1px solid #ffe0b2;color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
-
-/* PRICING */
+.price-modified-badge{display:inline-block;background:#fff3e0;border:1px solid #ffe0b2;color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
 .prow{display:flex;align-items:center;gap:10px;padding:11px;background:#fff;border:1px solid var(--border);border-radius:11px;margin-bottom:8px;}
 .prow-ico{width:30px;height:30px;background:var(--ice);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .prow-lbl{flex:1;font-size:12px;font-weight:600;color:var(--text);}
@@ -167,16 +161,12 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .sim-res{border-top:1px solid rgba(255,255,255,.1);padding-top:11px;text-align:center;}
 .sim-tot{font-family:Arial,sans-serif;font-size:30px;color:#fff;font-weight:700;}
 .sim-bd{font-size:10px;color:rgba(255,255,255,.4);margin-top:4px;line-height:1.7;}
-
-/* DISPOS */
 .dispo-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
 .dday{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 3px;text-align:center;cursor:pointer;}
 .dday.off{background:var(--red-bg);border-color:#ffcdd2;}
 .dday-n{font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;}
 .dday-d{font-size:13px;font-weight:700;color:var(--text);margin-top:2px;}
 .dday.off .dday-d,.dday.off .dday-n{color:var(--red);}
-
-/* RAPPORT */
 .rep-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:12px;}
 .rep-ttl{font-size:9px;letter-spacing:2px;color:var(--blue2);text-transform:uppercase;font-weight:700;margin-bottom:11px;}
 .rep-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--off);font-size:12px;}
@@ -188,8 +178,6 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .bar-lbl{font-size:10px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;}
 .bar-bg{background:var(--off);border-radius:6px;height:8px;overflow:hidden;}
 .bar-fill{height:8px;border-radius:6px;background:var(--blue2);}
-
-/* DRIVER */
 .da-btn{flex:1;padding:9px 4px;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:8px;font-family:var(--fb);font-weight:700;border:1.5px solid;background:transparent;}
 .da-ac{color:var(--green);border-color:var(--green);}
 .da-st{color:var(--orange);border-color:var(--orange);}
@@ -198,10 +186,14 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .da-btn:disabled{opacity:.25;cursor:default;}
 .cgv-art{font-family:var(--ft);font-size:15px;font-weight:700;color:var(--navy);margin:16px 0 6px;}
 .cgv-p{font-size:11px;color:var(--muted);line-height:1.8;margin-bottom:8px;}
+
+/* CLIENT ESPACE */
+.client-ride-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;}
+.crc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.crc-ref{font-size:10px;font-weight:700;color:var(--navy);letter-spacing:1px;}
 </style>
 </head>
 <body>
-
 <div class="toast" id="toast"></div>
 
 <!-- ══ HOME ══ -->
@@ -210,7 +202,10 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <div class="hinner">
       <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;">
       <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Service Privé</div></div>
-      <button class="hadmin" onclick="go('p-login')">Admin</button>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="hadmin" onclick="goClientSpace()">Mon espace</button>
+        <button class="hadmin" onclick="go('p-login')">Admin</button>
+      </div>
     </div>
   </div>
   <div class="hero">
@@ -220,6 +215,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <div class="hero-title">Votre confort,<br><em>notre priorité.</em></div>
     <div class="hero-sub">Transferts premium vers les gares, aéroports et toutes destinations. Disponible 24h/24, 7j/7.</div>
     <button class="hero-btn" onclick="go('p-booking')">Réserver maintenant</button>
+    <button class="hero-btn2" onclick="goClientSpace()">Mon espace client →</button>
   </div>
   <div class="stats-strip">
     <div class="stat-s"><div class="stat-sn">24/7</div><div class="stat-sl">Disponible</div></div>
@@ -249,7 +245,6 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <div style="display:flex;align-items:center;gap:14px;padding:14px;border-bottom:1px solid var(--off);"><div style="width:34px;height:34px;background:var(--ice);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div style="font-size:13px;font-weight:600;">Groupe & événements</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">Mariages · Séminaires · Soirées</div></div></div>
       <div style="display:flex;align-items:center;gap:14px;padding:14px;"><div style="width:34px;height:34px;background:var(--ice);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><div style="font-size:13px;font-weight:600;">Mise à disposition</div><div style="font-size:11px;color:var(--muted);margin-top:1px;">À l'heure · À la journée</div></div></div>
     </div>
-    <div class="sec">Pourquoi nous choisir</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;">
       <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;"><div style="font-size:18px;margin-bottom:7px;">✓</div><div style="font-size:12px;font-weight:700;margin-bottom:3px;">Prix fixe</div><div style="font-size:10px;color:var(--muted);line-height:1.6;">Connu avant la course</div></div>
       <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;"><div style="font-size:18px;margin-bottom:7px;">⏱</div><div style="font-size:12px;font-weight:700;margin-bottom:3px;">Ponctualité</div><div style="font-size:10px;color:var(--muted);line-height:1.6;">Toujours à l'heure</div></div>
@@ -265,6 +260,60 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
   </div>
 </div>
 
+<!-- ══ CLIENT LOGIN ══ -->
+<div class="page" id="p-client-login" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:16px;">
+      <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:64px;height:64px;border-radius:50%;object-fit:cover;">
+    </div>
+    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Mon espace client</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:20px;">Connectez-vous pour gérer vos courses</div>
+    <div class="field"><label>E-mail</label><input type="email" id="cl-email" placeholder="vous@email.fr"></div>
+    <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="cl-pass" placeholder="••••••"></div>
+    <div id="cl-err" style="display:none;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px;font-size:11px;color:var(--red);text-align:center;margin-bottom:12px;"></div>
+    <button class="btn-p" onclick="clientLogin()">Se connecter</button>
+    <button class="btn-o" onclick="go('p-client-register')">Créer un compte</button>
+    <button class="btn-navy" onclick="go('p-home')">← Retour à l'accueil</button>
+  </div>
+</div>
+
+<!-- ══ CLIENT REGISTER ══ -->
+<div class="page" id="p-client-register" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div class="login-card">
+    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Créer un compte</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:20px;">Yan Transport · Client</div>
+    <div class="frow">
+      <div class="field"><label>Prénom *</label><input type="text" id="cr-first" placeholder="Prénom"></div>
+      <div class="field"><label>Nom *</label><input type="text" id="cr-last" placeholder="Nom"></div>
+    </div>
+    <div class="field"><label>Téléphone *</label><input type="tel" id="cr-phone" placeholder="06 00 00 00 00"></div>
+    <div class="field"><label>E-mail *</label><input type="email" id="cr-email" placeholder="vous@email.fr"></div>
+    <div class="field" style="margin-bottom:18px"><label>Mot de passe *</label><input type="password" id="cr-pass" placeholder="••••••"></div>
+    <div id="cr-err" style="display:none;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px;font-size:11px;color:var(--red);text-align:center;margin-bottom:12px;"></div>
+    <button class="btn-p" onclick="clientRegister()">Créer mon compte</button>
+    <button class="btn-o" onclick="go('p-client-login')">Déjà un compte ? Se connecter</button>
+    <button class="btn-navy" onclick="go('p-home')">← Retour</button>
+  </div>
+</div>
+
+<!-- ══ CLIENT DASHBOARD ══ -->
+<div class="page flex" id="p-client-dash">
+  <div class="hbar">
+    <div class="hinner">
+      <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+      <div><div class="hname" id="client-welcome">Bonjour</div><div class="hsub">Espace Client</div></div>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="hadmin" onclick="go('p-booking')">+ Réserver</button>
+        <button class="hadmin" onclick="clientLogout()">Déconnexion</button>
+      </div>
+    </div>
+  </div>
+  <div class="sbody">
+    <div class="sec">Mes réservations</div>
+    <div id="client-rides"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+  </div>
+</div>
+
 <!-- ══ BOOKING ══ -->
 <div class="page flex" id="p-booking">
   <div class="topbar">
@@ -273,9 +322,10 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <span style="width:50px"></span>
   </div>
   <div class="sbody">
-    <div class="fsec">Forfaits rapides</div>
-    <div class="forfait-grid" id="forfait-grid"></div>
-
+    <div id="forfait-section">
+      <div class="fsec">Forfaits rapides</div>
+      <div class="forfait-grid" id="forfait-grid"></div>
+    </div>
     <div class="fsec">Trajet</div>
     <div class="card">
       <div class="field"><label>Prise en charge *</label><input type="text" id="f-pickup" placeholder="Adresse, gare, aéroport..."></div>
@@ -286,13 +336,11 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       </div>
       <div class="dispo-warn" id="dispo-warn">Cette date est indisponible. Contactez-nous.</div>
     </div>
-
     <div class="fsec">Véhicule</div>
     <div class="vf-grid">
       <div class="vf-opt sel" id="vf-b" onclick="selVeh('berline')"><span class="vf-ico">🚗</span><div class="vf-nm">Berline</div><div style="font-size:10px;margin-top:3px;">1–4 pax</div></div>
       <div class="vf-opt" id="vf-v" onclick="selVeh('van')"><span class="vf-ico">🚐</span><div class="vf-nm">Van</div><div style="font-size:10px;margin-top:3px;">1–8 pax</div></div>
     </div>
-
     <div class="fsec">Distance & prix</div>
     <div class="card">
       <div class="field"><label>Distance (km) — calculée via Google Maps</label><input type="number" id="f-km" placeholder="Saisissez les adresses ci-dessus" min="1" oninput="calcP()" readonly></div>
@@ -304,7 +352,6 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
         </div>
       </div>
     </div>
-
     <div class="fsec">Passagers & bagages</div>
     <div class="card">
       <div class="frow">
@@ -312,7 +359,6 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
         <div class="field"><label>Valises</label><select id="f-bags"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></div>
       </div>
     </div>
-
     <div class="fsec">Vol / Train (optionnel)</div>
     <div class="card">
       <div class="frow">
@@ -321,9 +367,8 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       </div>
       <div class="field"><label>Message (optionnel)</label><textarea id="f-msg" placeholder="Siège bébé, infos supplémentaires..."></textarea></div>
     </div>
-
     <div class="fsec">Vos coordonnées</div>
-    <div class="card">
+    <div class="card" id="coords-card">
       <div class="frow">
         <div class="field"><label>Prénom *</label><input type="text" id="f-first" placeholder="Prénom"></div>
         <div class="field"><label>Nom *</label><input type="text" id="f-last" placeholder="Nom"></div>
@@ -331,7 +376,6 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <div class="field"><label>Téléphone *</label><input type="tel" id="f-phone" placeholder="+33 6 00 00 00 00"></div>
       <div class="field"><label>E-mail *</label><input type="email" id="f-email" placeholder="vous@email.fr"></div>
     </div>
-
     <div class="cancel-pol"><strong>Annulation :</strong> Gratuite jusqu'à 24h · 50% entre 24h–2h · 100% moins de 2h ou no-show.</div>
     <div class="cgv-wrap">
       <input type="checkbox" id="cgv-chk">
@@ -358,31 +402,30 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 
 <!-- ══ CGV ══ -->
 <div class="page flex" id="p-cgv">
-  <div class="topbar"><button class="tb-back" onclick="go('p-booking')">← Retour</button><span class="tb-title">Conditions Générales</span><span style="width:50px"></span></div>
+  <div class="topbar"><button class="tb-back" onclick="go('p-booking')">← Retour</button><span class="tb-title">CGV</span><span style="width:50px"></span></div>
   <div class="sbody">
     <div class="cgv-art">1. Objet</div><div class="cgv-p">Les présentes CGV régissent les conditions de réservation des services de transport avec chauffeur de Yan Transport, VTC basé à Marseille.</div>
-    <div class="cgv-art">2. Réservation</div><div class="cgv-p">Toute réservation constitue un contrat ferme dès confirmation par e-mail. Le client s'engage à fournir des informations exactes.</div>
-    <div class="cgv-art">3. Tarification</div><div class="cgv-p">Le prix est calculé selon la distance réelle et la gamme choisie. Le prix total est affiché avant confirmation. Les prix sont TTC. L'admin se réserve le droit de modifier le prix avant confirmation finale.</div>
+    <div class="cgv-art">2. Réservation</div><div class="cgv-p">Toute réservation constitue un contrat ferme dès confirmation par e-mail.</div>
+    <div class="cgv-art">3. Tarification</div><div class="cgv-p">Le prix est calculé selon la distance réelle et la gamme choisie. Les prix sont TTC. L'admin se réserve le droit de modifier le prix avant confirmation finale.</div>
     <div class="cgv-art">4. Annulation & no-show</div><div class="cgv-p">— Annulation gratuite jusqu'à 24h avant.<br>— Entre 24h et 2h : 50% du montant dû.<br>— Moins de 2h ou absence : 100% du montant dû.</div>
-    <div class="cgv-art">5. Responsabilité</div><div class="cgv-p">Yan Transport s'engage à respecter les horaires dans la limite des aléas de circulation.</div>
-    <div class="cgv-art">6. Données personnelles</div><div class="cgv-p">Données utilisées exclusivement pour la prestation. Contact : contact@yantransport.app</div>
+    <div class="cgv-art">5. Données personnelles</div><div class="cgv-p">Données utilisées exclusivement pour la prestation. Contact : contact@yantransport.app</div>
     <button class="btn-p" onclick="go('p-booking')" style="margin-top:16px;">Retour au formulaire</button>
   </div>
 </div>
 
 <!-- ══ RGPD ══ -->
 <div class="page flex" id="p-rgpd">
-  <div class="topbar"><button class="tb-back" onclick="go('p-booking')">← Retour</button><span class="tb-title">Confidentialité & RGPD</span><span style="width:50px"></span></div>
+  <div class="topbar"><button class="tb-back" onclick="go('p-booking')">← Retour</button><span class="tb-title">Confidentialité</span><span style="width:50px"></span></div>
   <div class="sbody">
     <div class="cgv-art">Responsable</div><div class="cgv-p">Yan Transport · contact@yantransport.app · Marseille.</div>
-    <div class="cgv-art">Données collectées</div><div class="cgv-p">Nom, prénom, e-mail, téléphone, adresses. Nécessaires à l'exécution de la réservation.</div>
+    <div class="cgv-art">Données collectées</div><div class="cgv-p">Nom, prénom, e-mail, téléphone, adresses.</div>
     <div class="cgv-art">Durée de conservation</div><div class="cgv-p">3 ans à compter de la dernière réservation.</div>
     <div class="cgv-art">Vos droits</div><div class="cgv-p">Accès, rectification, suppression. Contact : contact@yantransport.app. Réclamation : cnil.fr</div>
     <button class="btn-p" onclick="go('p-booking')" style="margin-top:16px;">Retour au formulaire</button>
   </div>
 </div>
 
-<!-- ══ LOGIN ══ -->
+<!-- ══ ADMIN LOGIN ══ -->
 <div class="page" id="p-login" style="align-items:center;justify-content:center;padding:30px 20px;">
   <div class="login-card">
     <div class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#90caf9" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
@@ -427,19 +470,20 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <button class="atab" id="tab-e" onclick="aTab('e')">Équipe</button>
   </div>
   <div style="flex:1;overflow-y:auto;">
-
     <!-- COURSES -->
     <div id="pan-c" style="padding:16px;">
-      <!-- STATS CLIQUABLES -->
       <div class="stats-g">
         <div class="stat-b active-filter" id="sf-all" onclick="filterRides('all')"><div class="stat-bn" id="st-tot">—</div><div class="stat-bl">Toutes</div></div>
         <div class="stat-b" id="sf-new" onclick="filterRides('new')"><div class="stat-bn" id="st-new" style="color:var(--blue2)">—</div><div class="stat-bl">À confirmer</div></div>
         <div class="stat-b" id="sf-assigned" onclick="filterRides('assigned')"><div class="stat-bn" id="st-act" style="color:var(--orange)">—</div><div class="stat-bl">Confirmées</div></div>
-        <div class="stat-b" id="sf-cancelled" onclick="filterRides('cancelled')"><div class="stat-bn" id="st-cancelled" style="color:var(--red)">—</div><div class="stat-bl">Annulées/No-show</div></div>
+        <div class="stat-b" id="sf-cancelled" onclick="filterRides('cancelled')"><div class="stat-bn" id="st-cancelled" style="color:var(--red)">—</div><div class="stat-bl">Annulées</div></div>
       </div>
-      <div class="stat-b" style="margin-bottom:16px;" id="sf-done" onclick="filterRides('done')"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div class="stat-bn" id="st-rev" style="color:var(--green);font-size:18px">—</div><div class="stat-bl">Terminées · CA</div></div><div style="font-size:10px;color:var(--muted)">Cliquer pour filtrer →</div></div></div>
-
-      <!-- CRÉER COURSE -->
+      <div class="stat-b" style="margin-bottom:14px;padding:13px;" id="sf-done" onclick="filterRides('done')">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div><div class="stat-bn" id="st-rev" style="color:var(--green);font-size:18px">—</div><div class="stat-bl">Terminées · CA total</div></div>
+          <div style="font-size:10px;color:var(--muted);">Filtrer →</div>
+        </div>
+      </div>
       <button onclick="toggleNewRide()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-bottom:14px;">+ Créer une course</button>
       <div id="new-ride-form" style="display:none;background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:16px;">
         <div class="sec">Nouvelle course</div>
@@ -472,23 +516,21 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
         <button class="btn-p" onclick="createRideAdmin()" style="margin-top:8px;">Créer la course</button>
         <button onclick="toggleNewRide()" style="width:100%;background:transparent;color:var(--muted);border:none;padding:10px;font-size:11px;cursor:pointer;font-family:var(--fb);margin-top:6px;">Annuler</button>
       </div>
-
       <div class="sec" id="rides-section-title">Toutes les courses</div>
       <div id="rides-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
     </div>
-
     <!-- TARIFS -->
     <div id="pan-t" style="display:none;padding:16px;">
       <div class="info">Formule : <strong>Prise en charge + (km × Prix/km) + Suppléments</strong></div>
-      <div class="sec">Forfaits rapides (affichés côté client)</div>
+      <div class="sec">Forfaits rapides (côté client)</div>
       <div id="forfaits-admin"></div>
       <button onclick="addForfait()" style="width:100%;background:transparent;border:1.5px dashed var(--border2);color:var(--blue2);padding:12px;font-size:11px;font-weight:700;border-radius:11px;cursor:pointer;font-family:var(--fb);margin-bottom:16px;">+ Ajouter un forfait</button>
       <div class="sec">Prise en charge fixe</div>
       <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline<div class="prow-sub">Forfait départ</div></div><input type="number" class="pinput" id="p-pb" value="8" min="0" step="0.5"><span class="punit">€</span></div>
       <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van<div class="prow-sub">Forfait départ</div></div><input type="number" class="pinput" id="p-pv" value="12" min="0" step="0.5"><span class="punit">€</span></div>
       <div class="sec" style="margin-top:14px">Prix au kilomètre</div>
-      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline<div class="prow-sub">Tarif km</div></div><input type="number" class="pinput" id="p-kb" value="1.80" min="0" step="0.05"><span class="punit">€/km</span></div>
-      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van<div class="prow-sub">Tarif km</div></div><input type="number" class="pinput" id="p-kv" value="2.50" min="0" step="0.05"><span class="punit">€/km</span></div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M5 17H3a2 2 0 01-2-2V9a2 2 0 012-2h14l4 4v4a2 2 0 01-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div><div class="prow-lbl">Berline</div><input type="number" class="pinput" id="p-kb" value="1.80" min="0" step="0.05"><span class="punit">€/km</span></div>
+      <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="prow-lbl">Van</div><input type="number" class="pinput" id="p-kv" value="2.50" min="0" step="0.05"><span class="punit">€/km</span></div>
       <div class="sec" style="margin-top:14px">Suppléments</div>
       <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg></div><div class="prow-lbl">Nuit (22h–6h)</div><input type="number" class="pinput" id="p-n" value="10" min="0"><span class="punit">€</span></div>
       <div class="prow"><div class="prow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="15" height="15"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg></div><div class="prow-lbl">Aéroport</div><input type="number" class="pinput" id="p-a" value="5" min="0"><span class="punit">€</span></div>
@@ -501,11 +543,10 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       </div>
       <button class="btn-p" onclick="savePrices()">Sauvegarder les tarifs</button>
     </div>
-
     <!-- DISPOS -->
     <div id="pan-d" style="display:none;padding:16px;">
       <div class="info">Cliquez sur un jour pour le bloquer.</div>
-      <div class="sec">Avril–Mai 2026</div>
+      <div class="sec">Calendrier</div>
       <div style="display:flex;gap:10px;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:3px;background:#fff;border:1px solid var(--border)"></div>Disponible</div>
         <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:3px;background:var(--red-bg);border:1px solid #ffcdd2"></div>Indisponible</div>
@@ -514,7 +555,6 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <div class="sec" style="margin-top:8px">Jours bloqués</div>
       <div id="dispo-list"></div>
     </div>
-
     <!-- RAPPORT -->
     <div id="pan-r" style="display:none;padding:16px;">
       <div class="stats-g">
@@ -528,10 +568,9 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <div class="rep-card"><div class="rep-ttl">Annulations & no-shows</div><div id="rep-cancel"></div></div>
       <div class="rep-card"><div class="rep-ttl">Clients récurrents</div><div id="rep-recurrent"></div></div>
     </div>
-
     <!-- ÉQUIPE -->
     <div id="pan-e" style="display:none;padding:16px;">
-      <div class="info">Ajoutez vos chauffeurs. Ils apparaîtront dans le dispatch automatiquement.</div>
+      <div class="info">Ajoutez vos chauffeurs ici.</div>
       <div class="sec">Ajouter un chauffeur</div>
       <div class="card" style="margin-bottom:16px;">
         <div class="frow"><div class="field"><label>Prénom *</label><input type="text" id="drv-new-first" placeholder="Prénom"></div><div class="field"><label>Nom *</label><input type="text" id="drv-new-last" placeholder="Nom"></div></div>
@@ -540,7 +579,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
         <button class="btn-p" onclick="addDriver()" style="margin-top:12px;">Ajouter le chauffeur</button>
       </div>
       <div class="sec">Chauffeurs enregistrés</div>
-      <div id="admin-drivers-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+      <div id="admin-drivers-list"></div>
     </div>
   </div>
 </div>
@@ -556,7 +595,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
   </div>
   <div class="sbody">
     <div class="sec">Mes courses assignées</div>
-    <div id="driver-rides"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+    <div id="driver-rides"></div>
     <div class="sec" style="margin-top:18px">Mon véhicule</div>
     <div class="card">
       <div class="field"><label>Marque & modèle</label><input type="text" id="drv-car" placeholder="Mercedes Classe E"></div>
@@ -567,18 +606,20 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 </div>
 
 <script>
-var sb = supabase.createClient('https://kxwsvdmnoyxblkvrlgar.supabase.co','sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu');
-var T = {pickup:{berline:8,van:12},km:{berline:1.80,van:2.50},night:10,airport:5,gare:3};
-var selVehCur = 'berline';
-var offDates = new Set();
-var lastRef = '';
-var ridesCache = [];
-var currentFilter = 'all';
-var currentDriverName = '';
-var currentDriverEmail = '';
-var forfaits = [];
+var sb=supabase.createClient('https://kxwsvdmnoyxblkvrlgar.supabase.co','sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu');
+var T={pickup:{berline:8,van:12},km:{berline:1.80,van:2.50},night:10,airport:5,gare:3};
+var selVehCur='berline';
+var offDates=new Set();
+var lastRef='';
+var ridesCache=[];
+var currentFilter='all';
+var currentDriverName='';
+var currentDriverEmail='';
+var currentClientEmail='';
+var currentClientName='';
+var forfaits=[];
 
-function fmt(n){ return parseFloat(n).toFixed(2); }
+function fmt(n){return parseFloat(n||0).toFixed(2);}
 
 // ── NAVIGATION ──
 function go(id){
@@ -586,6 +627,11 @@ function go(id){
   var el=document.getElementById(id);
   el.classList.add('on');
   el.scrollTop=0;
+}
+
+function goClientSpace(){
+  if(currentClientEmail){go('p-client-dash');loadClientRides();}
+  else{go('p-client-login');}
 }
 
 // ── GOOGLE MAPS ──
@@ -637,29 +683,33 @@ function selVeh(v){
 // ── FORFAITS ──
 function renderForfaits(){
   var grid=document.getElementById('forfait-grid');
+  var section=document.getElementById('forfait-section');
   if(!grid)return;
-  if(!forfaits.length){grid.innerHTML='';return;}
-  grid.innerHTML=forfaits.map(function(f){
-    return '<div class="forfait-card" onclick="applyForfait(\''+f.name+'\','+f.price+',\''+f.vehicle+'\')">'+
+  if(!forfaits.length){if(section)section.style.display='none';return;}
+  if(section)section.style.display='block';
+  grid.innerHTML=forfaits.map(function(f,i){
+    return '<div class="forfait-card" id="fc-'+i+'" onclick="applyForfait('+i+')">'+
       '<div class="forfait-name">'+f.name+'</div>'+
       '<div class="forfait-price">'+fmt(f.price)+' €</div>'+
       '<div class="forfait-sub">'+f.vehicle+'</div>'+
     '</div>';
   }).join('');
 }
-function applyForfait(name,price,vehicle){
+function applyForfait(i){
+  var f=forfaits[i];
   document.querySelectorAll('.forfait-card').forEach(function(c){c.classList.remove('sel');});
-  event.currentTarget.classList.add('sel');
-  selVeh(vehicle.toLowerCase());
+  var el=document.getElementById('fc-'+i);
+  if(el)el.classList.add('sel');
+  selVeh(f.vehicle.toLowerCase());
   document.getElementById('pp-wrap').style.display='block';
-  document.getElementById('pp-amt').textContent=fmt(price);
+  document.getElementById('pp-amt').textContent=fmt(f.price);
   document.getElementById('f-km').value='';
-  toast('Forfait '+name+' sélectionné : '+fmt(price)+' €');
+  toast('Forfait '+f.name+' : '+fmt(f.price)+' €');
 }
 function renderForfaitsAdmin(){
   var el=document.getElementById('forfaits-admin');
   if(!el)return;
-  if(!forfaits.length){el.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Aucun forfait. Ajoutez-en ci-dessous.</div>';return;}
+  if(!forfaits.length){el.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Aucun forfait.</div>';return;}
   el.innerHTML=forfaits.map(function(f,i){
     return '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">'+
       '<div style="flex:1"><div style="font-size:12px;font-weight:700;">'+f.name+'</div><div style="font-size:10px;color:var(--muted);">'+f.vehicle+' · '+fmt(f.price)+' €</div></div>'+
@@ -668,25 +718,124 @@ function renderForfaitsAdmin(){
   }).join('');
 }
 function addForfait(){
-  var name=prompt('Nom du forfait (ex: Aéroport MRS)');
-  if(!name)return;
-  var price=prompt('Prix (ex: 45)');
-  if(!price)return;
-  var veh=prompt('Véhicule (Berline ou Van)');
-  if(!veh)return;
-  forfaits.push({name:name,price:parseFloat(price),vehicle:veh});
-  renderForfaits();
-  renderForfaitsAdmin();
-  toast('Forfait ajouté');
+  var name=prompt('Nom du forfait (ex: Aéroport MRS)');if(!name)return;
+  var price=prompt('Prix en € (ex: 45)');if(!price)return;
+  var veh=prompt('Véhicule : tapez Berline ou Van');if(!veh)return;
+  forfaits.push({name:name,price:parseFloat(price),vehicle:veh.charAt(0).toUpperCase()+veh.slice(1).toLowerCase()});
+  renderForfaits();renderForfaitsAdmin();toast('Forfait ajouté');
 }
 function removeForfait(i){
-  forfaits.splice(i,1);
-  renderForfaits();
-  renderForfaitsAdmin();
-  toast('Forfait supprimé');
+  forfaits.splice(i,1);renderForfaits();renderForfaitsAdmin();toast('Forfait supprimé');
 }
 
-// ── DISPO ──
+// ── CLIENT AUTH ──
+async function clientLogin(){
+  var email=document.getElementById('cl-email').value.trim();
+  var pass=document.getElementById('cl-pass').value.trim();
+  var errEl=document.getElementById('cl-err');
+  errEl.style.display='none';
+  if(!email||!pass){toast('Remplissez email et mot de passe');return;}
+  var btn=document.querySelector('#p-client-login .btn-p');
+  btn.innerHTML='<span class="loader"></span>Connexion...';btn.disabled=true;
+  var {data,error}=await sb.auth.signInWithPassword({email:email,password:pass});
+  btn.innerHTML='Se connecter';btn.disabled=false;
+  if(error){errEl.textContent='Email ou mot de passe incorrect';errEl.style.display='block';return;}
+  currentClientEmail=email;
+  var {data:profile}=await sb.from('client_profiles').select('name,phone').eq('email',email).single();
+  if(profile){
+    currentClientName=profile.name||email;
+    document.getElementById('client-welcome').textContent='Bonjour, '+currentClientName.split(' ')[0];
+    prefillBookingForm(profile);
+  }
+  await loadClientRides();
+  go('p-client-dash');
+}
+
+async function clientRegister(){
+  var first=document.getElementById('cr-first').value.trim();
+  var last=document.getElementById('cr-last').value.trim();
+  var phone=document.getElementById('cr-phone').value.trim();
+  var email=document.getElementById('cr-email').value.trim();
+  var pass=document.getElementById('cr-pass').value.trim();
+  var errEl=document.getElementById('cr-err');
+  errEl.style.display='none';
+  if(!first||!last||!email||!pass||!phone){toast('Remplissez tous les champs');return;}
+  if(pass.length<6){errEl.textContent='Le mot de passe doit faire au moins 6 caractères';errEl.style.display='block';return;}
+  var btn=document.querySelector('#p-client-register .btn-p');
+  btn.innerHTML='<span class="loader"></span>Création...';btn.disabled=true;
+  var {data,error}=await sb.auth.signUp({email:email,password:pass});
+  btn.innerHTML='Créer mon compte';btn.disabled=false;
+  if(error){errEl.textContent=error.message;errEl.style.display='block';return;}
+  var name=first+' '+last;
+  await sb.from('client_profiles').upsert({email:email,name:name,phone:phone});
+  currentClientEmail=email;
+  currentClientName=name;
+  document.getElementById('client-welcome').textContent='Bonjour, '+first;
+  prefillBookingForm({name:name,phone:phone});
+  await loadClientRides();
+  go('p-client-dash');
+  toast('Compte créé ! Vérifiez votre email.');
+}
+
+async function clientLogout(){
+  await sb.auth.signOut();
+  currentClientEmail='';currentClientName='';
+  go('p-home');toast('Déconnecté');
+}
+
+function prefillBookingForm(profile){
+  if(profile.name){
+    var parts=(profile.name||'').split(' ');
+    var first=document.getElementById('f-first');
+    var last=document.getElementById('f-last');
+    if(first&&parts[0])first.value=parts[0];
+    if(last&&parts[1])last.value=parts.slice(1).join(' ');
+  }
+  if(profile.phone){
+    var ph=document.getElementById('f-phone');
+    if(ph)ph.value=profile.phone;
+  }
+  if(currentClientEmail){
+    var em=document.getElementById('f-email');
+    if(em)em.value=currentClientEmail;
+  }
+}
+
+async function loadClientRides(){
+  if(!currentClientEmail)return;
+  var {data}=await sb.from('bookings').select('*').eq('email',currentClientEmail).order('created_at',{ascending:false});
+  var el=document.getElementById('client-rides');
+  if(!el)return;
+  var rides=data||[];
+  if(!rides.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:20px;text-align:center;font-size:12px;color:var(--muted);">Vous n\'avez pas encore de réservation.<br><br><button onclick="go(\'p-booking\')" style="background:var(--blue2);color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);text-transform:uppercase;letter-spacing:1px;">Réserver maintenant</button></div>';return;}
+  var SM2={new:'À confirmer',assigned:'Confirmée',ongoing:'En route',done:'Terminée',cancelled:'Annulée',noshow:'No-show'};
+  var SC2={new:'b-new',assigned:'b-assigned',ongoing:'b-ongoing',done:'b-done',cancelled:'b-cancelled',noshow:'b-noshow'};
+  el.innerHTML=rides.map(function(r){
+    return '<div class="client-ride-card">'+
+      '<div class="crc-head">'+
+        '<div><div class="crc-ref">'+r.ref+'</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div>'+
+        '<span class="badge '+(SC2[r.status]||'b-new')+'">'+(SM2[r.status]||r.status)+'</span>'+
+      '</div>'+
+      '<div style="font-size:12px;font-weight:600;margin-bottom:3px;">📍 '+r.pickup+'</div>'+
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">🏁 '+r.dropoff+'</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;">'+
+        '<div style="font-size:11px;color:var(--muted);">'+r.vehicle+' · '+r.pax+' pax</div>'+
+        '<div style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:var(--navy)">'+fmt(r.price||0)+' €</div>'+
+      '</div>'+
+      (r.price_modified?'<div style="margin-top:5px;"><span class="price-modified-badge">Prix modifié par l\'admin</span></div>':'')+
+      (r.driver?'<div style="font-size:10px;color:var(--green);margin-top:5px;font-weight:600;">✓ Chauffeur assigné : '+r.driver+'</div>':'')+
+      (r.status==='new'?'<button onclick="cancelClientRide(\''+r.ref+'\')" style="width:100%;margin-top:10px;background:transparent;color:var(--red);border:1px solid var(--red);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);text-transform:uppercase;">Annuler</button>':'')+
+    '</div>';
+  }).join('');
+}
+
+async function cancelClientRide(ref){
+  if(!confirm('Annuler cette réservation ?'))return;
+  await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par le client depuis son espace'}).eq('ref',ref);
+  await loadClientRides();toast('Réservation annulée');
+}
+
+// ── DISPO CHECK ──
 async function checkDispo(){
   var d=document.getElementById('f-date').value;
   if(!d)return;
@@ -694,7 +843,7 @@ async function checkDispo(){
   document.getElementById('dispo-warn').style.display=(data&&data.length)?'block':'none';
 }
 
-// ── SUBMIT ──
+// ── SUBMIT BOOKING ──
 async function submitBooking(){
   var pickup=document.getElementById('f-pickup').value.trim();
   var dropoff=document.getElementById('f-dropoff').value.trim();
@@ -718,7 +867,7 @@ async function submitBooking(){
   lastRef=ref;
   var btn=document.getElementById('submit-btn');
   btn.innerHTML='<span class="loader"></span>Envoi...';btn.disabled=true;
-  var {error}=await sb.from('bookings').insert({ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,vehicle:selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1),km:km,pax:parseInt(document.getElementById('f-pax').value),bags:parseInt(document.getElementById('f-bags').value),flight:fl,train:tr,night:false,price:price,name:fn+' '+ln,phone:ph,email:em,message:msg,status:'new'});
+  var {error}=await sb.from('bookings').insert({ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,vehicle:selVehCur.charAt(0).toUpperCase()+selVehCur.slice(1),km:km,pax:parseInt(document.getElementById('f-pax').value),bags:parseInt(document.getElementById('f-bags').value),flight:fl,train:tr,night:false,price:price,name:fn+' '+ln,phone:ph,email:em,message:msg,status:'new',price_modified:false});
   btn.innerHTML='Confirmer la réservation';btn.disabled=false;
   if(error){toast('Erreur : '+error.message);return;}
   document.getElementById('succ-ref').textContent=ref;
@@ -731,6 +880,7 @@ async function submitBooking(){
     (fl?'<div class="dc-r"><span class="dc-k">Vol</span><span>'+fl+'</span></div>':'')+
     (tr?'<div class="dc-r"><span class="dc-k">Train</span><span>'+tr+'</span></div>':'')+
     '<div class="dc-r"><span class="dc-k">Prix</span><span class="price-big">'+fmt(price)+' €</span></div>';
+  if(currentClientEmail)loadClientRides();
   go('p-success');
 }
 async function cancelLast(){
@@ -755,8 +905,7 @@ async function adminLogin(){
   var u=document.getElementById('al-u').value.trim();
   var p=document.getElementById('al-p').value.trim();
   if(u==='admin'&&p==='YanAdmin2024!'){
-    await loadPricing();await loadRides();loadDispos();simulate();
-    go('p-admin');
+    await loadPricing();await loadRides();loadDispos();simulate();go('p-admin');
   }else{toast('Identifiants incorrects');}
 }
 
@@ -776,8 +925,7 @@ async function driverLogin(){
   var {data:drvData}=await sb.from('drivers').select('name').eq('email',email).single();
   currentDriverName=drvData?drvData.name:email;
   document.getElementById('drv-welcome').textContent='Bonjour, '+currentDriverName.split(' ')[0];
-  await loadDriverRides();
-  go('p-driver');
+  await loadDriverRides();go('p-driver');
 }
 async function driverLogout(){
   await sb.auth.signOut();currentDriverName='';currentDriverEmail='';
@@ -785,14 +933,20 @@ async function driverLogout(){
 }
 async function checkSession(){
   var {data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentDriverEmail=session.user.email;
-    var {data:drvData}=await sb.from('drivers').select('name').eq('email',currentDriverEmail).single();
-    if(drvData){
-      currentDriverName=drvData.name;
-      document.getElementById('drv-welcome').textContent='Bonjour, '+currentDriverName.split(' ')[0];
-      await loadDriverRides();go('p-driver');
-    }
+  if(!session)return;
+  var email=session.user.email;
+  var {data:drvData}=await sb.from('drivers').select('name').eq('email',email).single();
+  if(drvData){
+    currentDriverEmail=email;currentDriverName=drvData.name;
+    document.getElementById('drv-welcome').textContent='Bonjour, '+currentDriverName.split(' ')[0];
+    await loadDriverRides();go('p-driver');return;
+  }
+  var {data:clientData}=await sb.from('client_profiles').select('name,phone').eq('email',email).single();
+  if(clientData){
+    currentClientEmail=email;currentClientName=clientData.name||email;
+    document.getElementById('client-welcome').textContent='Bonjour, '+(clientData.name||email).split(' ')[0];
+    prefillBookingForm(clientData);
+    await loadClientRides();go('p-client-dash');
   }
 }
 
@@ -838,8 +992,7 @@ function simulate(){
 // ── LOAD RIDES ──
 async function loadRides(){
   var {data}=await sb.from('bookings').select('*').order('created_at',{ascending:false});
-  ridesCache=data||[];
-  renderRides();
+  ridesCache=data||[];renderRides();
 }
 
 // ── FILTER ──
@@ -858,41 +1011,35 @@ var SM={new:['b-new','À confirmer'],assigned:['b-assigned','Confirmée'],ongoin
 
 function renderRides(){
   var rides=ridesCache;
-  var total=rides.length;
   var newR=rides.filter(function(r){return r.status==='new';});
   var assigned=rides.filter(function(r){return r.status==='assigned'||r.status==='ongoing';});
   var cancelled=rides.filter(function(r){return r.status==='cancelled'||r.status==='noshow';});
   var done=rides.filter(function(r){return r.status==='done';});
   var ca=done.reduce(function(a,r){return a+(r.price||0);},0);
-  document.getElementById('st-tot').textContent=total;
+  document.getElementById('st-tot').textContent=rides.length;
   document.getElementById('st-new').textContent=newR.length;
   document.getElementById('st-act').textContent=assigned.length;
   document.getElementById('st-cancelled').textContent=cancelled.length;
   document.getElementById('st-rev').textContent=fmt(ca)+' €';
-
   var filtered=rides;
   if(currentFilter==='new')filtered=newR;
   else if(currentFilter==='assigned')filtered=assigned;
   else if(currentFilter==='cancelled')filtered=cancelled;
   else if(currentFilter==='done')filtered=done;
-
   if(!filtered.length){document.getElementById('rides-list').innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Aucune course dans cette catégorie.</div>';return;}
-
-  document.getElementById('rides-list').innerHTML=filtered.map(function(r,i){
+  document.getElementById('rides-list').innerHTML=filtered.map(function(r){
     var bc=SM[r.status]||SM.new;
-    var globalIdx=ridesCache.findIndex(function(x){return x.ref===r.ref;});
-    var priceModified=r.price_modified?'<span class="price-modified-badge">Prix modifié par l\'admin</span>':'';
     var sa=r.status!=='done'&&r.status!=='cancelled'&&r.status!=='noshow';
     return '<div class="ride-card">'+
       '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
       '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
       '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+(r.night?'<span class="chip hl">Nuit</span>':'')+'</div>'+
       '<div class="rc-foot"><span style="font-size:11px;color:var(--muted)">'+r.name+' · '+r.phone+'</span><span class="rc-price">'+fmt(r.price||0)+' €</span></div>'+
-      (priceModified?'<div style="margin-top:4px;">'+priceModified+'</div>':'')+
+      (r.price_modified?'<div style="margin-top:4px;"><span class="price-modified-badge">Prix modifié par l\'admin</span></div>':'')+
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
       (sa?
-        '<div class="price-edit-box"><label>✏️ Modifier le prix (admin)</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+globalIdx+'" value="'+fmt(r.price||0)+'" min="0" step="0.5" placeholder="Nouveau prix"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\','+globalIdx+',\''+r.email+'\')">Valider</button></div></div>'+
-        '<div class="d-row"><select class="dsel" id="ds-'+globalIdx+'"><option value="">— Chauffeur —</option></select><button class="abtn" onclick="assignRide(\''+r.ref+'\','+globalIdx+')">Assigner</button><button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button><button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button></div>'
+        '<div class="price-edit-box"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\')">Valider</button></div></div>'+
+        '<div class="d-row"><select class="dsel" id="ds-'+r.ref+'"><option value="">— Chauffeur —</option></select><button class="abtn" onclick="assignRide(\''+r.ref+'\')">Assigner</button><button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button><button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button></div>'
       :'')+
     '</div>';
   }).join('');
@@ -901,31 +1048,25 @@ function renderRides(){
 }
 
 // ── MODIFIER PRIX ──
-async function updatePrice(ref, idx, clientEmail){
-  var input = document.getElementById('pedit-'+idx);
-  if(!input){ toast('Erreur : champ introuvable'); return; }
-  var newPrice = parseFloat(input.value);
-  if(!newPrice || newPrice <= 0){ toast('Prix invalide'); return; }
-  var {error} = await sb.from('bookings')
-    .update({price: newPrice, price_modified: true})
-    .eq('ref', ref);
-  if(error){ toast('Erreur : '+error.message); return; }
+async function updatePrice(ref){
+  var input=document.getElementById('pedit-'+ref);
+  if(!input){toast('Erreur : champ introuvable');return;}
+  var newPrice=parseFloat(input.value);
+  if(!newPrice||newPrice<=0){toast('Prix invalide');return;}
+  var {error}=await sb.from('bookings').update({price:newPrice,price_modified:true}).eq('ref',ref);
+  if(error){toast('Erreur : '+error.message);return;}
   toast('Prix mis à jour : '+fmt(newPrice)+' €');
   await loadRides();
 }
-}
 
-async function assignRide(ref,i){
-  var sel=document.getElementById('ds-'+i);
+async function assignRide(ref){
+  var sel=document.getElementById('ds-'+ref);
   if(!sel||!sel.value){toast('Sélectionnez un chauffeur');return;}
   var driver=sel.value;
-  var ride=ridesCache.find(function(r){return r.ref===ref;});
   await sb.from('bookings').update({status:'assigned',driver:driver}).eq('ref',ref);
-  await loadRides();
-  toast('Assigné à '+driver);
+  await loadRides();toast('Assigné à '+driver);
 }
 async function cancelRide(ref){
-  var ride=ridesCache.find(function(r){return r.ref===ref;});
   await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par l\'administrateur'}).eq('ref',ref);
   await loadRides();toast('Course annulée');
 }
@@ -933,13 +1074,12 @@ async function markNoShow(ref){
   await sb.from('bookings').update({status:'noshow',noshow:true,cancel_reason:'No-show — client absent'}).eq('ref',ref);
   await loadRides();toast('No-show enregistré');
 }
-
 async function loadDriversForDispatch(){
   var {data}=await sb.from('drivers').select('name').eq('active',true).order('name');
   var names=(data||[]).map(function(d){return d.name;});
   document.querySelectorAll('.dsel').forEach(function(sel){
-    var cur=ridesCache.find(function(r){return r.status==='assigned';});
-    sel.innerHTML='<option value="">— Chauffeur —</option>'+names.map(function(n){return '<option>'+n+'</option>';}).join('');
+    var cur=sel.getAttribute('data-driver')||'';
+    sel.innerHTML='<option value="">— Chauffeur —</option>'+names.map(function(n){return '<option '+(cur===n?'selected':'')+'>'+n+'</option>';}).join('');
   });
 }
 
@@ -954,9 +1094,7 @@ function calcNR(){
   if(!km||km<1){document.getElementById('nr-price-box').style.display='none';return;}
   var veh=document.getElementById('nr-veh').value.toLowerCase();
   var night=parseInt(document.getElementById('nr-night').value);
-  var fl=document.getElementById('nr-flight').value;
-  var tr=document.getElementById('nr-train').value;
-  var r=calcRide(veh,km,night,!!fl,!!tr);
+  var r=calcRide(veh,km,night,!!document.getElementById('nr-flight').value,!!document.getElementById('nr-train').value);
   document.getElementById('nr-price-box').style.display='block';
   document.getElementById('nr-price-val').textContent=fmt(r.total);
 }
@@ -975,7 +1113,7 @@ async function createRideAdmin(){
   var tr=document.getElementById('nr-train').value.trim();
   var r=calcRide(veh.toLowerCase(),km,night,!!fl,!!tr);
   var ref='YAN-'+Date.now().toString().slice(-6);
-  var {error}=await sb.from('bookings').insert({ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,vehicle:veh,km:km,pax:parseInt(document.getElementById('nr-pax').value),bags:parseInt(document.getElementById('nr-bags').value),flight:fl,train:tr,night:!!night,price:r.total,name:name,phone:phone,email:document.getElementById('nr-email').value.trim(),message:'Course créée par l\'admin',status:'new'});
+  var {error}=await sb.from('bookings').insert({ref:ref,pickup:pickup,dropoff:dropoff,date:date,time:time,vehicle:veh,km:km,pax:parseInt(document.getElementById('nr-pax').value),bags:parseInt(document.getElementById('nr-bags').value),flight:fl,train:tr,night:!!night,price:r.total,name:name,phone:phone,email:document.getElementById('nr-email').value.trim(),message:'Course créée par l\'admin',status:'new',price_modified:false});
   if(error){toast('Erreur : '+error.message);return;}
   document.getElementById('new-ride-form').style.display='none';
   await loadRides();toast('Course créée : '+ref);
@@ -1044,8 +1182,7 @@ function renderRapport(){
   var tot=bCA+vCA||1;
   document.getElementById('rep-gamme').innerHTML='<div class="bar-wrap"><div class="bar-lbl"><span>Berline</span><span style="font-weight:700">'+fmt(bCA)+'€ ('+Math.round(bCA/tot*100)+'%)</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(bCA/tot*100)+'%"></div></div></div><div class="bar-wrap" style="margin-top:8px"><div class="bar-lbl"><span>Van</span><span style="font-weight:700">'+fmt(vCA)+'€ ('+Math.round(vCA/tot*100)+'%)</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(vCA/tot*100)+'%;background:#0a2d55"></div></div></div>';
   document.getElementById('rep-cancel').innerHTML='<div class="rep-row"><span class="rep-k">Annulations</span><span class="rep-v">'+cancelled.length+'</span></div><div class="rep-row"><span class="rep-k">No-shows</span><span class="rep-v" style="color:var(--red)">'+noshows.length+'</span></div><div class="rep-row"><span class="rep-k">Pénalités estimées</span><span class="rep-v pos">'+fmt(noshows.reduce(function(a,r){return a+(r.price||0);},0))+' €</span></div>';
-  var clients={};
-  ridesCache.forEach(function(r){clients[r.name]=(clients[r.name]||0)+1;});
+  var clients={};ridesCache.forEach(function(r){clients[r.name]=(clients[r.name]||0)+1;});
   var recur=Object.entries(clients).filter(function(e){return e[1]>1;});
   document.getElementById('rep-recurrent').innerHTML=recur.length?recur.map(function(e){return '<div class="rep-row"><span class="rep-k">'+e[0]+'</span><span class="rep-v pos">'+e[1]+' courses</span></div>';}).join(''):'<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun client récurrent.</div>';
 }
@@ -1054,7 +1191,7 @@ function renderRapport(){
 async function loadAdminDrivers(){
   var {data}=await sb.from('drivers').select('*').order('name');
   var el=document.getElementById('admin-drivers-list');
-  if(!data||!data.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px;">Aucun chauffeur enregistré.</div>';return;}
+  if(!data||!data.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:16px;">Aucun chauffeur.</div>';return;}
   el.innerHTML=data.map(function(d){
     return '<div class="ride-card">'+
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">'+
@@ -1077,12 +1214,9 @@ async function addDriver(){
   if(!email){toast('L\'e-mail est requis');return;}
   var {error}=await sb.from('drivers').insert({name:first+' '+last,email:email,phone:document.getElementById('drv-new-phone').value.trim(),vehicle_type:document.getElementById('drv-new-type').value,active:true});
   if(error){toast('Erreur : '+error.message);return;}
-  document.getElementById('drv-new-first').value='';
-  document.getElementById('drv-new-last').value='';
-  document.getElementById('drv-new-phone').value='';
-  document.getElementById('drv-new-email').value='';
-  await loadAdminDrivers();
-  toast('Chauffeur ajouté !');
+  document.getElementById('drv-new-first').value='';document.getElementById('drv-new-last').value='';
+  document.getElementById('drv-new-phone').value='';document.getElementById('drv-new-email').value='';
+  await loadAdminDrivers();toast('Chauffeur ajouté !');
   var open=confirm('Chauffeur ajouté !\n\nOuvrir Supabase pour envoyer l\'invitation à '+email+' ?');
   if(open)window.open('https://supabase.com/dashboard/project/kxwsvdmnoyxblkvrlgar/auth/users','_blank');
 }
@@ -1102,7 +1236,7 @@ async function loadDriverRides(){
   if(!currentDriverName){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Non connecté.</div>';return;}
   var {data}=await sb.from('bookings').select('*').eq('driver',currentDriverName).in('status',['assigned','accepted','ongoing']).order('date',{ascending:true});
   var mine=data||[];
-  if(!mine.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée pour le moment.</div>';return;}
+  if(!mine.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:16px;text-align:center;font-size:12px;color:var(--muted);">Aucune course assignée.</div>';return;}
   el.innerHTML=mine.map(function(r){
     var mapsUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
     return '<div class="ride-card">'+
@@ -1111,7 +1245,7 @@ async function loadDriverRides(){
       '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
       '<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
       (r.message?'<div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:4px;">'+r.message+'</div>':'')+
-      (r.price_modified?'<span class="price-modified-badge" style="display:inline-block;margin-bottom:6px;">Prix modifié</span>':'')+
+      (r.price_modified?'<div style="margin-bottom:5px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
       '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
         '<button class="da-btn da-ac" onclick="dAct(\''+r.ref+'\',\'accepted\')" '+(r.status!=='assigned'?'disabled':'')+'>Accepter</button>'+
         '<button class="da-btn da-st" onclick="dAct(\''+r.ref+'\',\'ongoing\')" '+(r.status!=='accepted'?'disabled':'')+'>Démarrer</button>'+
@@ -1145,8 +1279,11 @@ document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
 loadPricing();
 checkSession();
 renderForfaits();
-sb.channel('bookings').on('postgres_changes',{event:'INSERT',schema:'public',table:'bookings'},function(){
+var section=document.getElementById('forfait-section');
+if(section)section.style.display='none';
+sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'bookings'},function(){
   if(document.getElementById('p-admin').classList.contains('on'))loadRides();
+  if(document.getElementById('p-client-dash').classList.contains('on'))loadClientRides();
 }).subscribe();
 </script>
 </body>
