@@ -1431,9 +1431,10 @@ async function markNoShow(ref){
 async function loadDriversForDispatch(){
   var {data}=await sb.from('drivers').select('name').eq('active',true).order('name');
   var names=(data||[]).map(function(d){return d.name;});
-  document.querySelectorAll('.dsel').forEach(function(sel){
+  // Cibler uniquement les selects chauffeur (id commence par "ds-") pas les selects paiement (id commence par "pm-")
+  document.querySelectorAll('.dsel[id^="ds-"]').forEach(function(sel){
     var cur=sel.getAttribute('data-driver')||'';
-    sel.innerHTML='<option value="">— Chauffeur —</option>'+names.map(function(n){return '<option '+(cur===n?'selected':'')+'>'+n+'</option>';}).join('');
+    sel.innerHTML='<option value="">— Sélectionner un chauffeur —</option>'+names.map(function(n){return '<option '+(cur===n?'selected':'')+'>'+n+'</option>';}).join('');
   });
 }
 
