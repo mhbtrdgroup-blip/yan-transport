@@ -308,6 +308,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;">
       <div><div class="hname" id="client-welcome">Bonjour</div><div class="hsub">Espace Client</div></div>
       <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="hadmin" onclick="loadClientRides();toast('Actualisé')">↻</button>
         <button class="hadmin" onclick="go('p-booking')">+ Réserver</button>
         <button class="hadmin" onclick="clientLogout()">Déconnexion</button>
       </div>
@@ -465,8 +466,9 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;">
       <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Administration</div></div>
       <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="hadmin" onclick="loadRides();toast('Actualisé')">↻</button>
         <button class="hadmin" onclick="go('p-driver')">Chauffeur</button>
-        <button class="hadmin" onclick="go('p-home')">Client</button>
+        <button class="hadmin" onclick="localStorage.removeItem('yan_admin');go('p-home')">Quitter</button>
       </div>
     </div>
   </div>
@@ -598,7 +600,10 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <div class="hinner">
       <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;">
       <div><div class="hname" id="drv-welcome">Bonjour</div><div class="hsub">Espace Chauffeur</div></div>
-      <button class="hadmin" onclick="driverLogout()" style="margin-left:auto;">Déconnexion</button>
+      <div style="margin-left:auto;display:flex;gap:6px;">
+        <button class="hadmin" onclick="loadDriverRides();toast('Actualisé')">↻</button>
+        <button class="hadmin" onclick="driverLogout()">Déconnexion</button>
+      </div>
     </div>
   </div>
 
@@ -834,12 +839,6 @@ async function clientRegister(){
   toast('Compte créé ! Vérifiez votre email.');
 }
 
-async function clientLogout(){
-  await sb.auth.signOut();
-  currentClientEmail='';currentClientName='';
-  go('p-home');toast('Déconnecté');
-}
-
 function prefillBookingForm(profile){
   if(profile.name){
     var parts=(profile.name||'').split(' ');
@@ -995,24 +994,33 @@ async function submitBooking(withPayment){
 
   // Si paiement → rediriger vers Stripe
   if(withPayment){
-    var res = await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/stripe-payment', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu'},
-      body:JSON.stringify({
-        amount:price,
-        currency:'eur',
-        booking_ref:ref,
-        customer_email:em,
-        customer_name:fn+' '+ln,
-        description:'Course Yan Transport — '+pickup+' → '+dropoff
-      })
-    });
-    var data = await res.json();
-    if(data.url){
-      window.location.href = data.url;
-      return;
-    } else {
-      toast('Erreur paiement : '+(data.error||'Réessayez'));
+    try {
+      var res = await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/stripe-payment', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu'
+        },
+        body:JSON.stringify({
+          amount:price,
+          currency:'eur',
+          booking_ref:ref,
+          customer_email:em,
+          customer_name:fn+' '+ln,
+          description:'Course Yan Transport — '+pickup+' → '+dropoff
+        })
+      });
+      var data = await res.json();
+      console.log('Stripe response:', JSON.stringify(data));
+      if(data.url){
+        window.location.href = data.url;
+        return;
+      } else {
+        toast('Erreur paiement : '+(data.error||'Réessayez'));
+        return;
+      }
+    } catch(err) {
+      toast('Erreur réseau : '+(err as any).message);
       return;
     }
   }
@@ -1053,6 +1061,7 @@ async function adminLogin(){
   var u=document.getElementById('al-u').value.trim();
   var p=document.getElementById('al-p').value.trim();
   if(u==='admin'&&p==='YanAdmin2024!'){
+    localStorage.setItem('yan_admin','true');
     await loadPricing();await loadRides();loadDispos();simulate();go('p-admin');
   }else{toast('Identifiants incorrects');}
 }
@@ -1076,25 +1085,50 @@ async function driverLogin(){
   await loadDriverRides();go('p-driver');
 }
 async function driverLogout(){
-  await sb.auth.signOut();currentDriverName='';currentDriverEmail='';
+  await sb.auth.signOut();
+  currentDriverName='';currentDriverEmail='';
+  localStorage.removeItem('yan_admin');
+  go('p-home');toast('Déconnecté');
+}
+
+async function clientLogout(){
+  await sb.auth.signOut();
+  currentClientEmail='';currentClientName='';
+  localStorage.removeItem('yan_admin');
   go('p-home');toast('Déconnecté');
 }
 async function checkSession(){
-  var {data:{session}}=await sb.auth.getSession();
-  if(!session)return;
-  var email=session.user.email;
-  var {data:drvData}=await sb.from('drivers').select('name').eq('email',email).single();
-  if(drvData){
-    currentDriverEmail=email;currentDriverName=drvData.name;
-    document.getElementById('drv-welcome').textContent='Bonjour, '+currentDriverName.split(' ')[0];
-    await loadDriverRides();go('p-driver');return;
+  // Session admin persistante via localStorage
+  var adminLogged = localStorage.getItem('yan_admin');
+  if(adminLogged === 'true'){
+    await loadPricing(); await loadRides(); loadDispos(); simulate();
+    go('p-admin'); return;
   }
-  var {data:clientData}=await sb.from('client_profiles').select('name,phone').eq('email',email).single();
+
+  // Session Supabase (chauffeur ou client)
+  var {data:{session}} = await sb.auth.getSession();
+  if(!session) return;
+  var email = session.user.email;
+
+  // Vérifier si c'est un chauffeur
+  var {data:drvData} = await sb.from('drivers').select('name').eq('email', email).single();
+  if(drvData){
+    currentDriverEmail = email;
+    currentDriverName = drvData.name;
+    document.getElementById('drv-welcome').textContent = 'Bonjour, '+currentDriverName.split(' ')[0];
+    await loadDriverRides();
+    go('p-driver'); return;
+  }
+
+  // Vérifier si c'est un client
+  var {data:clientData} = await sb.from('client_profiles').select('name,phone').eq('email', email).single();
   if(clientData){
-    currentClientEmail=email;currentClientName=clientData.name||email;
-    document.getElementById('client-welcome').textContent='Bonjour, '+(clientData.name||email).split(' ')[0];
+    currentClientEmail = email;
+    currentClientName = clientData.name || email;
+    document.getElementById('client-welcome').textContent = 'Bonjour, '+(clientData.name||email).split(' ')[0];
     prefillBookingForm(clientData);
-    await loadClientRides();go('p-client-dash');
+    await loadClientRides();
+    go('p-client-dash');
   }
 }
 
@@ -1696,6 +1730,30 @@ function toast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('on');
   setTimeout(function(){t.classList.remove('on');},2500);
+}
+
+// ── PULL TO REFRESH ──
+var ptStart = 0;
+var ptActive = false;
+document.addEventListener('touchstart', function(e){
+  ptStart = e.touches[0].clientY;
+}, {passive:true});
+document.addEventListener('touchmove', function(e){
+  var cur = e.touches[0].clientY;
+  var page = document.querySelector('.page.on');
+  if(!page) return;
+  if(page.scrollTop === 0 && cur - ptStart > 60 && !ptActive){
+    ptActive = true;
+    toast('Actualisation...');
+    refreshCurrentPage();
+  }
+}, {passive:true});
+document.addEventListener('touchend', function(){ ptActive = false; }, {passive:true});
+
+function refreshCurrentPage(){
+  if(document.getElementById('p-admin').classList.contains('on')) loadRides();
+  else if(document.getElementById('p-driver').classList.contains('on')) loadDriverRides();
+  else if(document.getElementById('p-client-dash').classList.contains('on')) loadClientRides();
 }
 
 // ── INIT ──
