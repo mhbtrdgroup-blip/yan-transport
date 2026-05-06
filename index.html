@@ -1013,7 +1013,7 @@ async function submitBooking(withPayment){
       var data = await res.json();
       console.log('Stripe response:', JSON.stringify(data));
       if(data.url){
-        window.location.href = data.url;
+        window.open(data.url, '_blank');
         return;
       } else {
         toast('Erreur paiement : '+(data.error||'Réessayez'));
