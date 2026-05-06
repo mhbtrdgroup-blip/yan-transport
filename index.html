@@ -27,7 +27,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
-#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on{display:flex;}
+#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on,#p-booking-choice.on{display:flex;}
 
 /* COMMUNS */
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
@@ -219,7 +219,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     </div>
     <div class="hero-title">Votre confort,<br><em>notre priorité.</em></div>
     <div class="hero-sub">Transferts premium vers les gares, aéroports et toutes destinations. Disponible 24h/24, 7j/7.</div>
-    <button class="hero-btn" onclick="go('p-booking')">Réserver maintenant</button>
+    <button class="hero-btn" onclick="startBooking()">Réserver maintenant</button>
     <button class="hero-btn2" onclick="goClientSpace()">Mon espace client →</button>
   </div>
   <div class="stats-strip">
@@ -259,7 +259,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <div style="background:var(--navy);border-radius:18px;padding:24px;text-align:center;margin-bottom:20px;">
       <div style="font-family:var(--ft);font-size:22px;color:#fff;font-weight:700;margin-bottom:8px;">Prêt à partir ?</div>
       <div style="font-size:11px;color:rgba(255,255,255,.45);margin-bottom:20px;line-height:1.7;">Réservez en 2 minutes.<br>Confirmation immédiate par e-mail.</div>
-      <button onclick="go('p-booking')" style="display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);">Réserver ma course</button>
+      <button onclick="startBooking()" style="display:block;width:100%;background:var(--blue2);color:#fff;border:none;padding:16px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);">Réserver ma course</button>
       <div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,.3);">04 65 84 65 16 · contact@yantransport.app</div>
     </div>
   </div>
@@ -354,6 +354,47 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
   <div class="sbody">
     <div class="sec">Mes réservations</div>
     <div id="client-rides"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+  </div>
+</div>
+
+<!-- ══ BOOKING CHOICE ══ -->
+<div class="page" id="p-booking-choice" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div style="width:100%;max-width:380px;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:72px;height:72px;border-radius:50%;object-fit:cover;margin-bottom:14px;">
+      <div style="font-family:var(--ft);font-size:26px;color:var(--navy);font-weight:700;">Réserver une course</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">Choisissez comment continuer</div>
+    </div>
+
+    <!-- OPTION CONNECTÉ -->
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;cursor:pointer;" onclick="goClientSpace();go('p-booking')" id="choice-login">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:46px;height:46px;background:var(--navy);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#90caf9" stroke-width="2" width="22" height="22"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px;">Mon compte</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;">Connectez-vous ou créez un compte<br>pour suivre vos courses</div>
+        </div>
+        <div style="color:var(--blue2);font-size:18px;">→</div>
+      </div>
+    </div>
+
+    <!-- OPTION INVITÉ -->
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:24px;cursor:pointer;" onclick="bookAsGuest()">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:46px;height:46px;background:var(--ice);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="22" height="22"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:3px;">Continuer en invité</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.5;">Réservez rapidement sans créer<br>de compte</div>
+        </div>
+        <div style="color:var(--muted);font-size:18px;">→</div>
+      </div>
+    </div>
+
+    <button onclick="go('p-home')" style="width:100%;background:transparent;color:var(--muted);border:none;padding:12px;font-size:12px;cursor:pointer;font-family:var(--fb);">← Retour à l'accueil</button>
   </div>
 </div>
 
@@ -1243,7 +1284,7 @@ function simulate(){
 
 // ── LOAD RIDES ──
 async function loadRides(){
-  var {data}=await sb.from('bookings').select('*').order('created_at',{ascending:false});
+  var {data}=await sb.from('bookings').select('*').order('date',{ascending:true}).order('time',{ascending:true});
   ridesCache=data||[];
   renderRides();
 }
@@ -1286,10 +1327,29 @@ function renderRides(){
   else if(currentFilter==='cancelled')filtered=cancelled;
   else if(currentFilter==='done')filtered=done;
   if(!filtered.length){document.getElementById('rides-list').innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Aucune course dans cette catégorie.</div>';return;}
-  document.getElementById('rides-list').innerHTML=filtered.map(function(r){
+
+  var today=new Date().toISOString().split('T')[0];
+  var tomorrow=new Date(Date.now()+86400000).toISOString().split('T')[0];
+  var nextRideRef=null;
+  for(var ni=0;ni<filtered.length;ni++){
+    if(filtered[ni].date>=today&&(filtered[ni].status==='new'||filtered[ni].status==='assigned'||filtered[ni].status==='ongoing')){
+      nextRideRef=filtered[ni].ref;break;
+    }
+  }
+  var html='';
+  var lastDate=null;
+  filtered.forEach(function(r){
+    var rDate=r.date||'';
+    if(rDate!==lastDate){
+      lastDate=rDate;
+      var lbl=rDate===today?"📅 Aujourd'hui":rDate===tomorrow?'📅 Demain':rDate?'📅 '+rDate.split('-').reverse().join('/'):'📅 Date inconnue';
+      html+='<div style="font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:2px;text-transform:uppercase;padding:8px 4px 6px;margin-top:6px;border-bottom:1px solid var(--border);margin-bottom:8px;">'+lbl+'</div>';
+    }
     var bc=SM[r.status]||SM.new;
     var sa=r.status!=='done'&&r.status!=='cancelled'&&r.status!=='noshow';
-    return '<div class="ride-card">'+
+    var isNext=r.ref===nextRideRef;
+    html+=(isNext?'<div style="background:var(--blue2);color:#fff;font-size:10px;font-weight:700;padding:6px 12px;border-radius:8px 8px 0 0;letter-spacing:1px;text-transform:uppercase;">⏭ Prochaine course</div>':'')+
+      '<div class="ride-card" style="'+(isNext?'border-color:var(--blue2);border-width:2px;margin-bottom:14px;border-radius:'+(isNext?'0 0 14px 14px':'14px')+';':'')+'">' +
       '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
       '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
       '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+(r.night?'<span class="chip hl">Nuit</span>':'')+'</div>'+
@@ -1300,15 +1360,15 @@ function renderRides(){
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
       (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Générer et envoyer la facture</button>':'')+
       (sa?
-        '<div class="price-edit-box"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\')">Valider</button></div></div>'+
         '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
           '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Assigner un chauffeur</div>'+
           '<select class="dsel" id="ds-'+r.ref+'" style="width:100%;margin-bottom:8px;"><option value="">— Sélectionner un chauffeur —</option></select>'+
           '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Mode de paiement</div>'+
-          '<select class="dsel" id="pm-'+r.ref+'" style="width:100%;margin-bottom:10px;">'+
+          '<select id="pm-'+r.ref+'" style="width:100%;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:8px 10px;font-size:11px;font-family:var(--fb);outline:none;border-radius:9px;margin-bottom:10px;-webkit-appearance:none;">'+
             '<option value="board"'+(r.payment_method!=='account'?' selected':'')+'>Paiement à bord</option>'+
-            '<option value="account"'+(r.payment_method==='account'?' selected':'')+'>📋 En compte</option>'+
+            '<option value="account"'+(r.payment_method==='account'?' selected':'')+'>En compte</option>'+
           '</select>'+
+          '<div class="price-edit-box" style="margin-bottom:10px;"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\')">Valider</button></div></div>'+
           '<div style="display:flex;gap:6px;">'+
             '<button class="abtn" style="flex:2;" onclick="assignRide(\''+r.ref+'\')">✓ Assigner</button>'+
             '<button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button>'+
@@ -1316,8 +1376,9 @@ function renderRides(){
           '</div>'+
         '</div>'
       :'')+
-    '</div>';
-  }).join('');
+      '</div>';
+  });
+  document.getElementById('rides-list').innerHTML=html;
   loadDriversForDispatch();
 }
 
@@ -1883,6 +1944,27 @@ function toast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('on');
   setTimeout(function(){t.classList.remove('on');},2500);
+}
+
+// ── DÉMARRER RÉSERVATION ──
+function startBooking(){
+  // Si déjà connecté comme client → direct au formulaire
+  if(currentClientEmail){
+    go('p-booking');
+    return;
+  }
+  // Sinon → page de choix
+  go('p-booking-choice');
+}
+
+function bookAsGuest(){
+  // Vider les champs client au cas où
+  var fields=['f-first','f-last','f-phone','f-email'];
+  fields.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  go('p-booking');
 }
 
 // ── RESET PASSWORD ──
