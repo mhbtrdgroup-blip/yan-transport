@@ -475,13 +475,23 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 
 <!-- ══ SUCCESS ══ -->
 <div class="page" id="p-success" style="align-items:center;justify-content:center;padding:30px 20px;">
-  <div style="text-align:center;width:100%;">
+  <div style="text-align:center;width:100%;max-width:380px;margin:0 auto;">
     <div class="succ-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#1565c0" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
     <div style="font-family:var(--ft);font-size:24px;color:var(--navy);font-weight:700;margin-bottom:5px;">Réservation confirmée</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:13px;">Votre chauffeur sera ponctuel.</div>
     <div class="succ-pill" id="succ-ref">YAN-0000</div>
     <div class="det-card" id="succ-detail" style="margin-top:16px;"></div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Confirmation envoyée à <strong id="succ-email" style="color:var(--text)"></strong></div>
+
+    <!-- PROPOSITION CRÉER UN COMPTE (visible uniquement si invité) -->
+    <div id="create-account-banner" style="display:none;background:var(--ice);border:1.5px solid var(--border2);border-radius:14px;padding:18px;margin-bottom:16px;text-align:left;">
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;">💡 Créez votre espace client</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.6;">Suivez vos courses, accédez à votre historique et réservez en un clic la prochaine fois.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Vous recevrez un lien par email pour choisir votre mot de passe.</div>
+      <div id="cab-msg" style="display:none;border-radius:9px;padding:10px;font-size:11px;text-align:center;margin-bottom:10px;"></div>
+      <button id="cab-btn" onclick="createAccountFromBooking()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:11px;font-weight:700;border-radius:10px;cursor:pointer;font-family:var(--fb);letter-spacing:1px;text-transform:uppercase;">Créer mon compte gratuitement</button>
+    </div>
+
     <button class="btn-p" onclick="go('p-home')">Retour à l'accueil</button>
     <button class="btn-d" onclick="cancelLast()">Annuler cette réservation</button>
   </div>
@@ -974,15 +984,18 @@ async function loadClientRides(){
   var el=document.getElementById('client-rides');
   if(!el)return;
   var rides=data||[];
+  window._clientRidesCache = rides; // stocker pour le tracking
   if(!rides.length){el.innerHTML='<div style="background:var(--ice);border:1px solid var(--border2);border-radius:12px;padding:20px;text-align:center;font-size:12px;color:var(--muted);">Vous n\'avez pas encore de réservation.<br><br><button onclick="go(\'p-booking\')" style="background:var(--blue2);color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);text-transform:uppercase;letter-spacing:1px;">Réserver maintenant</button></div>';return;}
   var SM2={new:'À confirmer',assigned:'Confirmée',ongoing:'En route 🚗',done:'Terminée',cancelled:'Annulée',noshow:'No-show'};
   var SC2={new:'b-new',assigned:'b-assigned',ongoing:'b-ongoing',done:'b-done',cancelled:'b-cancelled',noshow:'b-noshow'};
   el.innerHTML=rides.map(function(r){
     var trackingBanner = '';
     if(r.status==='ongoing'){
-      trackingBanner = '<div id="tracking-'+r.ref+'" style="background:var(--green-bg);border:1px solid var(--green);border-radius:10px;padding:12px;margin-top:8px;text-align:center;">'+
-        '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px;">🚗 Votre chauffeur est en route</div>'+
-        '<div style="font-size:11px;color:var(--muted);">'+r.driver+' · Course en cours</div>'+
+      trackingBanner = '<div id="tracking-'+r.ref+'" style="background:var(--green-bg);border:1px solid var(--green);border-radius:10px;padding:12px;margin-top:8px;">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">🚗 Votre chauffeur est en route</div>'+
+        '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">'+r.driver+' · Position mise à jour en direct</div>'+
+        '<div id="map-'+r.ref+'" style="width:100%;height:200px;border-radius:10px;background:var(--off);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);">Chargement de la carte...</div>'+
+        '<div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;" id="pos-time-'+r.ref+'">En attente de position GPS...</div>'+
       '</div>';
     }
     if(r.status==='assigned'){
@@ -1011,6 +1024,20 @@ async function loadClientRides(){
       '</div>'+
     '</div>';
   }).join('');
+
+  // Initialiser les cartes pour les courses en cours après rendu
+  setTimeout(function(){
+    rides.forEach(function(r){
+      if(r.status==='ongoing' && r.driver_lat && r.driver_lng){
+        initDriverMap(r.ref, r.driver_lat, r.driver_lng);
+        var timeEl = document.getElementById('pos-time-'+r.ref);
+        if(timeEl && r.driver_updated_at){
+          var d = new Date(r.driver_updated_at);
+          timeEl.textContent = 'Mis à jour à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        }
+      }
+    });
+  }, 300);
 }
 
 function repeatRide(encodedData){
@@ -1027,24 +1054,18 @@ function repeatRide(encodedData){
   toast('Trajet pré-rempli — choisissez la date et l\'heure');
 }
 
-function updateTrackingStatus(ride){
-  var el = document.getElementById('tracking-'+ride.ref);
-  if(!el) return;
-  if(ride.status==='ongoing'){
-    el.style.background='var(--green-bg)';
-    el.style.borderColor='var(--green)';
-    el.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px;">🚗 Votre chauffeur est en route</div>'+
-      '<div style="font-size:11px;color:var(--muted);">'+(ride.driver||'')+' · Course en cours</div>';
-  } else if(ride.status==='done'){
-    el.style.background='var(--green-bg)';
-    el.innerHTML='<div style="font-size:12px;font-weight:700;color:var(--green);">✓ Course terminée</div>';
-  }
-}
-
 async function cancelClientRide(ref){
   if(!confirm('Annuler cette réservation ?'))return;
   await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par le client depuis son espace'}).eq('ref',ref);
   await loadClientRides();toast('Réservation annulée');
+  // Initialiser les cartes pour les courses en cours
+  setTimeout(function(){
+    (window._clientRidesCache||[]).forEach(function(r){
+      if(r.status==='ongoing' && r.driver_lat && r.driver_lng){
+        initDriverMap(r.ref, r.driver_lat, r.driver_lng);
+      }
+    });
+  }, 500);
 }
 
 // ── DISPO CHECK ──
@@ -1108,10 +1129,7 @@ async function submitBooking(withPayment){
     try {
       var res = await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/stripe-payment', {
         method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu'
-        },
+        headers:{'Content-Type':'application/json'},
         body:JSON.stringify({
           amount:price,
           currency:'eur',
@@ -1147,7 +1165,17 @@ async function submitBooking(withPayment){
     (fl?'<div class="dc-r"><span class="dc-k">Vol</span><span>'+fl+'</span></div>':'')+
     (tr?'<div class="dc-r"><span class="dc-k">Train</span><span>'+tr+'</span></div>':'')+
     '<div class="dc-r"><span class="dc-k">Prix</span><span class="price-big">'+fmt(price)+' €</span></div>';
-  if(currentClientEmail)loadClientRides();
+  if(currentClientEmail){
+    loadClientRides();
+    document.getElementById('create-account-banner').style.display='none';
+  } else {
+    // Invité — proposer de créer un compte
+    document.getElementById('create-account-banner').style.display='block';
+    document.getElementById('cab-msg').style.display='none';
+    var cabBtn=document.getElementById('cab-btn');
+    cabBtn.innerHTML='Créer mon compte gratuitement';
+    cabBtn.disabled=false;
+  }
   go('p-success');
 }
 async function cancelLast(){
@@ -1923,13 +1951,58 @@ async function loadDriverRidesDone(){
   el.innerHTML=rides.map(function(r){return drvRideCard(r, false);}).join('');
 }
 
+// ── GÉOLOCALISATION ──
+var trackingInterval = null;
+var trackingRef = null;
+
+function startTracking(ref){
+  trackingRef = ref;
+  if(!navigator.geolocation){ toast('GPS non disponible'); return; }
+  // Envoyer position immédiatement puis toutes les 10 secondes
+  sendPosition(ref);
+  trackingInterval = setInterval(function(){ sendPosition(ref); }, 10000);
+  toast('GPS activé — position envoyée en direct');
+}
+
+function stopTracking(){
+  if(trackingInterval){ clearInterval(trackingInterval); trackingInterval=null; }
+  trackingRef = null;
+}
+
+function sendPosition(ref){
+  navigator.geolocation.getCurrentPosition(function(pos){
+    sb.from('bookings').update({
+      driver_lat: pos.coords.latitude,
+      driver_lng: pos.coords.longitude,
+      driver_updated_at: new Date().toISOString()
+    }).eq('ref', ref).then(function(){
+      console.log('Position envoyée:', pos.coords.latitude, pos.coords.longitude);
+    });
+  }, function(err){
+    console.log('GPS error:', err.message);
+  }, {enableHighAccuracy:true, timeout:8000});
+}
+
 async function dAct(ref,s){
   await sb.from('bookings').update({status:s}).eq('ref',ref);
   var m={accepted:'Course acceptée ✓',ongoing:'Course démarrée !',done:'Course terminée ✓'};
   toast(m[s]||'Mis à jour');
+
+  if(s==='ongoing'){
+    // Démarrer le tracking GPS
+    startTracking(ref);
+    drvTab('ongoing');
+  }
+  if(s==='done'){
+    // Arrêter le tracking GPS
+    stopTracking();
+    // Effacer la position
+    await sb.from('bookings').update({driver_lat:null,driver_lng:null}).eq('ref',ref);
+    drvTab('done');
+  }
+
   await loadDriverRides();
   await loadDriverRidesOngoing();
-  if(s==='done') drvTab('done');
 }
 
 function saveVehicle(){
@@ -1944,6 +2017,108 @@ function toast(msg){
   var t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('on');
   setTimeout(function(){t.classList.remove('on');},2500);
+}
+
+var driverMaps = {}; // stocke les instances de carte par ref
+
+function initDriverMap(ref, lat, lng){
+  var mapEl = document.getElementById('map-'+ref);
+  if(!mapEl || !window.google) return;
+
+  var pos = {lat: parseFloat(lat), lng: parseFloat(lng)};
+
+  if(driverMaps[ref]){
+    // Mettre à jour la position existante
+    driverMaps[ref].marker.setPosition(pos);
+    driverMaps[ref].map.panTo(pos);
+  } else {
+    // Créer nouvelle carte
+    var map = new google.maps.Map(mapEl, {
+      center: pos,
+      zoom: 15,
+      disableDefaultUI: true,
+      zoomControl: true,
+      styles: [
+        {featureType:'all',elementType:'labels.icon',stylers:[{visibility:'off'}]},
+        {featureType:'poi',stylers:[{visibility:'off'}]}
+      ]
+    });
+    var marker = new google.maps.Marker({
+      position: pos,
+      map: map,
+      title: 'Votre chauffeur',
+      icon: {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 6,
+        fillColor: '#1976d2',
+        fillOpacity: 1,
+        strokeColor: '#fff',
+        strokeWeight: 2
+      }
+    });
+    driverMaps[ref] = {map: map, marker: marker};
+  }
+}
+
+function updateTrackingStatus(ride){
+  var el = document.getElementById('tracking-'+ride.ref);
+  if(!el) return;
+
+  if(ride.status==='ongoing'){
+    // Mettre à jour la carte si on a les coordonnées
+    if(ride.driver_lat && ride.driver_lng){
+      initDriverMap(ride.ref, ride.driver_lat, ride.driver_lng);
+      var timeEl = document.getElementById('pos-time-'+ride.ref);
+      if(timeEl && ride.driver_updated_at){
+        var d = new Date(ride.driver_updated_at);
+        timeEl.textContent = 'Mis à jour à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      }
+    }
+  } else if(ride.status==='done'){
+    el.style.background = 'var(--green-bg)';
+    el.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--green);text-align:center;">✓ Course terminée</div>';
+    if(driverMaps[ride.ref]) delete driverMaps[ride.ref];
+  }
+}
+
+// ── CRÉER COMPTE DEPUIS RÉSERVATION ──
+async function createAccountFromBooking(){
+  // Récupérer l'email depuis le champ de la réservation
+  var email = document.getElementById('succ-email').textContent.trim();
+  var name = document.getElementById('f-first').value.trim()+' '+document.getElementById('f-last').value.trim();
+  var phone = document.getElementById('f-phone').value.trim();
+
+  if(!email){toast('Email introuvable');return;}
+
+  var cabBtn = document.getElementById('cab-btn');
+  var cabMsg = document.getElementById('cab-msg');
+  cabBtn.innerHTML='<span class="loader"></span>Création...';
+  cabBtn.disabled=true;
+  cabMsg.style.display='none';
+
+  // Créer le profil client
+  await sb.from('client_profiles').upsert({email:email, name:name.trim(), phone:phone});
+
+  // Envoyer lien de réinitialisation = invitation à créer son mot de passe
+  var {error} = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://yantransport.app/?reset=true'
+  });
+
+  cabBtn.innerHTML='Créer mon compte gratuitement';
+  cabBtn.disabled=false;
+
+  if(error){
+    cabMsg.style.display='block';
+    cabMsg.style.background='var(--red-bg)';
+    cabMsg.style.color='var(--red)';
+    cabMsg.textContent='Erreur : '+error.message;
+  } else {
+    cabMsg.style.display='block';
+    cabMsg.style.background='var(--green-bg)';
+    cabMsg.style.color='var(--green)';
+    cabMsg.textContent='✓ Email envoyé ! Cliquez le lien pour choisir votre mot de passe.';
+    cabBtn.style.display='none';
+  }
 }
 
 // ── DÉMARRER RÉSERVATION ──
