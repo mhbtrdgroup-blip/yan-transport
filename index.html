@@ -1899,6 +1899,7 @@ function drvRideCard(r, showActions){
   }
   return '<div class="ride-card">'+
     '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span style="font-family:Arial,sans-serif;font-size:17px;font-weight:700;color:var(--navy)">'+fmt(r.price||0)+' €</span></div>'+
+    '<div style="margin-bottom:6px;">'+paymentBadge(r)+'</div>'+
     '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
     '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
     '<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
@@ -2261,18 +2262,38 @@ renderForfaits();
 var section=document.getElementById('forfait-section');
 if(section)section.style.display='none';
 
-// Gérer retour reset password
-var urlParams = new URLSearchParams(window.location.search);
-var resetParam = urlParams.get('reset');
-if(resetParam === 'true'){
+// Gérer retour reset password — Supabase met les tokens dans le hash URL
+var hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+var accessToken = hashParams.get('access_token');
+var tokenType = hashParams.get('type');
+
+if(accessToken && tokenType === 'recovery'){
   window.history.replaceState({}, '', '/');
-  // Supabase gère automatiquement la session après le clic sur le lien
-  sb.auth.onAuthStateChange(function(event, session){
-    if(event === 'PASSWORD_RECOVERY'){
-      go('p-new-password');
-    }
+  // Restaurer la session Supabase avec le token
+  sb.auth.setSession({
+    access_token: accessToken,
+    refresh_token: hashParams.get('refresh_token') || ''
+  }).then(function(){
+    go('p-new-password');
+  });
+} else if(tokenType === 'signup' && accessToken){
+  // Confirmation d'inscription
+  window.history.replaceState({}, '', '/');
+  sb.auth.setSession({
+    access_token: accessToken,
+    refresh_token: hashParams.get('refresh_token') || ''
+  }).then(function(){
+    toast('✓ Email confirmé ! Connectez-vous.');
+    go('p-client-login');
   });
 }
+
+// onAuthStateChange global pour PASSWORD_RECOVERY
+sb.auth.onAuthStateChange(function(event, session){
+  if(event === 'PASSWORD_RECOVERY'){
+    go('p-new-password');
+  }
+});
 
 // Gérer retour Stripe
 var urlParams = new URLSearchParams(window.location.search);
