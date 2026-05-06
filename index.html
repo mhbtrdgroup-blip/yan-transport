@@ -1020,7 +1020,7 @@ async function submitBooking(withPayment){
         return;
       }
     } catch(err) {
-      toast('Erreur réseau : '+(err as any).message);
+      toast('Erreur réseau : '+err.message);
       return;
     }
   }
