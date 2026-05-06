@@ -1142,7 +1142,30 @@ async function submitBooking(withPayment){
       var data = await res.json();
       console.log('Stripe response:', JSON.stringify(data));
       if(data.url){
-        window.open(data.url, '_blank');
+        // Sur mobile PWA window.open est bloqué — on affiche un bouton de redirection
+        var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        var isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        if(isStandalone || isMobile){
+          // Afficher page intermédiaire avec bouton
+          document.getElementById('succ-ref').textContent = ref;
+          document.getElementById('succ-email').textContent = em;
+          document.getElementById('succ-detail').innerHTML =
+            '<div style="text-align:center;padding:10px;">'+
+            '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">Réservation enregistrée ✓</div>'+
+            '<div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Cliquez ci-dessous pour finaliser le paiement</div>'+
+            '<a href="'+data.url+'" style="display:block;background:#635bff;color:#fff;padding:16px;text-align:center;text-decoration:none;font-weight:700;border-radius:11px;font-size:13px;letter-spacing:1px;">💳 Payer maintenant</a>'+
+            '</div>';
+          if(!currentClientEmail){
+            document.getElementById('create-account-banner').style.display='block';
+          }
+          go('p-success');
+        } else {
+          window.open(data.url, '_blank');
+          go('p-success');
+          document.getElementById('succ-ref').textContent = ref;
+          document.getElementById('succ-email').textContent = em;
+          document.getElementById('succ-detail').innerHTML = '<div class="dc-r"><span class="dc-k">Statut</span><span style="color:var(--green);font-weight:700;">Redirection vers Stripe...</span></div>';
+        }
         return;
       } else {
         toast('Erreur paiement : '+(data.error||'Réessayez'));
