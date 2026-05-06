@@ -27,7 +27,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
-#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on{display:flex;}
+#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on{display:flex;}
 
 /* COMMUNS */
 .topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
@@ -274,11 +274,48 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Mon espace client</div>
     <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:20px;">Connectez-vous pour gérer vos courses</div>
     <div class="field"><label>E-mail</label><input type="email" id="cl-email" placeholder="vous@email.fr"></div>
-    <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="cl-pass" placeholder="••••••"></div>
+    <div class="field" style="margin-bottom:6px"><label>Mot de passe</label><input type="password" id="cl-pass" placeholder="••••••"></div>
+    <div style="text-align:right;margin-bottom:14px;">
+      <span onclick="go('p-reset')" style="font-size:11px;color:var(--blue2);cursor:pointer;font-weight:600;">Mot de passe oublié ?</span>
+    </div>
     <div id="cl-err" style="display:none;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px;font-size:11px;color:var(--red);text-align:center;margin-bottom:12px;"></div>
     <button class="btn-p" onclick="clientLogin()">Se connecter</button>
     <button class="btn-o" onclick="go('p-client-register')">Créer un compte</button>
     <button class="btn-navy" onclick="go('p-home')">← Retour à l'accueil</button>
+  </div>
+</div>
+
+<!-- ══ RESET PASSWORD ══ -->
+<div class="page" id="p-reset" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="width:56px;height:56px;background:var(--ice);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" width="24" height="24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+    </div>
+    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Mot de passe oublié</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:20px;">Entrez votre email pour recevoir un lien de réinitialisation</div>
+    <div class="field" style="margin-bottom:18px"><label>E-mail</label><input type="email" id="reset-email" placeholder="vous@email.fr"></div>
+    <div id="reset-msg" style="display:none;border-radius:9px;padding:12px;font-size:11px;text-align:center;margin-bottom:12px;"></div>
+    <button class="btn-p" id="reset-btn" onclick="sendResetEmail()">Envoyer le lien</button>
+    <button class="btn-o" onclick="go('p-client-login')">← Retour à la connexion</button>
+  </div>
+</div>
+
+<!-- ══ NEW PASSWORD ══ -->
+<div class="page" id="p-new-password" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="width:56px;height:56px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" width="24" height="24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+    </div>
+    <div style="font-family:var(--ft);font-size:20px;color:var(--navy);font-weight:700;text-align:center;">Nouveau mot de passe</div>
+    <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;margin-bottom:20px;">Choisissez votre nouveau mot de passe</div>
+    <div class="field"><label>Nouveau mot de passe</label><input type="password" id="newpass1" placeholder="Au moins 6 caractères"></div>
+    <div class="field" style="margin-bottom:18px"><label>Confirmer le mot de passe</label><input type="password" id="newpass2" placeholder="Répétez le mot de passe"></div>
+    <div id="newpass-msg" style="display:none;border-radius:9px;padding:12px;font-size:11px;text-align:center;margin-bottom:12px;"></div>
+    <button class="btn-p" id="newpass-btn" onclick="updatePassword()">Enregistrer le mot de passe</button>
   </div>
 </div>
 
@@ -1732,7 +1769,71 @@ function toast(msg){
   setTimeout(function(){t.classList.remove('on');},2500);
 }
 
-// ── PULL TO REFRESH ──
+// ── RESET PASSWORD ──
+async function sendResetEmail(){
+  var email = document.getElementById('reset-email').value.trim();
+  var msgEl = document.getElementById('reset-msg');
+  var btn = document.getElementById('reset-btn');
+  if(!email){ toast('Entrez votre email'); return; }
+  btn.innerHTML = '<span class="loader"></span>Envoi...';
+  btn.disabled = true;
+  var {error} = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://yantransport.app/?reset=true'
+  });
+  btn.innerHTML = 'Envoyer le lien';
+  btn.disabled = false;
+  if(error){
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--red-bg)';
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Erreur : '+error.message;
+  } else {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--green-bg)';
+    msgEl.style.color = 'var(--green)';
+    msgEl.textContent = '✓ Email envoyé ! Vérifiez votre boîte mail.';
+    document.getElementById('reset-email').value = '';
+  }
+}
+
+async function updatePassword(){
+  var p1 = document.getElementById('newpass1').value;
+  var p2 = document.getElementById('newpass2').value;
+  var msgEl = document.getElementById('newpass-msg');
+  var btn = document.getElementById('newpass-btn');
+  if(!p1||!p2){ toast('Remplissez les deux champs'); return; }
+  if(p1 !== p2){
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--red-bg)';
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Les mots de passe ne correspondent pas';
+    return;
+  }
+  if(p1.length < 6){
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--red-bg)';
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Le mot de passe doit faire au moins 6 caractères';
+    return;
+  }
+  btn.innerHTML = '<span class="loader"></span>Enregistrement...';
+  btn.disabled = true;
+  var {error} = await sb.auth.updateUser({password: p1});
+  btn.innerHTML = 'Enregistrer le mot de passe';
+  btn.disabled = false;
+  if(error){
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--red-bg)';
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Erreur : '+error.message;
+  } else {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'var(--green-bg)';
+    msgEl.style.color = 'var(--green)';
+    msgEl.textContent = '✓ Mot de passe mis à jour !';
+    setTimeout(function(){ go('p-client-login'); }, 2000);
+  }
+}
 var ptStart = 0;
 var ptActive = false;
 document.addEventListener('touchstart', function(e){
@@ -1763,6 +1864,19 @@ checkSession();
 renderForfaits();
 var section=document.getElementById('forfait-section');
 if(section)section.style.display='none';
+
+// Gérer retour reset password
+var urlParams = new URLSearchParams(window.location.search);
+var resetParam = urlParams.get('reset');
+if(resetParam === 'true'){
+  window.history.replaceState({}, '', '/');
+  // Supabase gère automatiquement la session après le clic sur le lien
+  sb.auth.onAuthStateChange(function(event, session){
+    if(event === 'PASSWORD_RECOVERY'){
+      go('p-new-password');
+    }
+  });
+}
 
 // Gérer retour Stripe
 var urlParams = new URLSearchParams(window.location.search);
