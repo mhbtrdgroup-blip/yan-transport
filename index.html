@@ -425,8 +425,8 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
       <label for="cgv-chk">J'accepte les <span style="color:var(--blue2);cursor:pointer;font-weight:600" onclick="go('p-cgv')">CGV</span> et la <span style="color:var(--blue2);cursor:pointer;font-weight:600" onclick="go('p-rgpd')">Politique de confidentialité</span>. *</label>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px;">
-      <button class="btn-p" id="submit-btn" onclick="submitBooking(false)" style="flex:1;padding:16px;">Réserver paiement à bord </button>
-      <button style="flex:1;background:#635bff;color:#fff;border:none;padding:16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);" id="pay-btn" onclick="submitBooking(true)">💳 Réserver paiement en ligne </button>
+      <button class="btn-p" id="submit-btn" onclick="submitBooking(false)" style="flex:1;padding:16px;">Réserver — Paiement à bord</button>
+      <button style="flex:1;background:#635bff;color:#fff;border:none;padding:16px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);" id="pay-btn" onclick="submitBooking(true)">Réserver — Paiement en ligne</button>
     </div>
     <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:12px;padding-bottom:20px;">Confirmation par e-mail immédiate</div>
   </div>
@@ -488,7 +488,10 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
     </div>
     <div id="form-driver" style="display:none">
       <div class="field"><label>E-mail</label><input type="email" id="drv-login-email" placeholder="votre@email.fr"></div>
-      <div class="field" style="margin-bottom:18px"><label>Mot de passe</label><input type="password" id="drv-login-pass" placeholder="••••••"></div>
+      <div class="field" style="margin-bottom:6px"><label>Mot de passe</label><input type="password" id="drv-login-pass" placeholder="••••••"></div>
+      <div style="text-align:right;margin-bottom:14px;">
+        <span onclick="go('p-reset')" style="font-size:11px;color:var(--blue2);cursor:pointer;font-weight:600;">Mot de passe oublié ?</span>
+      </div>
       <button class="btn-p" onclick="driverLogin()">Se connecter</button>
       <div id="drv-login-err" style="display:none;margin-top:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:9px;padding:10px;font-size:11px;color:var(--red);text-align:center;"></div>
     </div>
@@ -1052,8 +1055,8 @@ async function submitBooking(withPayment){
     paid: withPayment ? false : null
   });
 
-  document.getElementById('submit-btn').innerHTML='Réserver sans payer';
-  document.getElementById('pay-btn').innerHTML='💳 Payer maintenant';
+  document.getElementById('submit-btn').innerHTML='Réserver — Paiement à bord';
+  document.getElementById('pay-btn').innerHTML='Réserver — Paiement en ligne';
   document.getElementById('submit-btn').disabled=false;
   document.getElementById('pay-btn').disabled=false;
 
@@ -1262,7 +1265,7 @@ var SM={new:['b-new','À confirmer'],assigned:['b-assigned','Confirmée'],ongoin
 function paymentBadge(r){
   if(r.paid) return '<span style="background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">✓ Payé en ligne</span>';
   if(r.payment_method==='account') return '<span style="background:#e8f1fd;border:1px solid var(--border2);color:#0c447c;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">📋 En compte</span>';
-  return '<span style="background:var(--orange-bg);border:1px solid #ffe0b2;color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">💵 Paiement à bord</span>';
+  return '<span style="background:var(--orange-bg);border:1px solid #ffe0b2;color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">Paiement à bord</span>';
 }
 
 function renderRides(){
@@ -1298,17 +1301,19 @@ function renderRides(){
       (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Générer et envoyer la facture</button>':'')+
       (sa?
         '<div class="price-edit-box"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\')">Valider</button></div></div>'+
-        '<div class="d-row">'+
-          '<select class="dsel" id="ds-'+r.ref+'"><option value="">— Chauffeur —</option></select>'+
-          '<select class="dsel" id="pm-'+r.ref+'" style="max-width:110px;font-size:10px;">'+
-            '<option value="board"'+(r.payment_method!=='account'?' selected':'')+'>💵 À bord</option>'+
+        '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
+          '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Assigner un chauffeur</div>'+
+          '<select class="dsel" id="ds-'+r.ref+'" style="width:100%;margin-bottom:8px;"><option value="">— Sélectionner un chauffeur —</option></select>'+
+          '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Mode de paiement</div>'+
+          '<select class="dsel" id="pm-'+r.ref+'" style="width:100%;margin-bottom:10px;">'+
+            '<option value="board"'+(r.payment_method!=='account'?' selected':'')+'>Paiement à bord</option>'+
             '<option value="account"'+(r.payment_method==='account'?' selected':'')+'>📋 En compte</option>'+
           '</select>'+
-        '</div>'+
-        '<div class="d-row">'+
-          '<button class="abtn" onclick="assignRide(\''+r.ref+'\')">Assigner</button>'+
-          '<button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button>'+
-          '<button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button>'+
+          '<div style="display:flex;gap:6px;">'+
+            '<button class="abtn" style="flex:2;" onclick="assignRide(\''+r.ref+'\')">✓ Assigner</button>'+
+            '<button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button>'+
+            '<button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button>'+
+          '</div>'+
         '</div>'
       :'')+
     '</div>';
