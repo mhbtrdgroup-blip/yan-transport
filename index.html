@@ -841,13 +841,34 @@ function calcDist(p,d){
 // ── PRIX ──
 function calcRide(veh,km,night,fl,tr){
   var v=veh.toLowerCase();
-  var base=T.pickup[v]||8;
-  var kc=(T.km[v]||1.8)*km;
   var s=0;
   if(night)s+=T.night;
   if(fl)s+=T.airport;
   if(tr)s+=T.gare;
-  return{base:base,kc:kc,s:s,total:base+kc+s};
+
+  var total;
+  if(v==='berline'){
+    var minBerline=35;
+    var minKmBerline=15;
+    if(km<=minKmBerline){
+      // Prix minimum
+      total=minBerline+s;
+    } else {
+      // Prix minimum + km supplémentaires au-delà de 15km
+      var extraKm=km-minKmBerline;
+      total=minBerline+(extraKm*(T.km.berline||1.80))+s;
+    }
+  } else {
+    var minVan=60;
+    var minKmVan=20;
+    if(km<=minKmVan){
+      total=minVan+s;
+    } else {
+      var extraKmV=km-minKmVan;
+      total=minVan+(extraKmV*(T.km.van||2.50))+s;
+    }
+  }
+  return{base:0,kc:0,s:s,total:total};
 }
 function calcP(){
   var km=parseFloat(document.getElementById('f-km').value);
@@ -990,6 +1011,22 @@ async function loadClientRides(){
   var SC2={new:'b-new',assigned:'b-assigned',ongoing:'b-ongoing',done:'b-done',cancelled:'b-cancelled',noshow:'b-noshow'};
   el.innerHTML=rides.map(function(r){
     var trackingBanner = '';
+    var now = new Date();
+
+    // Calculer si annulation possible (24h avant)
+    var canCancel = false;
+    var cancelMsg = '';
+    if(r.date && r.time && (r.status==='new'||r.status==='assigned'||r.status==='accepted')){
+      var parts = r.date.split('-');
+      var tparts = r.time.split(':');
+      var rideTime = new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]),parseInt(tparts[0]),parseInt(tparts[1]));
+      var diffH = (rideTime - now) / (1000*60*60);
+      if(diffH > 24){ canCancel = true; cancelMsg = 'Gratuite jusqu\'à 24h avant'; }
+      else if(diffH > 2){ canCancel = true; cancelMsg = '50% retenu (moins de 24h)'; }
+      else if(diffH > 0){ canCancel = false; cancelMsg = 'Non remboursable (moins de 2h)'; }
+    }
+    if(r.status==='new') canCancel = true;
+
     if(r.status==='ongoing'){
       trackingBanner = '<div id="tracking-'+r.ref+'" style="background:var(--green-bg);border:1px solid var(--green);border-radius:10px;padding:12px;margin-top:8px;">'+
         '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">🚗 Votre chauffeur est en route</div>'+
@@ -998,12 +1035,22 @@ async function loadClientRides(){
         '<div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;" id="pos-time-'+r.ref+'">En attente de position GPS...</div>'+
       '</div>';
     }
-    if(r.status==='assigned'){
-      trackingBanner = '<div id="tracking-'+r.ref+'" style="background:var(--orange-bg);border:1px solid var(--orange);border-radius:10px;padding:12px;margin-top:8px;text-align:center;">'+
-        '<div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:4px;">✓ Chauffeur assigné</div>'+
-        '<div style="font-size:11px;color:var(--muted);">'+r.driver+' · Confirmée pour le '+(r.date?r.date.split('-').reverse().join('/'):'')+' à '+r.time+'</div>'+
+    if(r.status==='assigned'||r.status==='accepted'){
+      trackingBanner = '<div style="background:var(--orange-bg);border:1px solid var(--orange);border-radius:10px;padding:14px;margin-top:8px;">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--orange);margin-bottom:8px;">✓ Chauffeur assigné</div>'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:9px;">'+
+          '<div style="width:36px;height:36px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+
+            '<svg viewBox="0 0 24 24" fill="none" stroke="#90caf9" stroke-width="2" width="18" height="18"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'+
+          '</div>'+
+          '<div style="flex:1;">'+
+            '<div style="font-size:12px;font-weight:700;color:var(--navy);">'+r.driver+'</div>'+
+            '<div style="font-size:11px;color:var(--muted);">'+r.vehicle+'</div>'+
+          '</div>'+
+          (r.driver?'<a href="tel:__DRV_PHONE__" id="drv-tel-'+r.ref+'" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px 12px;border-radius:9px;font-size:11px;font-weight:700;text-decoration:none;font-family:var(--fb);">📞 Appeler</a>':'')+
+        '</div>'+
       '</div>';
     }
+
     return '<div class="client-ride-card">'+
       '<div class="crc-head">'+
         '<div><div class="crc-ref">'+r.ref+'</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div>'+
@@ -1011,16 +1058,26 @@ async function loadClientRides(){
       '</div>'+
       '<div style="font-size:12px;font-weight:600;margin-bottom:3px;">📍 '+r.pickup+'</div>'+
       '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">🏁 '+r.dropoff+'</div>'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
         '<div style="font-size:11px;color:var(--muted);">'+r.vehicle+' · '+r.pax+' pax</div>'+
         '<div style="font-family:Arial,sans-serif;font-size:16px;font-weight:700;color:var(--navy)">'+fmt(r.price||0)+' €</div>'+
       '</div>'+
-      (r.price_modified?'<div style="margin-top:5px;"><span class="price-modified-badge">Prix modifié par l\'admin</span></div>':'')+
+      (r.price_modified?'<div style="margin-bottom:5px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
+      paymentBadge(r)+
       trackingBanner+
-      '<div style="display:flex;gap:8px;margin-top:10px;">'+
+      '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">'+
+        // Bouton payer maintenant si pas payé et course active
+        (!r.paid && r.status!=='done' && r.status!=='cancelled' && r.status!=='noshow'?
+          '<button onclick="payNowClient(\''+r.ref+'\','+r.price+',\''+r.email+'\',\''+r.name+'\')" style="flex:1;background:#635bff;color:#fff;border:none;padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">💳 Payer</button>':'')+
+        // Bouton annuler (jusqu'à 24h ou 2h avec message)
+        (canCancel?
+          '<button onclick="cancelClientRide(\''+r.ref+'\',\''+cancelMsg+'\')" style="flex:1;background:transparent;color:var(--red);border:1px solid var(--red);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">Annuler</button>':'')+ 
+        // Bouton répéter
         (r.status==='done'||r.status==='cancelled'?
           '<button onclick="repeatRide(\''+encodeURIComponent(JSON.stringify({pickup:r.pickup,dropoff:r.dropoff,vehicle:r.vehicle,pax:r.pax,bags:r.bags||0}))+'\') " style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">🔄 Répéter</button>':'')+
-        (r.status==='new'?'<button onclick="cancelClientRide(\''+r.ref+'\')" style="flex:1;background:transparent;color:var(--red);border:1px solid var(--red);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);text-transform:uppercase;">Annuler</button>':'')+
+        // Bouton facture si terminée
+        (r.status==='done'?
+          '<button onclick="downloadClientInvoice(\''+r.ref+'\')" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Facture</button>':'')+
       '</div>'+
     '</div>';
   }).join('');
@@ -1037,6 +1094,7 @@ async function loadClientRides(){
         }
       }
     });
+    loadDriverPhones();
   }, 300);
 }
 
@@ -1054,18 +1112,89 @@ function repeatRide(encodedData){
   toast('Trajet pré-rempli — choisissez la date et l\'heure');
 }
 
-async function cancelClientRide(ref){
-  if(!confirm('Annuler cette réservation ?'))return;
-  await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par le client depuis son espace'}).eq('ref',ref);
-  await loadClientRides();toast('Réservation annulée');
-  // Initialiser les cartes pour les courses en cours
-  setTimeout(function(){
-    (window._clientRidesCache||[]).forEach(function(r){
-      if(r.status==='ongoing' && r.driver_lat && r.driver_lng){
-        initDriverMap(r.ref, r.driver_lat, r.driver_lng);
+// ── PAYER DEPUIS DASHBOARD CLIENT ──
+async function payNowClient(ref, price, email, name){
+  var btn = event.target;
+  btn.innerHTML = '<span class="loader"></span>';
+  btn.disabled = true;
+  try {
+    var res = await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/stripe-payment',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({amount:price,currency:'eur',booking_ref:ref,customer_email:email,customer_name:name,description:'Course Yan Transport — '+ref})
+    });
+    var data = await res.json();
+    if(data.url){
+      var isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      if(isStandalone){
+        // Créer un lien et simuler un clic
+        var a = document.createElement('a');
+        a.href = data.url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        window.open(data.url, '_blank');
+      }
+    } else { toast('Erreur : '+(data.error||'Réessayez')); }
+  } catch(e){ toast('Erreur réseau'); }
+  btn.innerHTML = '💳 Payer';
+  btn.disabled = false;
+}
+
+// ── FACTURE DEPUIS DASHBOARD CLIENT ──
+async function downloadClientInvoice(ref){
+  var rides = window._clientRidesCache || [];
+  var r = rides.find(function(x){return x.ref===ref;});
+  if(!r){toast('Course introuvable');return;}
+  var btn = event.target;
+  btn.innerHTML = '<span class="loader"></span>';
+  btn.disabled = true;
+  try {
+    var invoiceNum = 'FAC-'+ref+'-'+new Date().getFullYear();
+    var dateFacture = new Date().toLocaleDateString('fr-FR');
+    var paymentLabel = r.paid?'Payé en ligne':r.payment_method==='account'?'En compte':'Paiement à bord';
+    var res = await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-invoice',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({booking_ref:ref,invoice_num:invoiceNum,date_facture:dateFacture,client_name:r.name,client_email:r.email,pickup:r.pickup,dropoff:r.dropoff,date_course:r.date,time_course:r.time,vehicle:r.vehicle,pax:r.pax,km:r.km,price:r.price,driver:r.driver,payment_label:paymentLabel,flight:r.flight,train:r.train})
+    });
+    var data = await res.json();
+    if(data.success){ toast('✓ Facture envoyée à '+r.email); }
+    else { toast('Erreur : '+(data.error||'Réessayez')); }
+  } catch(e){ toast('Erreur réseau'); }
+  btn.innerHTML = '📄 Facture';
+  btn.disabled = false;
+}
+
+// ── CHARGER TÉLÉPHONE CHAUFFEUR ──
+async function loadDriverPhones(){
+  var {data} = await sb.from('drivers').select('name,phone').eq('active',true);
+  if(!data) return;
+  data.forEach(function(d){
+    var els = document.querySelectorAll('[id^="drv-tel-"]');
+    els.forEach(function(el){
+      // Trouver la carte correspondante et mettre à jour le lien tel
+      var card = el.closest('.client-ride-card');
+      if(card){
+        var nameEl = card.querySelector('[style*="font-weight:700;color:var(--navy)"]');
+        if(nameEl && nameEl.textContent === d.name && d.phone){
+          el.href = 'tel:'+d.phone;
+        }
       }
     });
-  }, 500);
+  });
+}
+
+async function cancelClientRide(ref, cancelMsg){
+  var msg = cancelMsg ? '\n\nConditions : '+cancelMsg : '';
+  if(!confirm('Annuler cette réservation ?'+msg)) return;
+  var reason = 'Annulé par le client depuis son espace';
+  await sb.from('bookings').update({status:'cancelled',cancel_reason:reason}).eq('ref',ref);
+  await loadClientRides();
+  toast('Réservation annulée');
 }
 
 // ── DISPO CHECK ──
@@ -1330,7 +1459,16 @@ function simulate(){
   var r=calcRide(v,km,n,a,false);
   var el=document.getElementById('sim-tot');var bd=document.getElementById('sim-bd');
   if(el)el.textContent=fmt(r.total)+' €';
-  if(bd)bd.innerHTML='Base '+fmt(r.base)+'€ + '+km+'km × '+T.km[v].toFixed(2)+'€ = '+fmt(r.kc)+'€'+(r.s>0?' + supp. '+fmt(r.s)+'€':'');
+  if(bd){
+    var minKm=v==='berline'?15:20;
+    var minP=v==='berline'?35:60;
+    if(km<=minKm){
+      bd.innerHTML='Prix minimum '+minP+'€'+(r.s>0?' + supp. '+fmt(r.s)+'€':'');
+    } else {
+      var extra=km-minKm;
+      bd.innerHTML='Min '+minP+'€ + '+extra+'km × '+T.km[v].toFixed(2)+'€/km'+(r.s>0?' + supp. '+fmt(r.s)+'€':'');
+    }
+  }
 }
 
 // ── LOAD RIDES ──
@@ -1409,7 +1547,14 @@ function renderRides(){
       '<div style="margin-top:4px;">'+paymentBadge(r)+'</div>'+
       (r.price_modified?'<div style="margin-top:4px;"><span class="price-modified-badge">Prix modifié par l\'admin</span></div>':'')+
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
-      (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Générer et envoyer la facture</button>':'')+
+      (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Renvoyer la facture</button>':'')+
+      (r.status==='cancelled'||r.status==='noshow'?
+        '<div style="margin-top:10px;padding:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;">'+
+          '<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Suivi annulation</div>'+
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--red);font-weight:700;text-decoration:none;">'+r.phone+'</a></div>'+
+          '<button onclick="markFollowupDone(\''+r.ref+'\')" style="width:100%;background:'+(r.cancel_followup_done?'var(--green-bg)':'var(--red-bg)')+';color:'+(r.cancel_followup_done?'var(--green)':'var(--red)')+';border:1px solid '+(r.cancel_followup_done?'var(--green)':'#ffcdd2')+';padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">'+(r.cancel_followup_done?'✓ Suivi effectué':'📞 Marquer comme appelé')+'</button>'+
+        '</div>'
+      :'')+
       (sa?
         '<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
           '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Assigner un chauffeur</div>'+
@@ -2007,22 +2152,52 @@ function sendPosition(ref){
   }, {enableHighAccuracy:true, timeout:8000});
 }
 
+async function markFollowupDone(ref){
+  var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
+  var already = idx>-1 && ridesCache[idx].cancel_followup_done;
+  await sb.from('bookings').update({cancel_followup_done:!already}).eq('ref',ref);
+  if(idx>-1) ridesCache[idx].cancel_followup_done=!already;
+  renderRides();
+  toast(already?'Suivi retiré':'✓ Suivi annulation effectué');
+}
+
 async function dAct(ref,s){
   await sb.from('bookings').update({status:s}).eq('ref',ref);
   var m={accepted:'Course acceptée ✓',ongoing:'Course démarrée !',done:'Course terminée ✓'};
   toast(m[s]||'Mis à jour');
 
   if(s==='ongoing'){
-    // Démarrer le tracking GPS
     startTracking(ref);
     drvTab('ongoing');
   }
   if(s==='done'){
-    // Arrêter le tracking GPS
     stopTracking();
-    // Effacer la position
     await sb.from('bookings').update({driver_lat:null,driver_lng:null}).eq('ref',ref);
     drvTab('done');
+
+    // Générer automatiquement la facture
+    var {data:rideData} = await sb.from('bookings').select('*').eq('ref',ref).single();
+    if(rideData && rideData.email && !rideData.invoice_sent){
+      var invoiceNum = 'FAC-'+ref+'-'+new Date().getFullYear();
+      var dateFacture = new Date().toLocaleDateString('fr-FR');
+      var paymentLabel = rideData.paid?'Payé en ligne':rideData.payment_method==='account'?'En compte':'Paiement à bord';
+      fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-invoice',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          booking_ref:ref,invoice_num:invoiceNum,date_facture:dateFacture,
+          client_name:rideData.name,client_email:rideData.email,
+          pickup:rideData.pickup,dropoff:rideData.dropoff,
+          date_course:rideData.date,time_course:rideData.time,
+          vehicle:rideData.vehicle,pax:rideData.pax,km:rideData.km,
+          price:rideData.price,driver:rideData.driver,
+          payment_label:paymentLabel,flight:rideData.flight,train:rideData.train
+        })
+      }).then(function(){
+        sb.from('bookings').update({invoice_sent:true}).eq('ref',ref);
+        toast('✓ Facture envoyée au client');
+      });
+    }
   }
 
   await loadDriverRides();
