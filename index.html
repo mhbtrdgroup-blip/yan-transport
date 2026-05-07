@@ -1046,7 +1046,7 @@ async function loadClientRides(){
             '<div style="font-size:12px;font-weight:700;color:var(--navy);">'+r.driver+'</div>'+
             '<div style="font-size:11px;color:var(--muted);">'+r.vehicle+'</div>'+
           '</div>'+
-          (r.driver?'<a href="tel:__DRV_PHONE__" id="drv-tel-'+r.ref+'" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px 12px;border-radius:9px;font-size:11px;font-weight:700;text-decoration:none;font-family:var(--fb);">📞 Appeler</a>':'')+
+          '<a id="drv-tel-'+r.ref+'" href="#" style="background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px 12px;border-radius:9px;font-size:11px;font-weight:700;text-decoration:none;font-family:var(--fb);">📞 Appeler</a>'+
         '</div>'+
       '</div>';
     }
@@ -1173,18 +1173,19 @@ async function downloadClientInvoice(ref){
 async function loadDriverPhones(){
   var {data} = await sb.from('drivers').select('name,phone').eq('active',true);
   if(!data) return;
-  data.forEach(function(d){
-    var els = document.querySelectorAll('[id^="drv-tel-"]');
-    els.forEach(function(el){
-      // Trouver la carte correspondante et mettre à jour le lien tel
-      var card = el.closest('.client-ride-card');
-      if(card){
-        var nameEl = card.querySelector('[style*="font-weight:700;color:var(--navy)"]');
-        if(nameEl && nameEl.textContent === d.name && d.phone){
-          el.href = 'tel:'+d.phone;
-        }
+  var phoneMap = {};
+  data.forEach(function(d){ if(d.phone) phoneMap[d.name] = d.phone; });
+
+  // Mettre à jour tous les boutons appeler
+  var rides = window._clientRidesCache || [];
+  rides.forEach(function(r){
+    if((r.status==='assigned'||r.status==='accepted') && r.driver && phoneMap[r.driver]){
+      var el = document.getElementById('drv-tel-'+r.ref);
+      if(el){
+        el.href = 'tel:'+phoneMap[r.driver];
+        el.textContent = '📞 '+phoneMap[r.driver];
       }
-    });
+    }
   });
 }
 
