@@ -1424,10 +1424,6 @@ async function adminLogin(){
     localStorage.setItem('yan_admin','true');
     await loadPricing();await loadRides();loadDispos();simulate();
     go('p-admin');
-    // Restaurer le dernier filtre utilisé
-    var savedFilter = localStorage.getItem('yan_filter')||'all';
-    currentFilter = savedFilter;
-    filterRides(savedFilter);
   }else{toast('Identifiants incorrects');}
 }
 
@@ -1468,9 +1464,6 @@ async function checkSession(){
   if(adminLogged === 'true'){
     await loadPricing(); await loadRides(); loadDispos(); simulate();
     go('p-admin');
-    var savedFilter = localStorage.getItem('yan_filter')||'all';
-    currentFilter = savedFilter;
-    filterRides(savedFilter);
     return;
   }
 
