@@ -573,19 +573,31 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
   <div style="flex:1;overflow-y:auto;">
     <!-- COURSES -->
     <div id="pan-c" style="padding:16px;">
-      <div class="stats-g">
-        <div class="stat-b active-filter" id="sf-all" onclick="filterRides('all')"><div class="stat-bn" id="st-tot">—</div><div class="stat-bl">Toutes</div></div>
-        <div class="stat-b" id="sf-new" onclick="filterRides('new')"><div class="stat-bn" id="st-new" style="color:var(--blue2)">—</div><div class="stat-bl">À confirmer</div></div>
-        <div class="stat-b" id="sf-assigned" onclick="filterRides('assigned')"><div class="stat-bn" id="st-act" style="color:var(--orange)">—</div><div class="stat-bl">Confirmées</div></div>
-        <div class="stat-b" id="sf-cancelled" onclick="filterRides('cancelled')"><div class="stat-bn" id="st-cancelled" style="color:var(--red)">—</div><div class="stat-bl">Annulées</div></div>
-      </div>
-      <div class="stat-b" style="margin-bottom:14px;padding:13px;" id="sf-done" onclick="filterRides('done')">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div><div class="stat-bn" id="st-rev" style="color:var(--green);font-size:18px">—</div><div class="stat-bl">Terminées · CA total</div></div>
-          <div style="font-size:10px;color:var(--muted);">Filtrer →</div>
+
+      <!-- STATS RAPIDES -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;">
+        <div style="background:#fff;border:1.5px solid #ffcdd2;border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:var(--red)" id="st-new">—</div>
+          <div style="font-size:8px;color:var(--red);text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-top:2px;">Urgent</div>
+        </div>
+        <div style="background:#fff;border:1.5px solid #ffe0b2;border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:var(--orange)" id="st-act">—</div>
+          <div style="font-size:8px;color:var(--orange);text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-top:2px;">Confirmées</div>
+        </div>
+        <div style="background:#fff;border:1.5px solid #a5d6a7;border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:var(--green)" id="st-rev">—</div>
+          <div style="font-size:8px;color:var(--green);text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-top:2px;">CA</div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;text-align:center;">
+          <div style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:var(--muted)" id="st-cancelled">—</div>
+          <div style="font-size:8px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.5px;margin-top:2px;">Annulées</div>
         </div>
       </div>
+
+      <!-- BOUTON CRÉER -->
       <button onclick="toggleNewRide()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:11px;font-family:var(--fb);margin-bottom:14px;">+ Créer une course</button>
+
+      <!-- FORMULAIRE NOUVELLE COURSE -->
       <div id="new-ride-form" style="display:none;background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px;margin-bottom:16px;">
         <div class="sec">Nouvelle course</div>
         <div class="field"><label>Prise en charge *</label><input type="text" id="nr-pickup" placeholder="Adresse départ"></div>
@@ -617,8 +629,64 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
         <button class="btn-p" onclick="createRideAdmin()" style="margin-top:8px;">Créer la course</button>
         <button onclick="toggleNewRide()" style="width:100%;background:transparent;color:var(--muted);border:none;padding:10px;font-size:11px;cursor:pointer;font-family:var(--fb);margin-top:6px;">Annuler</button>
       </div>
-      <div class="sec" id="rides-section-title">Toutes les courses</div>
-      <div id="rides-list"><div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Chargement...</div></div>
+
+      <!-- ACCORDÉON SECTIONS -->
+      <div id="accordion-new">
+        <div onclick="toggleAccordion('new')" style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #ffcdd2;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;"></div>
+            <span style="font-size:12px;font-weight:700;color:var(--red);">À confirmer</span>
+            <span style="background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;" id="badge-new">0</span>
+          </div>
+          <span id="arrow-new" style="color:var(--red);font-size:16px;transition:transform .2s;">▼</span>
+        </div>
+        <div id="section-new" style="margin-bottom:12px;">
+          <div id="list-new"><div style="font-size:12px;color:var(--muted);text-align:center;padding:16px;background:#fff;border-radius:10px;">Chargement...</div></div>
+        </div>
+      </div>
+
+      <div id="accordion-assigned">
+        <div onclick="toggleAccordion('assigned')" style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #ffe0b2;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--orange);flex-shrink:0;"></div>
+            <span style="font-size:12px;font-weight:700;color:var(--orange);">Confirmées</span>
+            <span style="background:var(--orange);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;" id="badge-assigned">0</span>
+          </div>
+          <span id="arrow-assigned" style="color:var(--orange);font-size:16px;transition:transform .2s;">▶</span>
+        </div>
+        <div id="section-assigned" style="display:none;margin-bottom:12px;">
+          <div id="list-assigned"></div>
+        </div>
+      </div>
+
+      <div id="accordion-done">
+        <div onclick="toggleAccordion('done')" style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #a5d6a7;border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--green);flex-shrink:0;"></div>
+            <span style="font-size:12px;font-weight:700;color:var(--green);">Terminées</span>
+            <span style="background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;" id="badge-done">0</span>
+          </div>
+          <span id="arrow-done" style="color:var(--green);font-size:16px;transition:transform .2s;">▶</span>
+        </div>
+        <div id="section-done" style="display:none;margin-bottom:12px;">
+          <div id="list-done"></div>
+        </div>
+      </div>
+
+      <div id="accordion-cancelled">
+        <div onclick="toggleAccordion('cancelled')" style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--border);border-radius:12px;padding:13px 15px;cursor:pointer;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0;"></div>
+            <span style="font-size:12px;font-weight:700;color:var(--muted);">Annulées & No-shows</span>
+            <span style="background:var(--muted);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;" id="badge-cancelled">0</span>
+          </div>
+          <span id="arrow-cancelled" style="color:var(--muted);font-size:16px;transition:transform .2s;">▶</span>
+        </div>
+        <div id="section-cancelled" style="display:none;margin-bottom:12px;">
+          <div id="list-cancelled"></div>
+        </div>
+      </div>
+
     </div>
     <!-- TARIFS -->
     <div id="pan-t" style="display:none;padding:16px;">
@@ -1489,81 +1557,76 @@ async function loadRides(){
 }
 
 // ── FILTER ──
-function filterRides(filter){
-  currentFilter=filter;
-  localStorage.setItem('yan_filter', filter);
-  document.querySelectorAll('.stat-b').forEach(function(b){b.classList.remove('active-filter');});
-  var sfMap={all:'sf-all',new:'sf-new',assigned:'sf-assigned',cancelled:'sf-cancelled',done:'sf-done'};
-  var sfEl=document.getElementById(sfMap[filter]);
-  if(sfEl)sfEl.classList.add('active-filter');
-  var titles={all:'Toutes les courses',new:'Courses à confirmer',assigned:'Courses confirmées',cancelled:'Annulées & No-shows',done:'Courses terminées'};
-  document.getElementById('rides-section-title').textContent=titles[filter]||'Courses';
-  renderRides();
+// ── ACCORDÉON ──
+var accordionState = {new:true, assigned:false, done:false, cancelled:false};
+
+function toggleAccordion(section){
+  accordionState[section] = !accordionState[section];
+  var el = document.getElementById('section-'+section);
+  var arrow = document.getElementById('arrow-'+section);
+  if(accordionState[section]){
+    el.style.display='block';
+    arrow.textContent='▼';
+  } else {
+    el.style.display='none';
+    arrow.textContent='▶';
+  }
 }
 
 var SM={new:['b-new','À confirmer'],assigned:['b-assigned','Confirmée'],ongoing:['b-ongoing','En route'],done:['b-done','Terminée'],cancelled:['b-cancelled','Annulée'],noshow:['b-noshow','No-show']};
 
-function paymentBadge(r){
-  if(r.paid) return '<span style="background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">✓ Payé en ligne</span>';
-  if(r.payment_method==='account') return '<span style="background:#e8f1fd;border:1px solid var(--border2);color:#0c447c;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">📋 En compte</span>';
-  return '<span style="background:var(--orange-bg);border:1px solid #ffe0b2;color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;margin-right:4px;">Paiement à bord</span>';
-}
-
 function renderRides(){
   var rides=ridesCache;
   var newR=rides.filter(function(r){return r.status==='new';});
-  var assigned=rides.filter(function(r){return r.status==='assigned'||r.status==='ongoing';});
+  var assigned=rides.filter(function(r){return r.status==='assigned'||r.status==='accepted'||r.status==='ongoing';});
   var cancelled=rides.filter(function(r){return r.status==='cancelled'||r.status==='noshow';});
   var done=rides.filter(function(r){return r.status==='done';});
   var ca=done.reduce(function(a,r){return a+(r.price||0);},0);
-  document.getElementById('st-tot').textContent=rides.length;
-  document.getElementById('st-new').textContent=newR.length;
-  document.getElementById('st-act').textContent=assigned.length;
-  document.getElementById('st-cancelled').textContent=cancelled.length;
-  document.getElementById('st-rev').textContent=fmt(ca)+' €';
-  var filtered=rides;
-  if(currentFilter==='new')filtered=newR;
-  else if(currentFilter==='assigned')filtered=assigned;
-  else if(currentFilter==='cancelled')filtered=cancelled;
-  else if(currentFilter==='done')filtered=done;
-  if(!filtered.length){document.getElementById('rides-list').innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:20px;">Aucune course dans cette catégorie.</div>';return;}
+
+  // Badges stats
+  var stNew=document.getElementById('st-new');
+  var stAct=document.getElementById('st-act');
+  var stRev=document.getElementById('st-rev');
+  var stCan=document.getElementById('st-cancelled');
+  if(stNew)stNew.textContent=newR.length;
+  if(stAct)stAct.textContent=assigned.length;
+  if(stRev)stRev.textContent=fmt(ca)+' €';
+  if(stCan)stCan.textContent=cancelled.length;
+  var bNew=document.getElementById('badge-new');
+  var bAss=document.getElementById('badge-assigned');
+  var bDon=document.getElementById('badge-done');
+  var bCan=document.getElementById('badge-cancelled');
+  if(bNew)bNew.textContent=newR.length;
+  if(bAss)bAss.textContent=assigned.length;
+  if(bDon)bDon.textContent=done.length;
+  if(bCan)bCan.textContent=cancelled.length;
+
+  // Auto-ouvrir si urgences
+  if(newR.length>0){
+    accordionState.new=true;
+  }
 
   var today=new Date().toISOString().split('T')[0];
   var tomorrow=new Date(Date.now()+86400000).toISOString().split('T')[0];
-  var nextRideRef=null;
-  for(var ni=0;ni<filtered.length;ni++){
-    if(filtered[ni].date>=today&&(filtered[ni].status==='new'||filtered[ni].status==='assigned'||filtered[ni].status==='ongoing')){
-      nextRideRef=filtered[ni].ref;break;
-    }
-  }
-  var html='';
-  var lastDate=null;
-  filtered.forEach(function(r){
-    var rDate=r.date||'';
-    if(rDate!==lastDate){
-      lastDate=rDate;
-      var lbl=rDate===today?"📅 Aujourd'hui":rDate===tomorrow?'📅 Demain':rDate?'📅 '+rDate.split('-').reverse().join('/'):'📅 Date inconnue';
-      html+='<div style="font-size:10px;font-weight:700;color:var(--blue2);letter-spacing:2px;text-transform:uppercase;padding:8px 4px 6px;margin-top:6px;border-bottom:1px solid var(--border);margin-bottom:8px;">'+lbl+'</div>';
-    }
+
+  function buildCard(r){
     var bc=SM[r.status]||SM.new;
     var sa=r.status!=='done'&&r.status!=='cancelled'&&r.status!=='noshow';
-    var isNext=r.ref===nextRideRef;
-    html+=(isNext?'<div style="background:var(--blue2);color:#fff;font-size:10px;font-weight:700;padding:6px 12px;border-radius:8px 8px 0 0;letter-spacing:1px;text-transform:uppercase;">⏭ Prochaine course</div>':'')+
-      '<div class="ride-card" style="'+(isNext?'border-color:var(--blue2);border-width:2px;margin-bottom:14px;border-radius:'+(isNext?'0 0 14px 14px':'14px')+';':'')+'">' +
+    return '<div class="ride-card" style="margin-bottom:8px;">'+
       '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
       '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
-      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+(r.night?'<span class="chip hl">Nuit</span>':'')+'</div>'+
-      '<div class="rc-foot"><span style="font-size:11px;color:var(--muted)">'+r.name+' · '+r.phone+'</span><span class="rc-price">'+fmt(r.price||0)+' €</span></div>'+
-      (r.driver?'<div style="margin-top:5px;font-size:11px;font-weight:600;color:var(--navy);">👨‍✈️ '+r.driver+'</div>':'')+
+      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
+      '<div class="rc-foot"><span style="font-size:11px;color:var(--muted)">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></span><span class="rc-price">'+fmt(r.price||0)+' €</span></div>'+
+      (r.driver?'<div style="margin-top:4px;font-size:11px;font-weight:600;color:var(--navy);">👨‍✈️ '+r.driver+'</div>':'')+
       '<div style="margin-top:4px;">'+paymentBadge(r)+'</div>'+
-      (r.price_modified?'<div style="margin-top:4px;"><span class="price-modified-badge">Prix modifié par l\'admin</span></div>':'')+
-      (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:5px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
-      (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Renvoyer la facture</button>':'')+
+      (r.price_modified?'<div style="margin-top:3px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
+      (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
+      (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\');" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Renvoyer la facture</button>':'')+
       (r.status==='cancelled'||r.status==='noshow'?
-        '<div style="margin-top:10px;padding:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;">'+
-          '<div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Suivi annulation</div>'+
-          '<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--red);font-weight:700;text-decoration:none;">'+r.phone+'</a></div>'+
-          '<button onclick="markFollowupDone(\''+r.ref+'\')" style="width:100%;background:'+(r.cancel_followup_done?'var(--green-bg)':'var(--red-bg)')+';color:'+(r.cancel_followup_done?'var(--green)':'var(--red)')+';border:1px solid '+(r.cancel_followup_done?'var(--green)':'#ffcdd2')+';padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">'+(r.cancel_followup_done?'✓ Suivi effectué':'📞 Marquer comme appelé')+'</button>'+
+        '<div style="margin-top:8px;padding:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;">'+
+          '<div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:5px;">Suivi annulation</div>'+
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--red);font-weight:700;text-decoration:none;">📞 '+r.phone+'</a></div>'+
+          '<button onclick="markFollowupDone(\''+r.ref+'\');" style="width:100%;background:'+(r.cancel_followup_done?'var(--green-bg)':'transparent')+';color:'+(r.cancel_followup_done?'var(--green)':'var(--red)')+';border:1px solid '+(r.cancel_followup_done?'var(--green)':'#ffcdd2')+';padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">'+(r.cancel_followup_done?'✓ Suivi effectué':'📞 Marquer comme appelé')+'</button>'+
         '</div>'
       :'')+
       (sa?
@@ -1575,19 +1638,54 @@ function renderRides(){
             '<option value="board"'+(r.payment_method!=='account'?' selected':'')+'>Paiement à bord</option>'+
             '<option value="account"'+(r.payment_method==='account'?' selected':'')+'>En compte</option>'+
           '</select>'+
-          '<div class="price-edit-box" style="margin-bottom:10px;"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\')">Valider</button></div></div>'+
+          '<div class="price-edit-box" style="margin-bottom:10px;"><label>✏️ Modifier le prix</label><div class="price-edit-row"><input type="number" class="price-edit-input" id="pedit-'+r.ref+'" value="'+fmt(r.price||0)+'" min="0" step="0.5"><button class="price-edit-btn" onclick="updatePrice(\''+r.ref+'\');">Valider</button></div></div>'+
           '<div style="display:flex;gap:6px;">'+
-            '<button class="abtn" style="flex:2;" onclick="assignRide(\''+r.ref+'\')">✓ Assigner</button>'+
-            '<button class="sbtn" onclick="cancelRide(\''+r.ref+'\')">Annuler</button>'+
-            '<button class="nbtn" onclick="markNoShow(\''+r.ref+'\')">No-show</button>'+
+            '<button class="abtn" style="flex:2;" onclick="assignRide(\''+r.ref+'\');">✓ Assigner</button>'+
+            '<button class="sbtn" onclick="cancelRide(\''+r.ref+'\');">Annuler</button>'+
+            '<button class="nbtn" onclick="markNoShow(\''+r.ref+'\');">No-show</button>'+
           '</div>'+
         '</div>'
       :'')+
       '</div>';
+  }
+
+  function renderSection(list, containerId){
+    var el=document.getElementById(containerId);
+    if(!el)return;
+    if(!list.length){
+      el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:14px;background:#fff;border-radius:10px;margin-bottom:4px;">Aucune course</div>';
+      return;
+    }
+    var html='';
+    var lastDate=null;
+    list.forEach(function(r){
+      var rDate=r.date||'';
+      if(rDate!==lastDate){
+        lastDate=rDate;
+        var lbl=rDate===today?"📅 Aujourd\'hui":rDate===tomorrow?'📅 Demain':rDate?'📅 '+rDate.split('-').reverse().join('/'):'📅 ?';
+        html+='<div style="font-size:9px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;padding:6px 4px 4px;margin-top:4px;border-bottom:1px solid var(--border);margin-bottom:6px;">'+lbl+'</div>';
+      }
+      html+=buildCard(r);
+    });
+    el.innerHTML=html;
+  }
+
+  renderSection(newR,'list-new');
+  renderSection(assigned,'list-assigned');
+  renderSection(done,'list-done');
+  renderSection(cancelled,'list-cancelled');
+
+  // Appliquer état accordéon
+  ['new','assigned','done','cancelled'].forEach(function(s){
+    var secEl=document.getElementById('section-'+s);
+    var arrow=document.getElementById('arrow-'+s);
+    if(secEl)secEl.style.display=accordionState[s]?'block':'none';
+    if(arrow)arrow.textContent=accordionState[s]?'▼':'▶';
   });
-  document.getElementById('rides-list').innerHTML=html;
+
   loadDriversForDispatch();
 }
+
 
 // ── MODIFIER PRIX ──
 async function updatePrice(ref){
