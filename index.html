@@ -1354,7 +1354,12 @@ async function adminLogin(){
   var p=document.getElementById('al-p').value.trim();
   if(u==='admin'&&p==='YanAdmin2024!'){
     localStorage.setItem('yan_admin','true');
-    await loadPricing();await loadRides();loadDispos();simulate();go('p-admin');
+    await loadPricing();await loadRides();loadDispos();simulate();
+    go('p-admin');
+    // Restaurer le dernier filtre utilisé
+    var savedFilter = localStorage.getItem('yan_filter')||'all';
+    currentFilter = savedFilter;
+    filterRides(savedFilter);
   }else{toast('Identifiants incorrects');}
 }
 
@@ -1394,7 +1399,11 @@ async function checkSession(){
   var adminLogged = localStorage.getItem('yan_admin');
   if(adminLogged === 'true'){
     await loadPricing(); await loadRides(); loadDispos(); simulate();
-    go('p-admin'); return;
+    go('p-admin');
+    var savedFilter = localStorage.getItem('yan_filter')||'all';
+    currentFilter = savedFilter;
+    filterRides(savedFilter);
+    return;
   }
 
   // Session Supabase (chauffeur ou client)
@@ -1482,6 +1491,7 @@ async function loadRides(){
 // ── FILTER ──
 function filterRides(filter){
   currentFilter=filter;
+  localStorage.setItem('yan_filter', filter);
   document.querySelectorAll('.stat-b').forEach(function(b){b.classList.remove('active-filter');});
   var sfMap={all:'sf-all',new:'sf-new',assigned:'sf-assigned',cancelled:'sf-cancelled',done:'sf-done'};
   var sfEl=document.getElementById(sfMap[filter]);
