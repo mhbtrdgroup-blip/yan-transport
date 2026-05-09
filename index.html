@@ -1774,10 +1774,6 @@ async function cancelRide(ref){
   await sb.from('bookings').update({status:'cancelled',cancel_reason:'Annulé par l\'administrateur'}).eq('ref',ref);
   var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
   if(idx>-1){ridesCache[idx].status='cancelled';ridesCache[idx].cancel_reason='Annulé par l\'administrateur';}
-  currentFilter='cancelled';
-  document.querySelectorAll('.stat-b').forEach(function(b){b.classList.remove('active-filter');});
-  var sf=document.getElementById('sf-cancelled');if(sf)sf.classList.add('active-filter');
-  document.getElementById('rides-section-title').textContent='Annulées & No-shows';
   renderRides();
   toast('Course annulée');
 }
@@ -1786,10 +1782,6 @@ async function markNoShow(ref){
   await sb.from('bookings').update({status:'noshow',noshow:true,cancel_reason:'No-show — client absent'}).eq('ref',ref);
   var idx=ridesCache.findIndex(function(r){return r.ref===ref;});
   if(idx>-1){ridesCache[idx].status='noshow';ridesCache[idx].noshow=true;ridesCache[idx].cancel_reason='No-show — client absent';}
-  currentFilter='cancelled';
-  document.querySelectorAll('.stat-b').forEach(function(b){b.classList.remove('active-filter');});
-  var sf=document.getElementById('sf-cancelled');if(sf)sf.classList.add('active-filter');
-  document.getElementById('rides-section-title').textContent='Annulées & No-shows';
   renderRides();
   toast('No-show enregistré');
 }
