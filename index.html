@@ -842,6 +842,12 @@ var forfaits=[];
 
 function fmt(n){return parseFloat(n||0).toFixed(2);}
 
+function paymentBadge(r){
+  if(r.paid)return '<span style="background:#e8f5e9;border:1px solid #a5d6a7;color:#2e7d32;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">Payé en ligne</span>';
+  if(r.payment_method==='account')return '<span style="background:var(--ice);border:1px solid var(--border2);color:#0c447c;font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">En compte</span>';
+  return '<span style="background:var(--orange-bg);border:1px solid #ffe0b2;color:var(--orange);font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;">Paiement à bord</span>';
+}
+
 // ── NAVIGATION ──
 function go(id){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
