@@ -1939,11 +1939,7 @@ async function addDriver(){
   var {error}=await sb.from('drivers').insert({name:first+' '+last,email:email,phone:phone,vehicle_type:vtype,active:true});
   btn.innerHTML='Ajouter le chauffeur';btn.disabled=false;
   if(error){toast('Erreur : '+error.message);return;}
-  // Envoyer email invitation avec lien reset password
-  try {
-    await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://yantransport.app/'});
-  } catch(e){ console.log('Email invite error:', e); }
-  // Envoyer email de bienvenue via Edge Function
+  // Envoyer email bienvenue + invitation via Edge Function (qui a la service role key)
   fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-confirmation',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -1957,7 +1953,7 @@ async function addDriver(){
   document.getElementById('drv-new-phone').value='';
   document.getElementById('drv-new-email').value='';
   await loadAdminDrivers();
-  toast('Chauffeur ajouté ! Email de bienvenue envoyé à '+email);
+  toast('Chauffeur ajouté ! Email envoyé à '+email);
 }
 async function toggleDriver(id,active){
   await sb.from('drivers').update({active:!active}).eq('id',id);
