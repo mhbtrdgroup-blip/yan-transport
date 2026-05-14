@@ -2362,13 +2362,42 @@ async function dAct(ref,s){
 // Statuts chauffeur détaillés (Sur place, Prise en charge, Déposé)
 async function updateDriverStatus(ref, dStatus){
   await sb.from('bookings').update({driver_status:dStatus}).eq('ref',ref);
-  var labels={
-    en_route:'🚗 En route',
-    sur_place:'📍 Sur place',
-    pickup:'🧳 Client à bord',
-    dropoff:'✓ Déposé'
-  };
+  var labels={en_route:'🚗 En route',sur_place:'📍 Sur place',pickup:'🧳 Client à bord',dropoff:'✓ Déposé'};
   toast(labels[dStatus]||'Statut mis à jour');
+
+  // Récupérer les infos de la course pour les emails
+  var {data:r} = await sb.from('bookings').select('*').eq('ref',ref).single();
+  if(!r) { await loadDriverRidesOngoing(); return; }
+
+  // Email client uniquement pour En route et Sur place
+  var sendToClient = dStatus==='en_route' || dStatus==='sur_place';
+  // Email admin pour tous les statuts
+  var adminEmail = 'contact@yantransport.app';
+
+  fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-confirmation',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      type:'driver_status_update',
+      record:{
+        ref:r.ref,
+        name:r.name,
+        email:r.email,
+        phone:r.phone,
+        pickup:r.pickup,
+        dropoff:r.dropoff,
+        date:r.date,
+        time:r.time,
+        driver:r.driver,
+        vehicle:r.vehicle,
+        driver_status:dStatus,
+        status_label:labels[dStatus],
+        send_to_client:sendToClient,
+        admin_email:adminEmail
+      }
+    })
+  });
+
   await loadDriverRidesOngoing();
 }
 
