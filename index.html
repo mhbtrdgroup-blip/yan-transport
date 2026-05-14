@@ -1102,8 +1102,13 @@ async function loadClientRides(){
     if(r.status==='new') canCancel = true;
 
     if(r.status==='ongoing'){
+      var ds=r.driver_status||'en_route';
+      var statusLabels2={en_route:'🚗 Votre chauffeur est en route',sur_place:'📍 Votre chauffeur est sur place',pickup:'🧳 Votre chauffeur vous a pris en charge',dropoff:'✓ Vous avez été déposé'};
+      var statusColors2={en_route:'var(--blue2)',sur_place:'var(--orange)',pickup:'var(--green)',dropoff:'#6a1b9a'};
+      var sl2text=statusLabels2[ds]||statusLabels2.en_route;
+      var sl2color=statusColors2[ds]||'var(--blue2)';
       trackingBanner = '<div id="tracking-'+r.ref+'" style="background:var(--green-bg);border:1px solid var(--green);border-radius:10px;padding:12px;margin-top:8px;">'+
-        '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">🚗 Votre chauffeur est en route</div>'+
+        '<div id="driver-status-text-'+r.ref+'" style="font-size:12px;font-weight:700;color:'+sl2color+';margin-bottom:6px;">'+sl2text+'</div>'+
         '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">'+r.driver+' · Position mise à jour en direct</div>'+
         '<div id="map-'+r.ref+'" style="width:100%;height:200px;border-radius:10px;background:var(--off);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);">Chargement de la carte...</div>'+
         '<div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;" id="pos-time-'+r.ref+'">En attente de position GPS...</div>'+
@@ -1616,11 +1621,14 @@ function renderRides(){
       '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
       '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
       '<div class="rc-foot"><span style="font-size:11px;color:var(--muted)">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></span><span class="rc-price">'+fmt(r.price||0)+' €</span></div>'+
-      (r.driver?'<div style="margin-top:4px;font-size:11px;font-weight:600;color:var(--navy);">👨‍✈️ '+r.driver+'</div>':'')+
+      (r.driver?'<div style="margin-top:4px;font-size:11px;font-weight:600;color:var(--navy);">👨‍✈️ '+r.driver+driverStatusBadge(r)+'</div>':'')+
       '<div style="margin-top:4px;">'+paymentBadge(r)+'</div>'+
       (r.price_modified?'<div style="margin-top:3px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
-      (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\');" style="width:100%;margin-top:8px;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Renvoyer la facture</button>':'')+
+      '<div style="display:flex;gap:6px;margin-top:8px;">'+
+        '<button onclick="showAdminBonCommande(\''+r.ref+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Bon de commande</button>'+
+        (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\');" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Facture</button>':'')+
+      '</div>'+
       (r.status==='cancelled'||r.status==='noshow'?
         '<div style="margin-top:8px;padding:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;">'+
           '<div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:5px;">Suivi annulation</div>'+
@@ -1922,15 +1930,34 @@ async function addDriver(){
   var first=document.getElementById('drv-new-first').value.trim();
   var last=document.getElementById('drv-new-last').value.trim();
   var email=document.getElementById('drv-new-email').value.trim();
+  var phone=document.getElementById('drv-new-phone').value.trim();
+  var vtype=document.getElementById('drv-new-type').value;
   if(!first||!last){toast('Entrez le prénom et le nom');return;}
   if(!email){toast('L\'e-mail est requis');return;}
-  var {error}=await sb.from('drivers').insert({name:first+' '+last,email:email,phone:document.getElementById('drv-new-phone').value.trim(),vehicle_type:document.getElementById('drv-new-type').value,active:true});
+  var btn=document.querySelector('#pan-e .btn-p');
+  btn.innerHTML='<span class="loader"></span>Ajout...';btn.disabled=true;
+  var {error}=await sb.from('drivers').insert({name:first+' '+last,email:email,phone:phone,vehicle_type:vtype,active:true});
+  btn.innerHTML='Ajouter le chauffeur';btn.disabled=false;
   if(error){toast('Erreur : '+error.message);return;}
-  document.getElementById('drv-new-first').value='';document.getElementById('drv-new-last').value='';
-  document.getElementById('drv-new-phone').value='';document.getElementById('drv-new-email').value='';
-  await loadAdminDrivers();toast('Chauffeur ajouté !');
-  var open=confirm('Chauffeur ajouté !\n\nOuvrir Supabase pour envoyer l\'invitation à '+email+' ?');
-  if(open)window.open('https://supabase.com/dashboard/project/kxwsvdmnoyxblkvrlgar/auth/users','_blank');
+  // Envoyer email invitation avec lien reset password
+  try {
+    await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://yantransport.app/'});
+  } catch(e){ console.log('Email invite error:', e); }
+  // Envoyer email de bienvenue via Edge Function
+  fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-confirmation',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      type:'driver_welcome',
+      record:{name:first+' '+last,email:email,phone:phone,vehicle_type:vtype}
+    })
+  });
+  document.getElementById('drv-new-first').value='';
+  document.getElementById('drv-new-last').value='';
+  document.getElementById('drv-new-phone').value='';
+  document.getElementById('drv-new-email').value='';
+  await loadAdminDrivers();
+  toast('Chauffeur ajouté ! Email de bienvenue envoyé à '+email);
 }
 async function toggleDriver(id,active){
   await sb.from('drivers').update({active:!active}).eq('id',id);
@@ -2122,29 +2149,54 @@ function downloadICS(encodedContent){
   document.querySelector('[style*="position:fixed"][style*="z-index:1000"]').remove();
 }
 
+function driverStatusBadge(r){
+  var labels={en_route:'🚗 En route',sur_place:'📍 Sur place',pickup:'🧳 Client à bord',dropoff:'✓ Déposé',done:'✓ Terminée'};
+  var colors={en_route:'var(--blue2)',sur_place:'var(--orange)',pickup:'var(--green)',dropoff:'#6a1b9a',done:'var(--green)'};
+  if(!r.driver_status||r.status!=='ongoing')return '';
+  var label=labels[r.driver_status]||r.driver_status;
+  var color=colors[r.driver_status]||'var(--muted)';
+  return '<div style="display:inline-block;background:'+color+';color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:1px;margin-top:4px;">'+label+'</div>';
+}
+
 function drvRideCard(r, showActions){
-  var mapsUrl='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(r.dropoff)+'&travelmode=driving';
   var actions = '';
   if(showActions){
-    actions = '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
-      '<button class="da-btn da-ac" onclick="dAct(\''+r.ref+'\',\'accepted\')" '+(r.status!=='assigned'?'disabled':'')+'>Accepter</button>'+
-      '<button class="da-btn da-st" onclick="dAct(\''+r.ref+'\',\'ongoing\')" '+(r.status!=='accepted'?'disabled':'')+'>Démarrer</button>'+
-      '<button class="da-btn da-fi" onclick="dAct(\''+r.ref+'\',\'done\')" '+(r.status!=='ongoing'?'disabled':'')+'>Terminer</button>'+
-      '<button onclick="openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">🗺 Nav.</button>'+
-    '</div>'+
-    '<div style="display:flex;gap:6px;margin-top:8px;">'+
-      '<button onclick="showBonCommande(\''+r.ref+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Bon de commande</button>'+
-      '<button onclick="addToCalendar(\''+r.ref+'\')" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📅 Calendrier</button>'+
-    '</div>';
+    // Boutons statut détaillé si en cours
+    var statusBtns = '';
+    if(r.status==='ongoing'){
+      var ds=r.driver_status||'en_route';
+      statusBtns =
+        '<div style="margin-top:8px;padding:10px;background:var(--ice);border-radius:10px;">' +
+        '<div style="font-size:9px;font-weight:700;color:var(--blue2);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Mise à jour statut</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' +
+          '<button onclick="updateDriverStatus(\''+r.ref+'\',\'en_route\')" style="padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);border:1.5px solid var(--blue2);background:'+(ds==='en_route'?'var(--blue2)':'transparent')+';color:'+(ds==='en_route'?'#fff':'var(--blue2)')+';"> 🚗 En route</button>' +
+          '<button onclick="updateDriverStatus(\''+r.ref+'\',\'sur_place\')" style="padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);border:1.5px solid var(--orange);background:'+(ds==='sur_place'?'var(--orange)':'transparent')+';color:'+(ds==='sur_place'?'#fff':'var(--orange)')+';"> 📍 Sur place</button>' +
+          '<button onclick="updateDriverStatus(\''+r.ref+'\',\'pickup\')" style="padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);border:1.5px solid var(--green);background:'+(ds==='pickup'?'var(--green)':'transparent')+';color:'+(ds==='pickup'?'#fff':'var(--green)')+';"> 🧳 Client à bord</button>' +
+          '<button onclick="updateDriverStatus(\''+r.ref+'\',\'dropoff\')" style="padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);border:1.5px solid #6a1b9a;background:'+(ds==='dropoff'?'#6a1b9a':'transparent')+';color:'+(ds==='dropoff'?'#fff':'#6a1b9a')+';"> ✓ Déposé</button>' +
+        '</div></div>';
+    }
+    actions =
+      '<div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">'+
+        '<button class="da-btn da-ac" onclick="dAct(\''+r.ref+'\',\'accepted\')" '+(r.status!=='assigned'?'disabled':'')+'>Accepter</button>'+
+        '<button class="da-btn da-st" onclick="dAct(\''+r.ref+'\',\'ongoing\')" '+(r.status!=='accepted'?'disabled':'')+'>Démarrer</button>'+
+        '<button class="da-btn da-fi" onclick="dAct(\''+r.ref+'\',\'done\')" '+(r.status!=='ongoing'?'disabled':'')+'>Terminer</button>'+
+        '<button onclick="openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">🗺 Nav.</button>'+
+      '</div>'+
+      statusBtns+
+      '<div style="display:flex;gap:6px;margin-top:8px;">'+
+        '<button onclick="showBonCommande(\''+r.ref+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Bon de commande</button>'+
+        '<button onclick="addToCalendar(\''+r.ref+'\')" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:9px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📅 Calendrier</button>'+
+      '</div>';
   } else {
-    actions = '<div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;">'+
-      '<button onclick="showBonCommande(\''+r.ref+'\')" style="background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:7px 12px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Bon</button>'+
-      '<span class="badge b-done">Terminée</span>'+
-    '</div>';
+    actions =
+      '<div style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;">'+
+        '<button onclick="showBonCommande(\''+r.ref+'\')" style="background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:7px 12px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Bon</button>'+
+        '<span class="badge b-done">Terminée</span>'+
+      '</div>';
   }
   return '<div class="ride-card">'+
     '<div class="rc-head"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span style="font-family:Arial,sans-serif;font-size:17px;font-weight:700;color:var(--navy)">'+fmt(r.price||0)+' €</span></div>'+
-    '<div style="margin-bottom:6px;">'+paymentBadge(r)+'</div>'+
+    '<div style="margin-bottom:6px;">'+paymentBadge(r)+driverStatusBadge(r)+'</div>'+
     '<div class="rc-route"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
     '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
     '<div style="font-size:11px;color:var(--muted);margin-bottom:3px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></div>'+
@@ -2262,8 +2314,14 @@ async function markFollowupDone(ref){
 }
 
 async function dAct(ref,s){
-  await sb.from('bookings').update({status:s}).eq('ref',ref);
-  var m={accepted:'Course acceptée ✓',ongoing:'Course démarrée !',done:'Course terminée ✓'};
+  // Statuts détaillés du chauffeur
+  var driverStatus = {
+    accepted: 'accepted',
+    ongoing: 'en_route',
+    done: 'done'
+  };
+  await sb.from('bookings').update({status:s, driver_status:driverStatus[s]||null}).eq('ref',ref);
+  var m={accepted:'Course acceptée ✓',ongoing:'Course démarrée — En route !',done:'Course terminée ✓'};
   toast(m[s]||'Mis à jour');
 
   if(s==='ongoing'){
@@ -2272,10 +2330,8 @@ async function dAct(ref,s){
   }
   if(s==='done'){
     stopTracking();
-    await sb.from('bookings').update({driver_lat:null,driver_lng:null}).eq('ref',ref);
+    await sb.from('bookings').update({driver_lat:null,driver_lng:null,driver_status:'done'}).eq('ref',ref);
     drvTab('done');
-
-    // Générer automatiquement la facture
     var {data:rideData} = await sb.from('bookings').select('*').eq('ref',ref).single();
     if(rideData && rideData.email && !rideData.invoice_sent){
       var invoiceNum = 'FAC-'+ref+'-'+new Date().getFullYear();
@@ -2299,8 +2355,20 @@ async function dAct(ref,s){
       });
     }
   }
-
   await loadDriverRides();
+  await loadDriverRidesOngoing();
+}
+
+// Statuts chauffeur détaillés (Sur place, Prise en charge, Déposé)
+async function updateDriverStatus(ref, dStatus){
+  await sb.from('bookings').update({driver_status:dStatus}).eq('ref',ref);
+  var labels={
+    en_route:'🚗 En route',
+    sur_place:'📍 Sur place',
+    pickup:'🧳 Client à bord',
+    dropoff:'✓ Déposé'
+  };
+  toast(labels[dStatus]||'Statut mis à jour');
   await loadDriverRidesOngoing();
 }
 
@@ -2359,12 +2427,67 @@ function initDriverMap(ref, lat, lng){
   }
 }
 
+function showAdminBonCommande(ref){
+  var r=ridesCache.find(function(x){return x.ref===ref;});
+  if(!r)return;
+  var now=new Date();
+  var dateRes=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  var paymentLabel=r.paid?'Payé en ligne':r.payment_method==='account'?'En compte':'Paiement à bord';
+  var html=[
+    '<div style="background:#fff;border-radius:16px;padding:20px;max-width:380px;margin:0 auto;font-family:Arial,sans-serif;">',
+    '<div style="text-align:center;margin-bottom:16px;"><img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:60px;height:60px;border-radius:50%;object-fit:cover;">',
+    '<div style="font-size:16px;font-weight:700;color:#04132b;margin-top:8px;">YAN TRANSPORT</div>',
+    '<div style="font-size:10px;color:#546e8a;letter-spacing:2px;text-transform:uppercase;">SERVICE DE VOITURE DE TRANSPORT AVEC CHAUFFEUR</div></div>',
+    '<div style="background:#f0f4fb;border-radius:10px;padding:14px;margin-bottom:14px;font-size:11px;color:#546e8a;line-height:1.7;">',
+    '<strong style="color:#04132b;">JUSTIFICATION DE LA RÉSERVATION PRÉALABLE</strong><br>',
+    'Article R3120-2 du Code des transports — Arrêté du 30 juillet 2013</div>',
+    '<table style="width:100%;border-collapse:collapse;font-size:12px;">',
+    '<tr style="background:#e8f1fd;"><td style="padding:10px;font-weight:700;">📆 Date réservation</td><td style="padding:10px;">'+dateRes+'</td></tr>',
+    '<tr><td style="padding:10px;font-weight:700;">🕐 Prise en charge</td><td style="padding:10px;">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  à '+r.time+'</td></tr>',
+    '<tr style="background:#e8f1fd;"><td style="padding:10px;font-weight:700;">📍 Départ</td><td style="padding:10px;">'+r.pickup+'</td></tr>',
+    '<tr><td style="padding:10px;font-weight:700;">🏁 Destination</td><td style="padding:10px;">'+r.dropoff+'</td></tr>',
+    '<tr style="background:#e8f1fd;"><td style="padding:10px;font-weight:700;">👤 Passager</td><td style="padding:10px;">'+r.name+'</td></tr>',
+    '<tr><td style="padding:10px;font-weight:700;">📞 Téléphone</td><td style="padding:10px;"><a href="tel:'+r.phone+'">'+r.phone+'</a></td></tr>',
+    '<tr style="background:#e8f1fd;"><td style="padding:10px;font-weight:700;">👥 Passagers</td><td style="padding:10px;">'+r.pax+'</td></tr>',
+    '<tr><td style="padding:10px;font-weight:700;">🚗 Véhicule</td><td style="padding:10px;">'+r.vehicle+'</td></tr>',
+    (r.driver?'<tr style="background:#e8f1fd;"><td style="padding:10px;font-weight:700;">👨‍✈️ Chauffeur</td><td style="padding:10px;">'+r.driver+'</td></tr>':''),
+    (r.flight?'<tr><td style="padding:10px;font-weight:700;">✈ Vol</td><td style="padding:10px;">'+r.flight+'</td></tr>':''),
+    (r.train?'<tr style="background:#e8f1fd;"><td style="padding:10px;font-weight:700;">🚄 Train</td><td style="padding:10px;">'+r.train+'</td></tr>':''),
+    '<tr><td style="padding:10px;font-weight:700;">💳 Paiement</td><td style="padding:10px;">'+paymentLabel+'</td></tr>',
+    '<tr style="background:#04132b;"><td style="padding:10px;font-weight:700;color:#90caf9;">💶 Tarif net</td><td style="padding:10px;font-size:18px;font-weight:700;color:#fff;">'+fmt(r.price||0)+' €</td></tr>',
+    '</table>',
+    '<div style="margin-top:14px;padding:12px;background:#f0f4fb;border-radius:10px;font-size:10px;color:#546e8a;text-align:center;">',
+    '<strong style="color:#04132b;">YAN TRANSPORT</strong><br>828 694.836 00036 R.C.S. Marseille<br>contact@yantransport.app · 04 65 84 65 16</div>',
+    '</div>'
+  ].join('');
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;overflow-y:auto;padding:20px;';
+  modal.innerHTML='<div style="max-width:430px;margin:0 auto;">'+html+'<button onclick="this.parentNode.parentNode.remove()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:14px;font-size:12px;font-weight:700;border-radius:11px;cursor:pointer;font-family:var(--fb);margin-top:12px;">Fermer</button></div>';
+  document.body.appendChild(modal);
+}
+
 function updateTrackingStatus(ride){
   var el = document.getElementById('tracking-'+ride.ref);
   if(!el) return;
 
   if(ride.status==='ongoing'){
-    // Mettre à jour la carte si on a les coordonnées
+    // Labels statuts détaillés
+    var statusLabels={
+      en_route:{text:'🚗 Votre chauffeur est en route',color:'var(--blue2)',bg:'#e3f2fd',border:'#90caf9'},
+      sur_place:{text:'📍 Votre chauffeur est sur place',color:'var(--orange)',bg:'var(--orange-bg)',border:'#ffe0b2'},
+      pickup:{text:'🧳 Votre chauffeur vous a pris en charge',color:'var(--green)',bg:'var(--green-bg)',border:'#a5d6a7'},
+      dropoff:{text:'✓ Vous avez été déposé',color:'#6a1b9a',bg:'#f3e5f5',border:'#ce93d8'}
+    };
+    var ds = ride.driver_status||'en_route';
+    var sl = statusLabels[ds]||statusLabels.en_route;
+    el.style.background = sl.bg;
+    el.style.borderColor = sl.border;
+    var statusDiv = document.getElementById('driver-status-text-'+ride.ref);
+    if(statusDiv){
+      statusDiv.style.color = sl.color;
+      statusDiv.textContent = sl.text;
+    }
+    // Mise à jour carte GPS
     if(ride.driver_lat && ride.driver_lng){
       initDriverMap(ride.ref, ride.driver_lat, ride.driver_lng);
       var timeEl = document.getElementById('pos-time-'+ride.ref);
