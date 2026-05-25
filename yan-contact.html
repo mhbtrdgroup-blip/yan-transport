@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yan Transport — Contact</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{--navy:#04132b;--blue:#1976d2;--gold:#c9a84c;}
+  body{min-height:100vh;background:var(--navy);font-family:'Montserrat',sans-serif;display:flex;align-items:center;justify-content:center;padding:24px 16px;position:relative;overflow:hidden;}
+  body::before{content:'';position:fixed;top:-40%;left:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(25,118,210,.12) 0%,transparent 70%);pointer-events:none;}
+  body::after{content:'';position:fixed;bottom:-30%;right:-20%;width:500px;height:500px;background:radial-gradient(circle,rgba(201,168,76,.08) 0%,transparent 70%);pointer-events:none;}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:36px 28px;width:100%;max-width:380px;text-align:center;backdrop-filter:blur(20px);animation:fadeUp .6s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+  .logo{width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,.4);margin-bottom:18px;box-shadow:0 0 40px rgba(25,118,210,.2);}
+  .brand{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:1px;margin-bottom:4px;}
+  .tagline{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:16px;}
+  .lang-switcher{display:flex;background:rgba(255,255,255,.07);border-radius:12px;padding:4px;margin-bottom:24px;gap:4px;}
+  .lang-btn{flex:1;padding:8px;font-size:11px;font-weight:700;border:none;border-radius:9px;cursor:pointer;font-family:'Montserrat',sans-serif;transition:all .2s;background:transparent;color:rgba(255,255,255,.4);letter-spacing:1px;}
+  .lang-btn.active{background:var(--blue);color:#fff;}
+  .divider{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1);}
+  .divider span{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;text-transform:uppercase;}
+  .btns{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+  .btn{display:flex;align-items:center;gap:14px;padding:15px 20px;border-radius:14px;text-decoration:none;font-size:13px;font-weight:600;font-family:'Montserrat',sans-serif;transition:transform .15s;cursor:pointer;border:none;width:100%;}
+  .btn:active{transform:scale(.97);}
+  .btn-app{background:var(--blue);color:#fff;box-shadow:0 4px 20px rgba(25,118,210,.35);}
+  .btn-wa{background:#25D366;color:#fff;box-shadow:0 4px 20px rgba(37,211,102,.3);}
+  .btn-tel{background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(255,255,255,.12);}
+  .btn-vcf{background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.25);}
+  .btn-ico{width:36px;height:36px;flex-shrink:0;background:rgba(255,255,255,.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .btn-txt{text-align:left;flex:1;}
+  .btn-txt-main{font-size:13px;font-weight:600;line-height:1.2;}
+  .btn-txt-sub{font-size:10px;opacity:.65;margin-top:2px;}
+  .btn-arrow{opacity:.5;font-size:16px;}
+  .footer{font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="card">
+  <img class="logo" src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" alt="Yan Transport">
+  <div class="brand">YAN TRANSPORT</div>
+  <div class="tagline" id="tagline">Service Privé · Marseille</div>
+
+  <div class="lang-switcher">
+    <button class="lang-btn active" onclick="setLang('fr')">🇫🇷 Français</button>
+    <button class="lang-btn" onclick="setLang('en')">🇬🇧 English</button>
+  </div>
+
+  <div class="divider"><span id="or-label">ou</span></div>
+
+  <div class="btns">
+    <a href="https://yantransport.app" class="btn btn-app">
+      <div class="btn-ico">🚗</div>
+      <div class="btn-txt">
+        <div class="btn-txt-main" id="t-book">Réserver en ligne</div>
+        <div class="btn-txt-sub">yantransport.app</div>
+      </div>
+      <span class="btn-arrow">→</span>
+    </a>
+
+    <a id="wa-link" href="https://wa.me/33618955142?text=Bonjour%20Yan%20Transport%2C%20je%20souhaite%20r%C3%A9server%20une%20course." class="btn btn-wa">
+      <div class="btn-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </div>
+      <div class="btn-txt">
+        <div class="btn-txt-main">WhatsApp</div>
+        <div class="btn-txt-sub" id="t-wa">Nous écrire directement</div>
+      </div>
+      <span class="btn-arrow">→</span>
+    </a>
+
+    <a href="data:text/vcard;charset=utf-8,BEGIN:VCARD%0AVERSION:3.0%0AFN:Yan%20Transport%0AORG:Yan%20Transport%0ATEL;TYPE=CELL:+33465846516%0ATEL;TYPE=CELL,WhatsApp:+33618955142%0AEMAIL:contact%40yantransport.app%0AURL:https://yantransport.app%0ANOTE:Service%20priv%C3%A9%20VTC%20Marseille%0AEND:VCARD" download="yan-transport.vcf" class="btn btn-vcf">
+      <div class="btn-ico">📇</div>
+      <div class="btn-txt">
+        <div class="btn-txt-main" id="t-save">Enregistrer le contact</div>
+        <div class="btn-txt-sub" id="t-save-sub">Compatible iPhone & Android</div>
+      </div>
+      <span class="btn-arrow">↓</span>
+    </a>
+  </div>
+
+  <div class="footer">
+    contact@yantransport.app · Marseille<br>
+    828 694.836 00036 R.C.S. Marseille
+  </div>
+</div>
+
+<script>
+var texts={
+  fr:{tagline:'Service Privé · Marseille',or:'ou',book:'Réserver en ligne',wa:'Nous écrire directement',waMsg:'Bonjour%20Yan%20Transport%2C%20je%20souhaite%20r%C3%A9server%20une%20course.',call:'Appeler Yan Transport',save:'Enregistrer le contact',saveSub:'Compatible iPhone & Android'},
+  en:{tagline:'Private Driver Service · Marseille',or:'or',book:'Book online',wa:'Message us directly',waMsg:'Hello%20Yan%20Transport%2C%20I%20would%20like%20to%20book%20a%20ride.',call:'Call Yan Transport',save:'Save contact',saveSub:'iPhone & Android compatible'}
+};
+function setLang(lang){
+  var t=texts[lang];
+  document.getElementById('tagline').textContent=t.tagline;
+  document.getElementById('or-label').textContent=t.or;
+  document.getElementById('t-book').textContent=t.book;
+  document.getElementById('t-wa').textContent=t.wa;
+  document.getElementById('t-call').textContent=t.call;
+  document.getElementById('t-save').textContent=t.save;
+  document.getElementById('t-save-sub').textContent=t.saveSub;
+  document.getElementById('wa-link').href='https://wa.me/33618955142?text='+t.waMsg;
+  document.querySelectorAll('.lang-btn').forEach(function(b,i){b.classList.toggle('active',(i===0&&lang==='fr')||(i===1&&lang==='en'));});
+}
+</script>
+</body>
+</html>
