@@ -22,8 +22,9 @@
   --red:#c62828;--red-bg:#ffebee;--border:#d0dff0;--border2:#b8cfe8;
   --ft:'Cormorant Garamond',serif;--fb:'Montserrat',sans-serif;
 }
-html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);max-width:430px;margin:0 auto;color:var(--text);}
-.page{display:none;position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#f0f4fb;}
+html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);color:var(--text);}
+#app-root{height:100%;overflow:hidden;max-width:430px;margin:0 auto;position:relative;background:#f0f4fb;}
+@media(min-width:431px){body{background:#e8eef7;}#app-root{box-shadow:0 0 60px rgba(0,0,0,.15);}}
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
@@ -199,6 +200,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
 </style>
 </head>
 <body>
+<div id="app-root">
 <div class="toast" id="toast"></div>
 
 <!-- ══ HOME ══ -->
@@ -830,6 +832,7 @@ html,body{height:100%;overflow:hidden;background:#f0f4fb;font-family:var(--fb);m
   </div>
 </div>
 
+</div><!-- end app-root -->
 <script>
 var sb=supabase.createClient('https://kxwsvdmnoyxblkvrlgar.supabase.co','sb_publishable_BaKktPIr3nkEYWKJWO49Fg_E4K6ziCu');
 var T={pickup:{berline:8,van:12},km:{berline:1.80,van:2.50},night:10,airport:5,gare:3};
