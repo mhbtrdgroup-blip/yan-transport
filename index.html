@@ -277,6 +277,17 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
+.splist{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;}
+.splist-h{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:11px 14px 9px;background:var(--off);border-bottom:1px solid var(--border);}
+.sprow{display:flex;align-items:center;gap:12px;padding:11px 12px 11px 14px;border-bottom:1px solid var(--off);}
+.sprow:last-child{border-bottom:none;}
+.sprow-i{width:30px;height:30px;border-radius:9px;background:var(--ice);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.sprow-t{flex:1;min-width:0;}
+.sprow-n{font-size:13.5px;font-weight:700;letter-spacing:-.01em;}
+.sprow-s{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.spbtn{border:1.5px solid var(--border);background:#fff;color:var(--muted);border-radius:9px;padding:7px 10px;font-size:11.5px;font-weight:800;cursor:pointer;}
+.spbtn.a{border-color:var(--border2);color:var(--blue2);}
+.sp-save{background:none;border:none;color:var(--blue2);font-size:12.5px;font-weight:800;cursor:pointer;padding:10px 2px 0;display:none;}
 .sug{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px;}
 .sug button{background:var(--ice);border:1px solid var(--border2);color:#0B3E7C;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
 .sug button:active{background:#DCE9FD;}
@@ -291,7 +302,10 @@ input,select,textarea,button{font-family:var(--fb);}
 .trip-meta div{flex:1;background:var(--off);border:1px solid var(--border);border-radius:12px;padding:10px 12px;}
 .trip-meta span{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;}
 .trip-meta b{font-size:17px;font-weight:800;letter-spacing:-.02em;}
-.lang{padding:8px 11px;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer;border:1px solid rgba(255,255,255,.16);color:#fff;background:rgba(255,255,255,.06);}
+.langsw{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:3px;}
+.langsw button{display:flex;align-items:center;gap:5px;border:none;background:transparent;color:rgba(255,255,255,.55);border-radius:999px;padding:5px 9px;font-size:11.5px;font-weight:800;cursor:pointer;line-height:1;}
+.langsw button i{font-style:normal;font-size:15px;line-height:1;}
+.langsw button.on{background:#fff;color:var(--navy);}
 .pl-row{display:flex;gap:10px;margin-bottom:8px;}
 .pl-time{width:52px;flex-shrink:0;text-align:right;font-size:13px;font-weight:800;color:var(--text);padding-top:14px;letter-spacing:-.01em;}
 .pl-time i{display:block;font-size:10.5px;color:var(--muted);font-style:normal;font-weight:700;}
@@ -313,7 +327,10 @@ input,select,textarea,button{font-family:var(--fb);}
       <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">
       <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Service Privé</div></div>
       <div style="margin-left:auto;display:flex;gap:6px;">
-        <button class="lang" id="lang-btn" onclick="toggleLang()">EN</button>
+        <div class="langsw">
+          <button id="lang-fr" onclick="setLang('fr')"><i>🇫🇷</i>FR</button>
+          <button id="lang-en" onclick="setLang('en')"><i>🇬🇧</i>EN</button>
+        </div>
         <button class="hadmin" onclick="goClientSpace()">Mon espace</button>
         <button class="hadmin" onclick="go('p-login')" style="padding:8px 11px;">Admin</button>
       </div>
@@ -546,9 +563,9 @@ input,select,textarea,button{font-family:var(--fb);}
       </div>
       <div class="card">
         <div class="field"><label>Prise en charge *</label><input type="text" id="f-pickup" placeholder="Adresse, gare, aéroport…" autocomplete="off"></div>
-        <div class="sug" id="sug-pickup"></div>
         <div class="field"><label>Lieu de dépose *</label><input type="text" id="f-dropoff" placeholder="Destination…" autocomplete="off"></div>
-        <div class="sug" id="sug-dropoff"></div>
+        <button class="sp-save" id="sp-save" onclick="addFav()">＋ Enregistrer ce départ dans mes adresses</button>
+        <div class="splist" id="spot-list" style="margin-top:12px;"></div>
         <div class="frow">
           <div class="field"><label>Date *</label><input type="date" id="f-date" onchange="checkDispo()"></div>
           <div class="field"><label>Heure *</label><input type="time" id="f-time" onchange="checkNightAuto()"></div>
@@ -3118,7 +3135,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     if(!hkm||typeof calcRide!=='function')return;
     var r=calcRide(homeVehCur,hkm,false,'','');
     el('h-est-amt').textContent=Math.round(r.total);
-    el('h-est-km').textContent=hkm+' km · prix fixe tout compris';
+    el('h-est-km').textContent=hkm+' km'+(window._hdur?' · '+window._hdur:'')+' · prix fixe';
     el('h-est').classList.add('on');
     el('h-est-hint').style.display='none';
   }
@@ -3137,7 +3154,12 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
           origins:[hp.geometry.location],destinations:[hd.geometry.location],
           travelMode:google.maps.TravelMode.DRIVING,unitSystem:google.maps.UnitSystem.METRIC
         },function(r2,s2){
-          if(s2==='OK'){ hkm=parseFloat((r2.rows[0].elements[0].distance.value/1000).toFixed(1)); homePrice(); }
+          if(s2==='OK'){
+            var e2=r2.rows[0].elements[0];
+            hkm=parseFloat((e2.distance.value/1000).toFixed(1));
+            window._hdur=e2.duration?e2.duration.text:'';
+            homePrice();
+          }
         });
       }
     });
@@ -3166,7 +3188,12 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
         origins:[hp.geometry.location],destinations:[hd.geometry.location],
         travelMode:google.maps.TravelMode.DRIVING,unitSystem:google.maps.UnitSystem.METRIC
       },function(res,status){
-        if(status==='OK'){ hkm=parseFloat((res.rows[0].elements[0].distance.value/1000).toFixed(1)); homePrice(); }
+        if(status==='OK'){
+          var eh=res.rows[0].elements[0];
+          hkm=parseFloat((eh.distance.value/1000).toFixed(1));
+          window._hdur=eh.duration?eh.duration.text:'';
+          homePrice();
+        }
       });
     }
     pa.addListener('place_changed',function(){hp=pa.getPlace();tryCalc();});
@@ -3262,7 +3289,8 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     var list=favs();
     box.innerHTML=list.map(function(f,i){
       return '<button class="fav" onclick="useFav('+i+')"><b>'+f.label+'</b><x onclick="event.stopPropagation();delFav('+i+')">×</x></button>';
-    }).join('')+'<button class="fav add" onclick="addFav()">+ Enregistrer une adresse</button>';
+    }).join('');
+    box.style.display=list.length?'flex':'none';
   }
   window.useFav=function(i){
     var f=favs()[i]; if(!f)return;
@@ -3341,7 +3369,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     var a=v('f-pickup'), b=v('f-dropoff');
     if(!a||!b)return;
     var g=new google.maps.Geocoder(), done=0, ok=0;
-    function fin(){ if(++done<2)return; if(ok===2){ if(!parseFloat(v('f-km')))measure(); drawTrip(); cb&&cb(); } }
+    function fin(){ if(++done<2)return; if(ok===2){ measure(); drawTrip(); cb&&cb(); } }
     g.geocode({address:a,componentRestrictions:{country:'fr'}},function(res,st){
       if(st==='OK'&&res[0]){tripP={geometry:{location:res[0].geometry.location}};ok++;} fin();
     });
@@ -3372,9 +3400,14 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     _bkGo(n);
     if(n===2)setTimeout(function(){
       if(tripMapObj&&google.maps.event)google.maps.event.trigger(tripMapObj,'resize');
-      if(tripP&&tripD){drawTrip();} else {ensureTrip();}
+      if(tripP&&tripD){ drawTrip(); if(!tripDur)measure(); } else { ensureTrip(); }
       var km=parseFloat(v('f-km'))||0;
       if(km&&el('trip-km')&&el('trip-km').textContent==='—')el('trip-km').textContent=km+' km';
+      var du=el('trip-dur');
+      if(du&&du.textContent==='—'){
+        if(tripDur)du.textContent=tripDur;
+        else if(km)du.textContent='~'+Math.max(10,Math.round(km/50*60))+' min';
+      }
     },150);
   };
 
@@ -3637,17 +3670,20 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   }
   function translateNow(){ if(lang!=='en')return; walk(document.body); }
   window.translateNow=translateNow;
-  window.toggleLang=function(){
-    if(lang==='en'){ localStorage.setItem('yan_lang','fr'); location.reload(); return; }
-    lang='en'; localStorage.setItem('yan_lang','en');
-    el('lang-btn').textContent='FR';
-    translateNow();
-    toast('English version enabled');
-  };
-  if(lang==='en'){
-    if(el('lang-btn'))el('lang-btn').textContent='FR';
-    setTimeout(translateNow,300);
+  function paintLang(){
+    var f=el('lang-fr'), e=el('lang-en');
+    if(f)f.classList.toggle('on',lang==='fr');
+    if(e)e.classList.toggle('on',lang==='en');
   }
+  window.setLang=function(l){
+    if(l===lang)return;
+    if(l==='fr'){ localStorage.setItem('yan_lang','fr'); location.reload(); return; }
+    lang='en'; localStorage.setItem('yan_lang','en');
+    paintLang(); translateNow(); toast('English version enabled');
+  };
+  window.toggleLang=function(){ setLang(lang==='en'?'fr':'en'); };
+  paintLang();
+  if(lang==='en')setTimeout(translateNow,300);
   var _goL=window.go;
   window.go=function(id){ _goL(id); setTimeout(translateNow,60); };
 
@@ -3707,19 +3743,30 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     if(v('f-pickup')&&v('f-dropoff'))ensureTrip();
   };
   (function renderSpots(){
-    function fill(box,target,label){
-      var b=el(box); if(!b)return;
-      b.innerHTML='<span>'+label+'</span>'+SPOTS.map(function(s,i){
-        return '<button type="button" onclick="YT_spot(\''+target+'\','+i+')">'+s.n+'</button>';
+    var b=el('spot-list');
+    if(b){
+      b.innerHTML='<div class="splist-h">Lieux fréquents</div>'+SPOTS.map(function(s,i){
+        return '<div class="sprow"><div class="sprow-i">📍</div>'+
+          '<div class="sprow-t"><div class="sprow-n">'+s.n+'</div><div class="sprow-s">'+s.a+'</div></div>'+
+          '<button class="spbtn a" type="button" onclick="YT_spot(\'pickup\','+i+')">Départ</button>'+
+          '<button class="spbtn" type="button" onclick="YT_spot(\'dropoff\','+i+')">Arrivée</button></div>';
       }).join('');
     }
-    fill('sug-pickup','pickup','Fréquent :');
-    fill('sug-dropoff','dropoff','Fréquent :');
     var hb=el('sug-home');
     if(hb){
-      hb.innerHTML='<span>Départ fréquent :</span>'+SPOTS.slice(0,3).map(function(s,i){
-        return '<button type="button" onclick="YT_spot(\'home-pickup\','+i+')">'+s.n+'</button>';
+      hb.className='splist';
+      hb.style.margin='0 0 12px';
+      hb.innerHTML='<div class="splist-h">Lieux fréquents</div>'+SPOTS.slice(0,3).map(function(s,i){
+        return '<div class="sprow" style="padding:9px 12px 9px 14px;"><div class="sprow-i" style="width:26px;height:26px;font-size:12px;">📍</div>'+
+          '<div class="sprow-t"><div class="sprow-n" style="font-size:13px;">'+s.n+'</div></div>'+
+          '<button class="spbtn a" type="button" onclick="YT_spot(\'home-pickup\','+i+')">Départ</button>'+
+          '<button class="spbtn" type="button" onclick="YT_spot(\'home-dropoff\','+i+')">Arrivée</button></div>';
       }).join('');
+    }
+    var pk=el('f-pickup'), sv=el('sp-save');
+    if(pk&&sv){
+      var sync=function(){ sv.style.display=pk.value.trim()?'block':'none'; };
+      pk.addEventListener('input',sync); pk.addEventListener('change',sync); sync();
     }
   })();
 
