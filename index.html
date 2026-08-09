@@ -277,6 +277,17 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
+.slide{position:relative;height:56px;border-radius:14px;background:var(--off);border:1.5px solid var(--border);overflow:hidden;margin-top:10px;touch-action:none;user-select:none;}
+.slide-fill{position:absolute;inset:0;width:0;background:var(--blue2);opacity:.16;transition:width .18s;}
+.slide-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800;color:var(--muted);letter-spacing:-.01em;pointer-events:none;padding-left:44px;text-align:center;}
+.slide-knob{position:absolute;top:5px;left:5px;width:46px;height:44px;border-radius:11px;background:var(--blue2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;box-shadow:0 6px 14px -6px rgba(22,104,227,.9);transition:left .18s;}
+.slide.dragging .slide-knob,.slide.dragging .slide-fill{transition:none;}
+.slide.done{border-color:var(--green);background:var(--green-bg);}
+.slide.done .slide-knob{background:var(--green);}
+.slide.done .slide-lbl{color:var(--green);}
+.slide.go .slide-knob{background:var(--green);}
+.slide.warn .slide-knob{background:var(--orange);box-shadow:0 6px 14px -6px rgba(180,83,9,.9);}
+.slide.fin .slide-knob{background:var(--red);box-shadow:0 6px 14px -6px rgba(192,52,47,.8);}
 .splist{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;}
 .splist-h{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:11px 14px 9px;background:var(--off);border-bottom:1px solid var(--border);}
 .sprow{display:flex;align-items:center;gap:12px;padding:11px 12px 11px 14px;border-bottom:1px solid var(--off);}
@@ -988,6 +999,7 @@ input,select,textarea,button{font-family:var(--fb);}
     <button class="atab on" id="drv-tab-active" onclick="drvTab('active')">En attente</button>
     <button class="atab" id="drv-tab-ongoing" onclick="drvTab('ongoing')">En route</button>
     <button class="atab" id="drv-tab-done" onclick="drvTab('done')">Terminées</button>
+    <button class="atab" id="drv-tab-plan" onclick="drvTab('plan')">Planning</button>
     <button class="atab" id="drv-tab-vehicle" onclick="drvTab('vehicle')">Véhicule</button>
   </div>
 
@@ -1006,6 +1018,16 @@ input,select,textarea,button{font-family:var(--fb);}
       </div>
       <div id="driver-rides-done"><div class="empty">Chargement…</div></div>
     </div>
+    <div id="drv-pan-plan" style="display:none;padding:16px;">
+      <div class="card" style="display:flex;gap:10px;align-items:flex-end;">
+        <div class="field" style="flex:1;margin-bottom:0;"><label>Ma journée</label><input type="date" id="drvplan-date" onchange="renderDriverPlanning()"></div>
+        <button onclick="drvPlanShift(-1)" style="background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;color:var(--muted);">‹</button>
+        <button onclick="drvPlanShift(1)" style="background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;color:var(--muted);">›</button>
+      </div>
+      <div id="drvplan-summary" style="display:flex;gap:8px;margin-bottom:14px;"></div>
+      <div id="drvplan-body"></div>
+    </div>
+
     <div id="drv-pan-vehicle" style="display:none;padding:16px;">
       <div class="sec">Mon véhicule</div>
       <div class="card">
@@ -3798,6 +3820,196 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   /* date retour >= date aller */
   var fd=el('f-date');
   if(fd)fd.addEventListener('change',function(){ var r=el('f-rdate'); if(r){r.min=fd.value; if(!r.value)r.value=fd.value;} });
+})();
+</script>
+
+<script>
+/* ══ CHAUFFEUR : glisser pour confirmer + planning du jour ══ */
+(function(){
+  function el(id){return document.getElementById(id);}
+
+  /* ────────── ÉTAPE SUIVANTE ────────── */
+  function nextStep(r){
+    if(r.status==='assigned') return {lbl:'Glissez pour accepter la course',icon:'✓',cls:'go',run:function(){dAct(r.ref,'accepted');}};
+    if(r.status==='accepted') return {lbl:'Glissez pour démarrer',icon:'→',cls:'',run:function(){dAct(r.ref,'ongoing');}};
+    if(r.status==='ongoing'){
+      var ds=r.driver_status||'en_route';
+      if(ds==='en_route')  return {lbl:'Glissez : je suis sur place',icon:'📍',cls:'warn',run:function(){updateDriverStatus(r.ref,'sur_place');}};
+      if(ds==='sur_place') return {lbl:'Glissez : client à bord',icon:'🧳',cls:'go',run:function(){updateDriverStatus(r.ref,'pickup');}};
+      if(ds==='pickup')    return {lbl:'Glissez : client déposé',icon:'✓',cls:'go',run:function(){updateDriverStatus(r.ref,'dropoff');}};
+      return {lbl:'Glissez pour terminer la course',icon:'✓',cls:'fin',run:function(){dAct(r.ref,'done');}};
+    }
+    return null;
+  }
+
+  /* ────────── COMPOSANT SLIDE ────────── */
+  function makeSlide(step){
+    var w=document.createElement('div');
+    w.className='slide '+(step.cls||'');
+    w.innerHTML='<div class="slide-fill"></div><div class="slide-lbl">'+step.lbl+'</div><div class="slide-knob">'+step.icon+'</div>';
+    var knob=w.querySelector('.slide-knob'), fill=w.querySelector('.slide-fill'), lbl=w.querySelector('.slide-lbl');
+    var dragging=false, startX=0, max=0, x=0, fired=false;
+
+    function setX(px){
+      x=Math.max(0,Math.min(max,px));
+      knob.style.left=(5+x)+'px';
+      fill.style.width=(x+51)+'px';
+    }
+    function down(e){
+      if(fired)return;
+      dragging=true; w.classList.add('dragging');
+      max=w.clientWidth-56;
+      startX=(e.touches?e.touches[0].clientX:e.clientX)-x;
+      e.preventDefault();
+    }
+    function move(e){
+      if(!dragging)return;
+      setX((e.touches?e.touches[0].clientX:e.clientX)-startX);
+      e.preventDefault();
+    }
+    function up(){
+      if(!dragging)return;
+      dragging=false; w.classList.remove('dragging');
+      if(x>max*0.82){
+        fired=true;
+        setX(max);
+        w.classList.add('done');
+        lbl.textContent='Confirmé';
+        if(navigator.vibrate)navigator.vibrate(30);
+        setTimeout(step.run,180);
+      } else setX(0);
+    }
+    knob.addEventListener('mousedown',down);
+    knob.addEventListener('touchstart',down,{passive:false});
+    document.addEventListener('mousemove',move);
+    document.addEventListener('touchmove',move,{passive:false});
+    document.addEventListener('mouseup',up);
+    document.addEventListener('touchend',up);
+    return w;
+  }
+
+  /* ────────── REMPLACER LES BOUTONS PAR LE SLIDE ────────── */
+  function enhance(){
+    document.querySelectorAll('#p-driver .ride-card').forEach(function(card){
+      if(card.dataset.sl)return;
+      var refEl=card.querySelector('.rc-ref'); if(!refEl)return;
+      var r=drvFindRide(refEl.textContent.trim());
+      if(!r||!r.status)return;
+      var step=nextStep(r);
+      if(!step)return;
+      card.dataset.sl='1';
+
+      /* on retire les anciens boutons d'état */
+      card.querySelectorAll('.da-btn').forEach(function(b){ b.remove(); });
+      Array.prototype.slice.call(card.querySelectorAll('div')).forEach(function(d){
+        if(d.textContent.indexOf('Mise à jour statut')===0)d.remove();
+      });
+      var row=card.querySelector('div[style*="border-top"]');
+      if(row&&!row.querySelector('button'))row.remove();
+
+      var anchor=card.querySelector('div[style*="border-top"]')||card;
+      anchor.parentNode.insertBefore(makeSlide(step),anchor.nextSibling);
+    });
+  }
+  window.YT_enhanceDriver=enhance;
+
+  ['loadDriverRides','loadDriverRidesOngoing','loadDriverRidesDone'].forEach(function(fn){
+    var orig=window[fn];
+    if(typeof orig!=='function')return;
+    window[fn]=async function(){
+      var out=await orig.apply(this,arguments);
+      setTimeout(enhance,120);
+      return out;
+    };
+  });
+  ['dAct','updateDriverStatus'].forEach(function(fn){
+    var orig=window[fn];
+    if(typeof orig!=='function')return;
+    window[fn]=async function(){
+      var out=await orig.apply(this,arguments);
+      setTimeout(function(){ enhance(); renderDriverPlanning(); },400);
+      return out;
+    };
+  });
+
+  /* ────────── PLANNING CHAUFFEUR ────────── */
+  function estMin(r){ var km=parseFloat(r.km)||0; return Math.max(20,Math.round(km/50*60)); }
+  function toMin(t){ if(!t)return 0; var p=t.split(':'); return parseInt(p[0])*60+parseInt(p[1]||0); }
+  function hhmm(m){ m=Math.max(0,m); return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
+
+  window.drvPlanShift=function(d){
+    var i=el('drvplan-date'); if(!i)return;
+    var base=i.value?new Date(i.value+'T00:00:00'):new Date();
+    i.value=new Date(base.getTime()+d*86400000).toISOString().slice(0,10);
+    renderDriverPlanning();
+  };
+
+  window.renderDriverPlanning=async function(){
+    var i=el('drvplan-date'), body=el('drvplan-body'), sum=el('drvplan-summary');
+    if(!i||!body||!window.currentDriverName)return;
+    if(!i.value)i.value=new Date().toISOString().slice(0,10);
+    var res=await sb.from('bookings').select('*').eq('driver',currentDriverName).eq('date',i.value)
+      .in('status',['assigned','accepted','ongoing','done']).order('time',{ascending:true});
+    var rides=res.data||[];
+    if(!rides.length){
+      sum.innerHTML='';
+      body.innerHTML='<div class="empty">Aucune course prévue ce jour-là.</div>';
+      return;
+    }
+    var ca=rides.reduce(function(s,r){return s+(parseFloat(r.price)||0);},0);
+    var kmTot=rides.reduce(function(s,r){return s+(parseFloat(r.km)||0);},0);
+    var lastEnd=toMin(rides[rides.length-1].time)+estMin(rides[rides.length-1]);
+    var amp=lastEnd-toMin(rides[0].time);
+    var SL={assigned:'À accepter',accepted:'Acceptée',ongoing:'En cours',done:'Terminée'};
+    var html='';
+    rides.forEach(function(r,n){
+      var start=toMin(r.time), end=start+estMin(r), conflict=false, gapTxt='';
+      if(n>0){
+        var prev=rides[n-1], gap=start-(toMin(prev.time)+estMin(prev));
+        if(gap<0){conflict=true;gapTxt='⚠ Chevauchement de '+Math.abs(gap)+' min';}
+        else if(gap<30)gapTxt='⚠ '+gap+' min seulement entre les deux courses';
+        else gapTxt=Math.floor(gap/60)+'h'+String(gap%60).padStart(2,'0')+' de pause';
+      }
+      if(gapTxt)html+='<div class="pl-gap'+(conflict||gapTxt.indexOf('seulement')>-1?' bad':'')+'">'+gapTxt+'</div>';
+      html+='<div class="pl-row"><div class="pl-time">'+(r.time||'--:--')+'<i>'+hhmm(end)+'</i></div>'+
+        '<div class="pl-card'+(conflict?' conflict':(r.status==='done'?' free':''))+'">'+
+          '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:7px;">'+
+            '<div style="font-size:12px;font-weight:800;color:var(--navy);">'+r.ref+'</div>'+
+            '<div style="font-size:16px;font-weight:800;letter-spacing:-.02em;">'+fmt(r.price||0)+' €</div></div>'+
+          '<div style="font-size:13.5px;font-weight:700;margin-bottom:3px;">'+r.pickup+'</div>'+
+          '<div style="font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:8px;">→ '+r.dropoff+'</div>'+
+          '<div class="chips"><span class="chip hl">'+(SL[r.status]||r.status)+'</span>'+
+            '<span class="chip">'+(r.km||'—')+' km · ~'+estMin(r)+' min</span>'+
+            '<span class="chip">'+(r.name||'')+'</span></div>'+
+          '<div style="display:flex;gap:7px;margin-top:9px;">'+
+            '<button onclick="openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" class="spbtn a" style="flex:1;padding:10px;">🗺 Naviguer</button>'+
+            '<a href="tel:'+(r.phone||'')+'" class="spbtn" style="flex:1;padding:10px;text-align:center;text-decoration:none;">📞 Client</a>'+
+          '</div>'+
+        '</div></div>';
+    });
+    body.innerHTML=html;
+    sum.innerHTML=
+      '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn">'+rides.length+'</div><div class="stat-bl">Courses</div></div>'+
+      '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn" style="color:var(--green)">'+Math.round(ca)+' €</div><div class="stat-bl">Ma journée</div></div>'+
+      '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn">'+Math.round(kmTot)+'</div><div class="stat-bl">km · '+Math.floor(amp/60)+'h'+String(amp%60).padStart(2,'0')+'</div></div>';
+  };
+
+  var _drvTab=window.drvTab;
+  window.drvTab=function(t){
+    if(t==='plan'){
+      ['active','ongoing','done','vehicle'].forEach(function(x){
+        var p=el('drv-pan-'+x); if(p)p.style.display='none';
+        var b=el('drv-tab-'+x); if(b)b.classList.remove('on');
+      });
+      el('drv-pan-plan').style.display='block';
+      el('drv-tab-plan').classList.add('on');
+      renderDriverPlanning();
+      return;
+    }
+    var pp=el('drv-pan-plan'); if(pp)pp.style.display='none';
+    var pb=el('drv-tab-plan'); if(pb)pb.classList.remove('on');
+    _drvTab(t);
+  };
 })();
 </script>
 </body>
