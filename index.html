@@ -27,9 +27,26 @@
   --sh:0 1px 2px rgba(8,20,40,.05),0 10px 28px -18px rgba(8,20,40,.35);
   --shl:0 18px 46px -26px rgba(8,20,40,.5);
 }
-html,body{height:100%;overflow:hidden;background:#EDF1F8;font-family:var(--fb);max-width:430px;margin:0 auto;color:var(--text);-webkit-font-smoothing:antialiased;}
-body{position:relative;box-shadow:0 0 0 1px rgba(8,20,40,.06);}
-.page{display:none;position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--off);}
+html,body{height:100%;width:100%;overflow:hidden;background:#EDF1F8;font-family:var(--fb);margin:0;color:var(--text);-webkit-font-smoothing:antialiased;}
+body{position:relative;}
+.page{display:none;position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:var(--off);box-shadow:0 0 0 1px rgba(8,20,40,.06);}
+img,svg,iframe{max-width:100%;}
+.frow>.field,.seg>button,.vf-opt,.tile,.stat-s,.sim-f{min-width:0;}
+@media(min-width:900px){
+  .page{max-width:960px;}
+  .hero{padding:44px 40px 40px;}
+  .hero-title{font-size:54px;}
+  .hero-sub{font-size:16px;max-width:560px;}
+  .est{max-width:620px;}
+  .stats-strip{padding:0 40px 26px;}
+  .sbody{padding:22px 40px 96px;}
+  .topbar,.hbar,.bk-steps,.bk-lbl,.bk-h,.bk-foot{padding-left:40px;padding-right:40px;}
+  #pan-c,#pan-t,#pan-d,#pan-r,#pan-e,#pan-p,#drv-pan-active,#drv-pan-ongoing,#drv-pan-done,#drv-pan-vehicle{padding:22px 40px !important;}
+  #p-home>div:last-child{padding:30px 40px 40px !important;}
+  #p-home>div:last-child>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:repeat(4,1fr);}
+  .forfait-grid{grid-template-columns:repeat(4,1fr);}
+  .trip-map{height:280px;}
+}
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
@@ -260,6 +277,10 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
+.sug{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 12px;}
+.sug button{background:var(--ice);border:1px solid var(--border2);color:#0B3E7C;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.sug button:active{background:#DCE9FD;}
+.sug span{font-size:11.5px;color:var(--muted);font-weight:700;align-self:center;margin-right:2px;}
 .opt-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--off);cursor:pointer;}
 .opt-row:last-child{border-bottom:none;}
 .opt-row input{width:20px;height:20px;accent-color:var(--blue2);flex-shrink:0;}
@@ -316,6 +337,7 @@ input,select,textarea,button{font-family:var(--fb);}
         <hr>
         <input type="text" id="h-dropoff" placeholder="Destination" autocomplete="off">
       </div>
+      <div class="sug" id="sug-home"></div>
       <div class="seg" id="h-seg">
         <button class="on" id="h-veh-berline" onclick="homeVeh('berline')">🚗 Berline<span style="font-weight:600;opacity:.6;font-size:11px;">1–3</span></button>
         <button id="h-veh-van" onclick="homeVeh('van')">🚐 Van<span style="font-weight:600;opacity:.6;font-size:11px;">1–8</span></button>
@@ -524,7 +546,9 @@ input,select,textarea,button{font-family:var(--fb);}
       </div>
       <div class="card">
         <div class="field"><label>Prise en charge *</label><input type="text" id="f-pickup" placeholder="Adresse, gare, aéroport…" autocomplete="off"></div>
+        <div class="sug" id="sug-pickup"></div>
         <div class="field"><label>Lieu de dépose *</label><input type="text" id="f-dropoff" placeholder="Destination…" autocomplete="off"></div>
+        <div class="sug" id="sug-dropoff"></div>
         <div class="frow">
           <div class="field"><label>Date *</label><input type="date" id="f-date" onchange="checkDispo()"></div>
           <div class="field"><label>Heure *</label><input type="time" id="f-time" onchange="checkNightAuto()"></div>
@@ -547,9 +571,9 @@ input,select,textarea,button{font-family:var(--fb);}
         </div>
         <div style="font-size:12.5px;color:var(--muted);font-weight:600;margin-top:4px;">Le trajet retour est créé automatiquement en sens inverse, au même tarif.</div>
       </div>
-      <div class="card">
+      <div class="card" id="repeat-card" style="display:none;">
         <div class="field" style="margin-bottom:0;">
-          <label>Course récurrente</label>
+          <label>Course récurrente <span style="color:var(--blue2);">· réservé aux comptes clients</span></label>
           <select id="f-repeat">
             <option value="0">Non, une seule fois</option>
             <option value="2">Chaque semaine · 2 semaines</option>
@@ -1522,7 +1546,7 @@ async function submitBooking(withPayment){
     bags:parseInt(document.getElementById('f-bags').value),
     flight:fl,train:tr,night:(function(){var h=time?parseInt(time.split(':')[0]):-1;return (h>=22||h<6)&&h>=0;}()),price:price,
     name:fn+' '+ln,phone:ph,email:em,message:msg,
-    status:'new',price_modified:false,
+    status: withPayment ? 'pending_payment' : 'new',price_modified:false,
     paid: withPayment ? false : null
   });
 
@@ -1560,10 +1584,11 @@ async function submitBooking(withPayment){
           document.getElementById('succ-email').textContent = em;
           document.getElementById('succ-detail').innerHTML =
             '<div style="text-align:center;padding:10px;">'+
-            '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">Réservation enregistrée ✓</div>'+
-            '<div style="font-size:11px;color:var(--muted);margin-bottom:16px;">Cliquez ci-dessous pour finaliser le paiement</div>'+
+            '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px;">Paiement en attente</div>'+
+            '<div style="font-size:12.5px;color:var(--muted);margin-bottom:16px;font-weight:600;">Votre course n\'est pas encore confirmée. Elle le sera dès le paiement effectué.</div>'+
             '<a href="'+data.url+'" style="display:block;background:#635bff;color:#fff;padding:16px;text-align:center;text-decoration:none;font-weight:700;border-radius:11px;font-size:13px;letter-spacing:1px;">💳 Payer maintenant</a>'+
             '</div>';
+          document.querySelector('#p-success div[style*="font-size:26px"]').textContent='Réservation en attente';
           if(!currentClientEmail){
             document.getElementById('create-account-banner').style.display='block';
           }
@@ -2924,11 +2949,13 @@ var paymentStatus = urlParams.get('payment');
 var paymentRef = urlParams.get('ref');
 if(paymentStatus === 'success' && paymentRef) {
   // Marquer comme payé dans Supabase
-  sb.from('bookings').update({paid: true}).eq('ref', paymentRef).then(async function(){
+  sb.from('bookings').update({paid: true, status: 'new'}).eq('ref', paymentRef).then(async function(){
     toast('✓ Paiement confirmé — '+paymentRef);
     // Notifier l'admin par email
     var {data:r} = await sb.from('bookings').select('*').eq('ref',paymentRef).single();
-    if(r){
+    // L'e-mail de confirmation est envoyé par le webhook Stripe (source de vérité).
+    // Ici on ne notifie que si le webhook n'a pas encore marqué l'envoi.
+    if(r && !r.confirmation_sent){
       fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-confirmation',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
@@ -3095,6 +3122,26 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     el('h-est').classList.add('on');
     el('h-est-hint').style.display='none';
   }
+  window.YT_homeFill=function(which,addr){
+    var f=el(which==='pickup'?'h-pickup':'h-dropoff');
+    if(!f)return;
+    f.value=addr;
+    if(!window.google||!google.maps||!google.maps.Geocoder)return;
+    var g=new google.maps.Geocoder();
+    g.geocode({address:addr,componentRestrictions:{country:'fr'}},function(res,st){
+      if(st!=='OK'||!res[0])return;
+      var pl={geometry:{location:res[0].geometry.location}};
+      if(which==='pickup')hp=pl; else hd=pl;
+      if(hp&&hd){
+        new google.maps.DistanceMatrixService().getDistanceMatrix({
+          origins:[hp.geometry.location],destinations:[hd.geometry.location],
+          travelMode:google.maps.TravelMode.DRIVING,unitSystem:google.maps.UnitSystem.METRIC
+        },function(r2,s2){
+          if(s2==='OK'){ hkm=parseFloat((r2.rows[0].elements[0].distance.value/1000).toFixed(1)); homePrice(); }
+        });
+      }
+    });
+  };
   window.homeToBooking=function(){
     var p=val('h-pickup'), d=val('h-dropoff');
     window.startBooking(homeVehCur);
@@ -3147,12 +3194,10 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
 
   /* ────────── OPTIONS PAYANTES ────────── */
   var OPTIONS=[
-    {id:'baby',  fr:'Siège bébé (moins de 4 ans)',        en:'Child seat (under 4)',            p:10},
     {id:'boost', fr:'Rehausseur (4 ans et +)',            en:'Booster seat (4 and over)',       p:0},
-    {id:'pet',   fr:'Animal de compagnie',                en:'Pet on board',                    p:20},
-    {id:'stop',  fr:'Arrêt supplémentaire',               en:'Extra stop',                      p:0},
-    {id:'bulky', fr:'Bagage spécial (ski, golf, vélo)',   en:'Special luggage (ski, golf, bike)',p:0},
-    {id:'meet',  fr:'Accueil pancarte (aéroport / gare)', en:'Meet & greet (airport / station)', p:0}
+    {id:'baby',  fr:'Siège bébé (moins de 4 ans)',        en:'Child seat (under 4)',            p:10},
+    {id:'meet',  fr:'Accueil pancarte (aéroport / gare)', en:'Meet & greet (airport / station)',p:10},
+    {id:'pet',   fr:'Animal de compagnie',                en:'Pet on board',                    p:20}
   ];
   window.YT_OPTIONS=OPTIONS;
   (function renderOptions(){
@@ -3270,14 +3315,67 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
         origin:tripP.geometry.location,destination:tripD.geometry.location,travelMode:google.maps.TravelMode.DRIVING
       },function(result,status){
         if(status==='OK'){ tripRenderer.setDirections(result); }
-        else { box.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--muted);font-weight:600;text-align:center;padding:0 20px;">Itinéraire indisponible — distance et durée calculées ci-dessous</div>'; tripMapObj=null; }
+        else { tripMapObj=null; fallbackMap(); }
       });
     }catch(e){}
   }
+  function fallbackMap(){
+    var box=el('trip-map');
+    if(!box||!tripP||!tripD)return;
+    try{
+      box.innerHTML='';
+      var m=new google.maps.Map(box,{disableDefaultUI:true,gestureHandling:'cooperative'});
+      var a=tripP.geometry.location,b=tripD.geometry.location;
+      new google.maps.Marker({position:a,map:m,label:{text:'A',color:'#fff',fontWeight:'700'}});
+      new google.maps.Marker({position:b,map:m,label:{text:'B',color:'#fff',fontWeight:'700'}});
+      new google.maps.Polyline({path:[a,b],map:m,strokeColor:'#1668E3',strokeOpacity:.85,strokeWeight:4});
+      var bounds=new google.maps.LatLngBounds(); bounds.extend(a); bounds.extend(b);
+      m.fitBounds(bounds,40);
+      tripMapObj=m;
+    }catch(e){}
+  }
+
+  function ensureTrip(cb){
+    if(tripP&&tripD){cb&&cb();return;}
+    if(!window.google||!google.maps||!google.maps.Geocoder)return;
+    var a=v('f-pickup'), b=v('f-dropoff');
+    if(!a||!b)return;
+    var g=new google.maps.Geocoder(), done=0, ok=0;
+    function fin(){ if(++done<2)return; if(ok===2){ if(!parseFloat(v('f-km')))measure(); drawTrip(); cb&&cb(); } }
+    g.geocode({address:a,componentRestrictions:{country:'fr'}},function(res,st){
+      if(st==='OK'&&res[0]){tripP={geometry:{location:res[0].geometry.location}};ok++;} fin();
+    });
+    g.geocode({address:b,componentRestrictions:{country:'fr'}},function(res,st){
+      if(st==='OK'&&res[0]){tripD={geometry:{location:res[0].geometry.location}};ok++;} fin();
+    });
+  }
+
+  function measure(){
+    if(!tripP||!tripD)return;
+    new google.maps.DistanceMatrixService().getDistanceMatrix({
+      origins:[tripP.geometry.location],destinations:[tripD.geometry.location],
+      travelMode:google.maps.TravelMode.DRIVING,unitSystem:google.maps.UnitSystem.METRIC
+    },function(res,status){
+      if(status!=='OK')return;
+      var e0=res.rows[0].elements[0];
+      var km=(e0.distance.value/1000).toFixed(1);
+      el('f-km').value=km;
+      tripDur=e0.duration?e0.duration.text:'';
+      if(el('trip-km'))el('trip-km').textContent=km+' km';
+      if(el('trip-dur'))el('trip-dur').textContent=tripDur||'—';
+      calcP();
+    });
+  }
+
   var _bkGo=window.bkGo;
   window.bkGo=function(n){
     _bkGo(n);
-    if(n===2)setTimeout(function(){ if(tripMapObj&&google.maps.event)google.maps.event.trigger(tripMapObj,'resize'); drawTrip(); },120);
+    if(n===2)setTimeout(function(){
+      if(tripMapObj&&google.maps.event)google.maps.event.trigger(tripMapObj,'resize');
+      if(tripP&&tripD){drawTrip();} else {ensureTrip();}
+      var km=parseFloat(v('f-km'))||0;
+      if(km&&el('trip-km')&&el('trip-km').textContent==='—')el('trip-km').textContent=km+' km';
+    },150);
   };
 
   /* ────────── SUBMIT : options + retour + récurrence ────────── */
@@ -3502,8 +3600,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     'Véhicule':'Vehicle','Passagers & bagages':'Passengers & luggage','Passagers *':'Passengers *','Valises':'Bags',
     'Votre parcours':'Your journey','Distance':'Distance','Durée estimée':'Estimated duration',
     "La carte s'affiche dès les adresses saisies":'The map appears once addresses are set',
-    'Options':'Options','Siège bébé (moins de 4 ans)':'Child seat (under 4)','Rehausseur (4 ans et +)':'Booster seat (4 and over)','Offert':'Free','Arrêt supplémentaire':'Extra stop',
-    'Bagage spécial (ski, golf, vélo)':'Special luggage (ski, golf, bike)','Accueil pancarte (aéroport / gare)':'Meet & greet (airport / station)',
+    'Options':'Options','Siège bébé (moins de 4 ans)':'Child seat (under 4)','Rehausseur (4 ans et +)':'Booster seat (4 and over)','Offert':'Free','Accueil pancarte (aéroport / gare)':'Meet & greet (airport / station)',
     'Animal de compagnie':'Pet on board','Distance & prix':'Distance & price',
     'Distance (km) — calculée via Google Maps':'Distance (km) — via Google Maps',
     'Prix de votre course':'Your fare','Vos coordonnées':'Your details','Prénom *':'First name *','Nom *':'Last name *',
@@ -3553,6 +3650,103 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   }
   var _goL=window.go;
   window.go=function(id){ _goL(id); setTimeout(translateNow,60); };
+
+  /* ────────── SUIVI DU PAIEMENT EN ATTENTE ────────── */
+  var payTimer=null;
+  window.watchPayment=function(ref){
+    if(payTimer)clearInterval(payTimer);
+    var tries=0;
+    var box=el('succ-detail');
+    if(box)box.insertAdjacentHTML('beforeend',
+      '<div class="dc-r" id="pay-watch"><span class="dc-k">Statut</span><span style="color:var(--orange);font-weight:800;">En attente du paiement…</span></div>');
+    payTimer=setInterval(async function(){
+      tries++;
+      if(tries>60){clearInterval(payTimer);return;}
+      var res=await sb.from('bookings').select('paid,status').eq('ref',ref).single();
+      var r=res.data;
+      if(!r)return;
+      if(r.paid||r.status==='new'){
+        clearInterval(payTimer);
+        var w=el('pay-watch');
+        if(w)w.innerHTML='<span class="dc-k">Statut</span><span style="color:var(--green);font-weight:800;">✓ Paiement confirmé</span>';
+        var t=document.querySelector('#p-success div[style*="font-size:26px"]');
+        if(t)t.textContent='Réservation confirmée';
+        toast('✓ Paiement reçu — confirmation envoyée par e-mail');
+        if(window.currentClientEmail)loadClientRides();
+      } else if(r.status==='payment_failed'){
+        clearInterval(payTimer);
+        var w2=el('pay-watch');
+        if(w2)w2.innerHTML='<span class="dc-k">Statut</span><span style="color:var(--red);font-weight:800;">Paiement non finalisé</span>';
+      }
+    },4000);
+  };
+  var _submitW=window.submitBooking;
+  window.submitBooking=async function(withPayment){
+    await _submitW.apply(this,arguments);
+    if(withPayment&&window.lastRef)setTimeout(function(){watchPayment(window.lastRef);},1200);
+  };
+
+  /* ────────── LIEUX FRÉQUENTS ────────── */
+  var SPOTS=[
+    {n:'Gare Saint-Charles', a:'Gare de Marseille-Saint-Charles, Marseille'},
+    {n:'Aéroport de Marseille', a:'Aéroport Marseille Provence, Marignane'},
+    {n:'Gare Aix TGV',       a:"Gare d'Aix-en-Provence TGV, Aix-en-Provence"},
+    {n:'Vieux-Port',         a:'Vieux-Port, Marseille'}
+  ];
+  window.YT_spot=function(target,i){
+    var s=SPOTS[i]; if(!s)return;
+    if(target==='home-pickup'){ window.YT_homeFill('pickup',s.a); toast('Départ : '+s.n); return; }
+    if(target==='home-dropoff'){ window.YT_homeFill('dropoff',s.a); toast('Destination : '+s.n); return; }
+    var f=el(target==='pickup'?'f-pickup':'f-dropoff');
+    if(!f)return;
+    f.value=s.a;
+    tripP=null; tripD=null;
+    if(el('trip-km'))el('trip-km').textContent='—';
+    if(el('trip-dur'))el('trip-dur').textContent='—';
+    toast((target==='pickup'?'Départ : ':'Destination : ')+s.n);
+    if(v('f-pickup')&&v('f-dropoff'))ensureTrip();
+  };
+  (function renderSpots(){
+    function fill(box,target,label){
+      var b=el(box); if(!b)return;
+      b.innerHTML='<span>'+label+'</span>'+SPOTS.map(function(s,i){
+        return '<button type="button" onclick="YT_spot(\''+target+'\','+i+')">'+s.n+'</button>';
+      }).join('');
+    }
+    fill('sug-pickup','pickup','Fréquent :');
+    fill('sug-dropoff','dropoff','Fréquent :');
+    var hb=el('sug-home');
+    if(hb){
+      hb.innerHTML='<span>Départ fréquent :</span>'+SPOTS.slice(0,3).map(function(s,i){
+        return '<button type="button" onclick="YT_spot(\'home-pickup\','+i+')">'+s.n+'</button>';
+      }).join('');
+    }
+  })();
+
+  /* récurrence : uniquement pour un client connecté */
+  function syncRepeat(){
+    var c=el('repeat-card'); if(!c)return;
+    var logged=!!window.currentClientEmail;
+    c.style.display=logged?'block':'none';
+    if(!logged&&el('f-repeat'))el('f-repeat').value='0';
+  }
+  window.YT_syncRepeat=syncRepeat;
+  var _goR=window.go;
+  window.go=function(id){ _goR(id); if(id==='p-booking')syncRepeat(); };
+  syncRepeat();
+
+  /* badge "en attente de paiement" côté client */
+  var _lcr=window.loadClientRides;
+  window.loadClientRides=async function(){
+    await _lcr.apply(this,arguments);
+    setTimeout(function(){
+      document.querySelectorAll('.client-ride-card .badge').forEach(function(b){
+        var s=b.textContent.trim();
+        if(s==='pending_payment'){ b.textContent='En attente de paiement'; b.className='badge b-assigned'; }
+        if(s==='payment_failed'){ b.textContent='Paiement non finalisé'; b.className='badge b-cancelled'; }
+      });
+    },420);
+  };
 
   /* date retour >= date aller */
   var fd=el('f-date');
