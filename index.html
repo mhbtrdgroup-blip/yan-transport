@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#06142B">
+<style>html,body{touch-action:pan-y;-webkit-text-size-adjust:100%;}</style>
+<script>
+document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
+document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
+(function(){var last=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-last<320){e.preventDefault();}last=n;},{passive:false});})();
+document.addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault();},{passive:false});
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Yan Transport">
@@ -287,6 +295,25 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
+.dp-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.dp-nav{width:46px;height:46px;flex-shrink:0;background:#fff;border:1.5px solid var(--border);border-radius:14px;font-size:20px;font-weight:800;color:var(--blue2);cursor:pointer;box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.dp-nav:active{background:var(--ice);}
+.dp-month{font-family:var(--ft);font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.02em;text-transform:capitalize;}
+.dp-today{background:none;border:none;font-size:11.5px;font-weight:800;color:var(--blue2);cursor:pointer;font-family:var(--fb);text-decoration:underline;padding:2px 4px;}
+.dp-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px;}
+.dp-day{background:#fff;border:1.5px solid var(--border);border-radius:14px;padding:9px 2px 8px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.dp-day u{display:block;font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;text-decoration:none;}
+.dp-day b{display:block;font-family:var(--ft);font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.02em;margin-top:2px;}
+.dp-day i{display:block;height:5px;margin-top:5px;}
+.dp-day i s{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--blue2);margin:0 1px;text-decoration:none;}
+.dp-day.today{background:var(--ice);border-color:var(--blue3);}
+.dp-day.sel{background:var(--navy);border-color:var(--navy);}
+.dp-day.sel u{color:rgba(255,255,255,.6);}
+.dp-day.sel b{color:#fff;}
+.dp-day.sel i s{background:#7fb8ff;}
+.dp-now{display:flex;align-items:center;gap:8px;padding:2px 0 8px 62px;}
+.dp-now span{flex:1;height:2px;background:linear-gradient(90deg,var(--red),transparent);}
+.dp-now b{font-size:10.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.06em;}
 .open-ride{width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:9px;background:var(--ice);color:var(--blue2);border:1.5px solid var(--blue2);border-radius:13px;padding:14px;font-size:13.5px;font-weight:800;font-family:var(--fb);cursor:pointer;letter-spacing:-.01em;}
 .open-ride.live{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 10px 24px -14px rgba(6,20,43,.9);}
 .open-ride .or-dot{width:8px;height:8px;border-radius:50%;background:#7ee2a8;animation:orPulse 1.6s ease-in-out infinite;}
@@ -1089,12 +1116,17 @@ input,select,textarea,button{font-family:var(--fb);}
       <div id="driver-rides-done"><div class="empty">Chargement…</div></div>
     </div>
     <div id="drv-pan-plan" style="padding:16px;">
-      <div class="card" style="display:flex;gap:10px;align-items:flex-end;">
-        <div class="field" style="flex:1;margin-bottom:0;"><label>Ma journée</label><input type="date" id="drvplan-date" onchange="renderDriverPlanning()"></div>
-        <button onclick="drvPlanShift(-1)" style="background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;color:var(--muted);">‹</button>
-        <button onclick="drvPlanShift(1)" style="background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;color:var(--muted);">›</button>
+      <div class="dp-head">
+        <button type="button" class="dp-nav" onclick="drvPlanShift(-7)" aria-label="Semaine précédente">‹</button>
+        <div style="flex:1;text-align:center;">
+          <div class="dp-month" id="drvplan-month">—</div>
+          <button type="button" class="dp-today" onclick="drvPlanToday()">Aujourd'hui</button>
+        </div>
+        <button type="button" class="dp-nav" onclick="drvPlanShift(7)" aria-label="Semaine suivante">›</button>
       </div>
-      <div id="drvplan-summary" style="display:flex;gap:8px;margin-bottom:14px;"></div>
+      <div class="dp-strip" id="drvplan-strip"></div>
+      <input type="date" id="drvplan-date" onchange="renderDriverPlanning()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+      <div id="drvplan-summary" style="display:flex;gap:8px;margin-bottom:16px;"></div>
       <div id="drvplan-body"></div>
     </div>
 
@@ -4297,6 +4329,38 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   function toMin(t){ if(!t)return 0; var p=t.split(':'); return parseInt(p[0])*60+parseInt(p[1]||0); }
   function hhmm(m){ m=Math.max(0,m); return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
 
+  window.drvPlanToday=function(){
+    var i=el('drvplan-date'); if(!i)return;
+    i.value=new Date().toISOString().slice(0,10);
+    renderDriverPlanning();
+  };
+
+  function renderStrip(day,counts){
+    var strip=el('drvplan-strip'), mo=el('drvplan-month');
+    if(!strip)return;
+    var d0=new Date(day+'T00:00:00');
+    var dow=(d0.getDay()+6)%7;
+    var mon=new Date(d0.getTime()-dow*86400000);
+    var today=new Date().toISOString().slice(0,10);
+    var N=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+    var html='';
+    for(var k=0;k<7;k++){
+      var d=new Date(mon.getTime()+k*86400000);
+      var iso=d.toISOString().slice(0,10);
+      var n=counts[iso]||0;
+      var dots=''; for(var j=0;j<Math.min(n,3);j++)dots+='<s></s>';
+      html+='<div class="dp-day'+(iso===day?' sel':(iso===today?' today':''))+'" onclick="drvPlanGo(\''+iso+'\')">'+
+        '<u>'+N[k]+'</u><b>'+d.getDate()+'</b><i>'+dots+'</i></div>';
+    }
+    strip.innerHTML=html;
+    if(mo)mo.textContent=d0.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  }
+
+  window.drvPlanGo=function(iso){
+    var i=el('drvplan-date'); if(!i)return;
+    i.value=iso; renderDriverPlanning();
+  };
+
   window.drvPlanShift=function(d){
     var i=el('drvplan-date'); if(!i)return;
     var base=i.value?new Date(i.value+'T00:00:00'):new Date();
@@ -4311,9 +4375,24 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     var res=await sb.from('bookings').select('*').eq('driver',currentDriverName).eq('date',i.value)
       .in('status',['assigned','accepted','ongoing']).order('time',{ascending:true});
     var rides=res.data||[];
+
+    /* pastilles de la semaine */
+    var d0=new Date(i.value+'T00:00:00'), dow=(d0.getDay()+6)%7;
+    var mon=new Date(d0.getTime()-dow*86400000);
+    var wk=await sb.from('bookings').select('date').eq('driver',currentDriverName)
+      .gte('date',mon.toISOString().slice(0,10))
+      .lte('date',new Date(mon.getTime()+6*86400000).toISOString().slice(0,10))
+      .in('status',['assigned','accepted','ongoing']);
+    var counts={};
+    (wk.data||[]).forEach(function(x){ counts[x.date]=(counts[x.date]||0)+1; });
+    renderStrip(i.value,counts);
+
+    var isToday=i.value===new Date().toISOString().slice(0,10);
     if(!rides.length){
       sum.innerHTML='';
-      body.innerHTML='<div class="empty">Aucune course à venir ce jour-là.<br><span style="font-size:12.5px;">Les courses terminées sont dans l\'onglet Terminées.</span></div>';
+      body.innerHTML='<div class="card" style="text-align:center;padding:30px 20px;">'+
+        '<div style="font-size:15px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;">'+(isToday?'Journée libre':'Aucune course ce jour-là')+'</div>'+
+        '<div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.5;">Les courses terminées restent dans l\'onglet Terminées.</div></div>';
       return;
     }
     var ca=rides.reduce(function(s,r){return s+(parseFloat(r.price)||0);},0);
@@ -4329,6 +4408,12 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
         if(gap<0){conflict=true;gapTxt='⚠ Chevauchement de '+Math.abs(gap)+' min';}
         else if(gap<30)gapTxt='⚠ '+gap+' min seulement entre les deux courses';
         else gapTxt=Math.floor(gap/60)+'h'+String(gap%60).padStart(2,'0')+' de pause';
+      }
+      if(isToday){
+        var nowM=new Date().getHours()*60+new Date().getMinutes();
+        var prevStart=n>0?toMin(rides[n-1].time):-1;
+        if(nowM<start&&nowM>prevStart)
+          html+='<div class="dp-now"><b>Maintenant '+hhmm(nowM)+'</b><span></span></div>';
       }
       if(gapTxt)html+='<div class="pl-gap'+(conflict||gapTxt.indexOf('seulement')>-1?' bad':'')+'">'+gapTxt+'</div>';
       html+='<div class="pl-row"><div class="pl-time">'+(r.time||'--:--')+'<i>'+hhmm(end)+'</i></div>'+
@@ -4351,7 +4436,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     body.innerHTML=html;
     sum.innerHTML=
       '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn">'+rides.length+'</div><div class="stat-bl">Courses</div></div>'+
-      '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn" style="color:var(--green)">'+Math.round(ca)+' €</div><div class="stat-bl">Ma journée</div></div>'+
+      '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn" style="color:var(--green)">'+Math.round(ca)+' €</div><div class="stat-bl">Ma recette</div></div>'+
       '<div class="stat-b" style="flex:1;text-align:center;cursor:default;"><div class="stat-bn">'+Math.round(kmTot)+'</div><div class="stat-bl">km · '+Math.floor(amp/60)+'h'+String(amp%60).padStart(2,'0')+'</div></div>';
   };
 
@@ -4441,6 +4526,9 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   }
 
   function showResumeBar(){
+    var old=el('drv-resume'); if(old)old.remove();
+    return;
+    /* eslint-disable */
     var r=ongoingRide();
     var bar=el('drv-resume');
     if(!r){ if(bar)bar.remove(); return; }
