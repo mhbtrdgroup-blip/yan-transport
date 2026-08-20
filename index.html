@@ -236,7 +236,7 @@ input,select,textarea,button{max-width:100%;}
 <div class="page on" id="p-home">
   <div class="hbar">
     <div class="hinner">
-      <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" onclick="secretTap()" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;cursor:pointer;">
+      <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" onclick="secretTap()" draggable="false" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;">
       <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Service Privé</div></div>
       <div style="margin-left:auto;display:flex;gap:6px;">
         <button class="hadmin" onclick="goClientSpace()">Mon espace</button>
@@ -747,14 +747,14 @@ input,select,textarea,button{max-width:100%;}
     </div>
     <!-- DISPOS -->
     <div id="pan-d" style="display:none;padding:16px;">
-      <div class="info">Naviguez avec les fl\u00e8ches. 1er clic sur un jour = voir ses courses. 2e clic = bloquer/d\u00e9bloquer.</div>
+      <div class="info">Naviguez avec les flèches. 1er clic sur un jour = voir ses courses. 2e clic = bloquer/débloquer.</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <button onclick="changeWeek(-1)" style="width:42px;height:42px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-size:16px;color:var(--blue2);font-weight:700;">\u25c0</button>
+        <button onclick="changeWeek(-1)" style="width:42px;height:42px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-size:16px;color:var(--blue2);font-weight:700;">◀</button>
         <div style="text-align:center;">
           <div style="font-size:13px;font-weight:700;color:var(--navy);" id="week-label">Semaine</div>
           <button onclick="goToday()" style="background:none;border:none;font-size:10px;color:var(--blue2);cursor:pointer;font-weight:600;font-family:var(--fb);text-decoration:underline;">Aujourd'hui</button>
         </div>
-        <button onclick="changeWeek(1)" style="width:42px;height:42px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-size:16px;color:var(--blue2);font-weight:700;">\u25b6</button>
+        <button onclick="changeWeek(1)" style="width:42px;height:42px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-size:16px;color:var(--blue2);font-weight:700;">▶</button>
       </div>
       <div class="sec">Calendrier</div>
       <div style="display:flex;gap:10px;margin-bottom:12px;">
@@ -763,8 +763,8 @@ input,select,textarea,button{max-width:100%;}
       </div>
       <div class="dispo-grid" id="dispo-grid"></div>
       <div class="sec" style="margin-top:14px" id="day-rides-title">Courses du jour</div>
-      <div id="day-rides"><div style="font-size:11px;color:var(--muted);padding:8px 0;">S\u00e9lectionnez un jour.</div></div>
-      <div class="sec" style="margin-top:14px">Jours bloqu\u00e9s</div>
+      <div id="day-rides"><div style="font-size:11px;color:var(--muted);padding:8px 0;">Sélectionnez un jour.</div></div>
+      <div class="sec" style="margin-top:14px">Jours bloqués</div>
       <div id="dispo-list"></div>
     </div>
     <!-- RAPPORT -->
@@ -897,17 +897,20 @@ var secretTimer = null;
 function secretTap(){
   secretCount++;
   clearTimeout(secretTimer);
-  secretTimer = setTimeout(function(){ secretCount = 0; }, 2000);
+  secretTimer = setTimeout(function(){ secretCount = 0; }, 3000);
   if(secretCount >= 5){
     secretCount = 0;
     go('p-login');
+    toast('Accès admin');
   }
 }
 
 // Accès admin via URL : yantransport.app/?admin
 if(new URLSearchParams(window.location.search).has('admin')){
   window.history.replaceState({}, '', '/');
-  setTimeout(function(){ go('p-login'); }, 100);
+  window.addEventListener('load', function(){
+    setTimeout(function(){ go('p-login'); }, 400);
+  });
 }
 
 // ── NAVIGATION ──
@@ -1726,34 +1729,34 @@ function renderRides(){
   function buildCard(r){
     var bc=SM[r.status]||SM.new;
     var sa=r.status!=='done'&&r.status!=='cancelled'&&r.status!=='noshow';
-    var payLabel=r.paid?'Pay\u00e9 en ligne':r.payment_method==='account'?'En compte':'Paiement \u00e0 bord';
+    var payLabel=r.paid?'Payé en ligne':r.payment_method==='account'?'En compte':'Paiement à bord';
     return '<div class="ride-card" style="margin-bottom:8px;">'+
-      '<div class="rc-head" onclick="showRideDetails(\''+r.ref+'\')" style="cursor:pointer;"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  \u00b7 '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
+      '<div class="rc-head" onclick="showRideDetails(\''+r.ref+'\')" style="cursor:pointer;"><div><div class="rc-ref">'+r.ref+'</div><div class="rc-time">'+(r.date?r.date.split('-').reverse().join('/'):'')+'  · '+r.time+'</div></div><span class="badge '+bc[0]+'">'+bc[1]+'</span></div>'+
       '<div class="rc-route" onclick="showRideDetails(\''+r.ref+'\')" style="cursor:pointer;"><div class="rc-from"><div class="dot b"></div>'+r.pickup+'</div><div class="rc-to"><div class="dot g"></div>'+r.dropoff+'</div></div>'+
-      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">\u2708 '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">\ud83d\ude84 '+r.train+'</span>':'')+'</div>'+
+      '<div class="chips"><span class="chip">'+r.vehicle+'</span><span class="chip">'+r.km+' km</span><span class="chip">'+r.pax+' pax</span>'+(r.flight?'<span class="chip hl">✈ '+r.flight+'</span>':'')+(r.train?'<span class="chip hl">🚄 '+r.train+'</span>':'')+'</div>'+
       '<div class="rc-foot">'+
-        '<span style="font-size:11px;color:var(--muted)">'+r.name+' \u00b7 <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></span>'+
-        (sa?'<span class="rc-price" onclick="editPriceInline(\''+r.ref+'\')" style="cursor:pointer;border-bottom:1.5px dashed var(--blue2);">'+fmt(r.price||0)+' \u20ac \u270f\ufe0f</span>'
-           :'<span class="rc-price">'+fmt(r.price||0)+' \u20ac</span>')+
+        '<span style="font-size:11px;color:var(--muted)">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--blue2);text-decoration:none;font-weight:700">'+r.phone+'</a></span>'+
+        (sa?'<span class="rc-price" onclick="editPriceInline(\''+r.ref+'\')" style="cursor:pointer;border-bottom:1.5px dashed var(--blue2);">'+fmt(r.price||0)+' € ✏️</span>'
+           :'<span class="rc-price">'+fmt(r.price||0)+' €</span>')+
       '</div>'+
       (sa?
         '<div onclick="openAssignSheet(\''+r.ref+'\')" style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:9px 12px;background:'+(r.driver?'var(--ice)':'var(--orange-bg)')+';border:1.5px dashed '+(r.driver?'var(--blue2)':'var(--orange)')+';border-radius:10px;cursor:pointer;">'+
-          '<span style="font-size:11px;font-weight:700;color:'+(r.driver?'var(--blue2)':'var(--orange)')+';">'+(r.driver?'\ud83d\udc68\u200d\u2708\ufe0f '+r.driver+' \u00b7 '+payLabel:'\u26a0\ufe0f Assigner un chauffeur')+'</span>'+
-          '<span style="font-size:13px;">\u270f\ufe0f</span>'+
+          '<span style="font-size:11px;font-weight:700;color:'+(r.driver?'var(--blue2)':'var(--orange)')+';">'+(r.driver?'👨‍✈️ '+r.driver+' · '+payLabel:'⚠️ Assigner un chauffeur')+'</span>'+
+          '<span style="font-size:13px;">✏️</span>'+
         '</div>'
-      :(r.driver?'<div style="margin-top:6px;font-size:11px;font-weight:600;color:var(--navy);">\ud83d\udc68\u200d\u2708\ufe0f '+r.driver+' '+driverStatusBadge(r)+'</div>':''))+
-      (r.price_modified?'<div style="margin-top:4px;"><span class="price-modified-badge">Prix modifi\u00e9</span></div>':'')+
+      :(r.driver?'<div style="margin-top:6px;font-size:11px;font-weight:600;color:var(--navy);">👨‍✈️ '+r.driver+' '+driverStatusBadge(r)+'</div>':''))+
+      (r.price_modified?'<div style="margin-top:4px;"><span class="price-modified-badge">Prix modifié</span></div>':'')+
       (r.cancel_reason?'<div style="font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;">'+r.cancel_reason+'</div>':'')+
       '<div style="display:flex;gap:6px;margin-top:10px;">'+
-        '<button onclick="showAdminBonCommande(\''+r.ref+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">\ud83d\udcc4 Bon</button>'+
-        (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">\ud83d\udcc4 Facture</button>':'')+
+        '<button onclick="showAdminBonCommande(\''+r.ref+'\')" style="flex:1;background:var(--ice);color:var(--blue2);border:1px solid var(--blue2);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Bon</button>'+
+        (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Facture</button>':'')+
         (sa?'<button onclick="cancelRideConfirm(\''+r.ref+'\')" style="flex:1;background:transparent;color:var(--red);border:1px solid #ffcdd2;padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">Annuler</button>':'')+
         (sa?'<button onclick="markNoShowConfirm(\''+r.ref+'\')" style="flex:1;background:transparent;color:var(--orange);border:1px solid #ffe0b2;padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">No-show</button>':'')+
       '</div>'+
       (r.status==='cancelled'||r.status==='noshow'?
         '<div style="margin-top:8px;padding:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;">'+
-          '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">'+r.name+' \u00b7 <a href="tel:'+r.phone+'" style="color:var(--red);font-weight:700;text-decoration:none;">\ud83d\udcde '+r.phone+'</a></div>'+
-          '<button onclick="markFollowupDone(\''+r.ref+'\')" style="width:100%;background:'+(r.cancel_followup_done?'var(--green-bg)':'transparent')+';color:'+(r.cancel_followup_done?'var(--green)':'var(--red)')+';border:1px solid '+(r.cancel_followup_done?'var(--green)':'#ffcdd2')+';padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">'+(r.cancel_followup_done?'\u2713 Suivi effectu\u00e9':'\ud83d\udcde Marquer comme appel\u00e9')+'</button>'+
+          '<div style="font-size:11px;color:var(--muted);margin-bottom:6px;">'+r.name+' · <a href="tel:'+r.phone+'" style="color:var(--red);font-weight:700;text-decoration:none;">📞 '+r.phone+'</a></div>'+
+          '<button onclick="markFollowupDone(\''+r.ref+'\')" style="width:100%;background:'+(r.cancel_followup_done?'var(--green-bg)':'transparent')+';color:'+(r.cancel_followup_done?'var(--green)':'var(--red)')+';border:1px solid '+(r.cancel_followup_done?'var(--green)':'#ffcdd2')+';padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">'+(r.cancel_followup_done?'✓ Suivi effectué':'📞 Marquer comme appelé')+'</button>'+
         '</div>'
       :'')+
       '</div>';
@@ -1801,12 +1804,12 @@ function renderRides(){
 // ── ÉDITION INLINE PRIX ──
 // ── TIMELINE SVG SUIVI COURSE ──
 function buildStatusTimeline(ds){
-  // \u00c9tapes : en_route → sur_place → pickup → dropoff
+  // Étapes : en_route → sur_place → pickup → dropoff
   var steps = [
     {key:'en_route', label:'En route', svg:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5a2 2 0 01-2-2V9a2 2 0 012-2h11l3 3v5a2 2 0 010 2z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg>'},
     {key:'sur_place', label:'Sur place', svg:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>'},
-    {key:'pickup', label:'\u00c0 bord', svg:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'},
-    {key:'dropoff', label:'D\u00e9pos\u00e9', svg:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'}
+    {key:'pickup', label:'À bord', svg:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'},
+    {key:'dropoff', label:'Déposé', svg:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'}
   ];
   var currentIdx = steps.findIndex(function(s){ return s.key === ds; });
   if(currentIdx === -1) currentIdx = 0;
@@ -1831,16 +1834,16 @@ function buildStatusTimeline(ds){
 async function editPriceInline(ref){
   var r = ridesCache.find(function(x){ return x.ref === ref; });
   if(!r) return;
-  var val = prompt('Nouveau prix pour ' + ref + ' (\u20ac) :', fmt(r.price || 0));
+  var val = prompt('Nouveau prix pour ' + ref + ' (€) :', fmt(r.price || 0));
   if(val === null) return;
   var v = parseFloat(val.replace(',', '.'));
   if(isNaN(v) || v < 0){ toast('Prix invalide'); return; }
-  if(!confirm('Voulez-vous modifier le prix de ' + fmt(r.price||0) + ' \u20ac \u00e0 ' + v.toFixed(2) + ' \u20ac ?')) return;
+  if(!confirm('Voulez-vous modifier le prix de ' + fmt(r.price||0) + ' € à ' + v.toFixed(2) + ' € ?')) return;
   await sb.from('bookings').update({price: v, price_modified: true}).eq('ref', ref);
   var idx = ridesCache.findIndex(function(x){ return x.ref === ref; });
   if(idx > -1){ ridesCache[idx].price = v; ridesCache[idx].price_modified = true; }
   renderRides();
-  toast('Prix modifi\u00e9 : ' + v.toFixed(2) + ' \u20ac');
+  toast('Prix modifié : ' + v.toFixed(2) + ' €');
 }
 
 // ── BOTTOM SHEET ASSIGNATION ──
@@ -1860,18 +1863,18 @@ async function openAssignSheet(ref){
   sheet.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:flex-end;';
   sheet.innerHTML = '<div style="width:100%;max-width:430px;margin:0 auto;background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 34px;">' +
     '<div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;"></div>' +
-    '<div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;">Assigner \u2014 ' + ref + '</div>' +
-    '<div style="font-size:11px;color:var(--muted);margin-bottom:16px;">' + r.pickup + ' \u2192 ' + r.dropoff + '</div>' +
+    '<div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;">Assigner — ' + ref + '</div>' +
+    '<div style="font-size:11px;color:var(--muted);margin-bottom:16px;">' + r.pickup + ' → ' + r.dropoff + '</div>' +
     '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Chauffeur</div>' +
     '<select id="sheet-driver" style="width:100%;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:12px;font-size:13px;font-family:var(--fb);outline:none;border-radius:11px;margin-bottom:14px;-webkit-appearance:none;">' +
-      '<option value="">\u2014 S\u00e9lectionner \u2014</option>' + driverOpts +
+      '<option value="">— Sélectionner —</option>' + driverOpts +
     '</select>' +
     '<div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Mode de paiement</div>' +
     '<select id="sheet-payment" style="width:100%;background:var(--off);border:1.5px solid var(--border);color:var(--text);padding:12px;font-size:13px;font-family:var(--fb);outline:none;border-radius:11px;margin-bottom:18px;-webkit-appearance:none;">' +
-      '<option value="board"' + (r.payment_method !== 'account' ? ' selected' : '') + '>Paiement \u00e0 bord</option>' +
+      '<option value="board"' + (r.payment_method !== 'account' ? ' selected' : '') + '>Paiement à bord</option>' +
       '<option value="account"' + (r.payment_method === 'account' ? ' selected' : '') + '>En compte</option>' +
     '</select>' +
-    '<button onclick="confirmAssignSheet()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:14px;font-size:12px;font-weight:700;border-radius:12px;cursor:pointer;font-family:var(--fb);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">\u2713 Confirmer l\'assignation</button>' +
+    '<button onclick="confirmAssignSheet()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:14px;font-size:12px;font-weight:700;border-radius:12px;cursor:pointer;font-family:var(--fb);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">✓ Confirmer l\'assignation</button>' +
     '<button onclick="document.querySelector(\'.assign-sheet\').remove()" style="width:100%;background:transparent;color:var(--muted);border:none;padding:10px;font-size:11px;cursor:pointer;font-family:var(--fb);">Annuler</button>' +
   '</div>';
   sheet.addEventListener('click', function(e){ if(e.target === sheet) sheet.remove(); });
@@ -1881,8 +1884,8 @@ async function openAssignSheet(ref){
 async function confirmAssignSheet(){
   var driver = document.getElementById('sheet-driver').value;
   var pm = document.getElementById('sheet-payment').value;
-  if(!driver){ toast('S\u00e9lectionnez un chauffeur'); return; }
-  if(!confirm('Voulez-vous assigner cette course \u00e0 ' + driver + ' ?')) return;
+  if(!driver){ toast('Sélectionnez un chauffeur'); return; }
+  if(!confirm('Voulez-vous assigner cette course à ' + driver + ' ?')) return;
   var ref = assignSheetRef;
   await sb.from('bookings').update({status: 'assigned', driver: driver, payment_method: pm}).eq('ref', ref);
   var idx = ridesCache.findIndex(function(x){ return x.ref === ref; });
@@ -1890,7 +1893,7 @@ async function confirmAssignSheet(){
   var sheetEl = document.querySelector('.assign-sheet');
   if(sheetEl) sheetEl.remove();
   renderRides();
-  toast('\u2713 Assign\u00e9 \u00e0 ' + driver);
+  toast('✓ Assigné à ' + driver);
 }
 
 // ── CONFIRMATIONS ──
@@ -2096,7 +2099,7 @@ function renderDispos(){
   var first = dates[0].split('-').reverse().join('/');
   var last = dates[6].split('-').reverse().join('/');
   var wl = document.getElementById('week-label');
-  if(wl) wl.textContent = first.substring(0,5) + ' \u2014 ' + last.substring(0,5);
+  if(wl) wl.textContent = first.substring(0,5) + ' — ' + last.substring(0,5);
 
   var ridesByDay = {};
   ridesCache.forEach(function(r){
@@ -2126,7 +2129,7 @@ function renderDispos(){
 function selectPlanDay(d){
   if(selectedPlanDay === d){
     var isOff = offDates.has(d);
-    if(confirm(isOff ? 'D\u00e9bloquer ce jour ?' : 'Bloquer ce jour ? Les clients ne pourront plus r\u00e9server.')){
+    if(confirm(isOff ? 'Débloquer ce jour ?' : 'Bloquer ce jour ? Les clients ne pourront plus réserver.')){
       toggleDay(d);
     }
     return;
@@ -2140,7 +2143,7 @@ function renderDayRides(){
   var titleEl = document.getElementById('day-rides-title');
   if(!el) return;
   if(!selectedPlanDay){
-    el.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px 0;">S\u00e9lectionnez un jour.</div>';
+    el.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px 0;">Sélectionnez un jour.</div>';
     return;
   }
   if(titleEl) titleEl.textContent = 'Courses du ' + selectedPlanDay.split('-').reverse().join('/');
@@ -2158,12 +2161,12 @@ function renderDayRides(){
       '<div style="text-align:center;flex-shrink:0;min-width:44px;"><div style="font-size:15px;font-weight:700;color:var(--navy);font-family:Arial,sans-serif;">' + (r.time || '?') + '</div></div>' +
       '<div style="flex:1;min-width:0;">' +
         '<div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.pickup + '</div>' +
-        '<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\u2192 ' + r.dropoff + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ' + r.dropoff + '</div>' +
         (r.driver ? '<div style="font-size:10px;color:var(--blue2);font-weight:600;margin-top:2px;">' + r.driver + '</div>' : '') +
       '</div>' +
       '<div style="text-align:right;flex-shrink:0;">' +
         '<span class="badge ' + bc[0] + '">' + bc[1] + '</span>' +
-        '<div style="font-size:13px;font-weight:700;color:var(--navy);font-family:Arial,sans-serif;margin-top:4px;">' + fmt(r.price || 0) + ' \u20ac</div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--navy);font-family:Arial,sans-serif;margin-top:4px;">' + fmt(r.price || 0) + ' €</div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -2172,22 +2175,22 @@ function renderDayRides(){
 function showRideDetails(ref){
   var r = ridesCache.find(function(x){ return x.ref === ref; });
   if(!r) return;
-  var SM4 = {new:'\u00c0 confirmer',assigned:'Confirm\u00e9e',accepted:'Accept\u00e9e',ongoing:'En route',done:'Termin\u00e9e',cancelled:'Annul\u00e9e',noshow:'No-show'};
-  var payLabel = r.paid ? 'Pay\u00e9 en ligne' : r.payment_method === 'account' ? 'En compte' : 'Paiement \u00e0 bord';
+  var SM4 = {new:'À confirmer',assigned:'Confirmée',accepted:'Acceptée',ongoing:'En route',done:'Terminée',cancelled:'Annulée',noshow:'No-show'};
+  var payLabel = r.paid ? 'Payé en ligne' : r.payment_method === 'account' ? 'En compte' : 'Paiement à bord';
   var rows = [
-    ['R\u00e9f\u00e9rence', r.ref],
+    ['Référence', r.ref],
     ['Statut', SM4[r.status] || r.status],
-    ['Date', (r.date ? r.date.split('-').reverse().join('/') : '') + ' \u00e0 ' + r.time],
+    ['Date', (r.date ? r.date.split('-').reverse().join('/') : '') + ' à ' + r.time],
     ['Prise en charge', r.pickup],
     ['Destination', r.dropoff],
-    ['V\u00e9hicule', r.vehicle + ' \u00b7 ' + r.pax + ' pax \u00b7 ' + (r.bags || 0) + ' valise(s)'],
+    ['Véhicule', r.vehicle + ' · ' + r.pax + ' pax · ' + (r.bags || 0) + ' valise(s)'],
     ['Distance', r.km + ' km'],
     ['Client', r.name],
-    ['T\u00e9l\u00e9phone', r.phone],
+    ['Téléphone', r.phone],
     ['E-mail', r.email || '-'],
-    ['Chauffeur', r.driver || 'Non assign\u00e9'],
+    ['Chauffeur', r.driver || 'Non assigné'],
     ['Paiement', payLabel],
-    ['Prix', fmt(r.price || 0) + ' \u20ac']
+    ['Prix', fmt(r.price || 0) + ' €']
   ];
   if(r.flight) rows.push(['Vol', r.flight]);
   if(r.train) rows.push(['Train', r.train]);
@@ -2206,8 +2209,8 @@ function showRideDetails(ref){
   modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:1000;overflow-y:auto;padding:20px;';
   modal.innerHTML = '<div style="max-width:400px;margin:20px auto;background:#fff;border-radius:18px;padding:20px;">' +
     '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
-      '<div style="font-size:15px;font-weight:700;color:var(--navy);">D\u00e9tails de la course</div>' +
-      '<a href="tel:' + r.phone + '" style="background:var(--green-bg);color:var(--green);padding:7px 12px;border-radius:9px;font-size:11px;font-weight:700;text-decoration:none;">\ud83d\udcde Appeler</a>' +
+      '<div style="font-size:15px;font-weight:700;color:var(--navy);">Détails de la course</div>' +
+      '<a href="tel:' + r.phone + '" style="background:var(--green-bg);color:var(--green);padding:7px 12px;border-radius:9px;font-size:11px;font-weight:700;text-decoration:none;">📞 Appeler</a>' +
     '</div>' +
     html +
     '<button onclick="document.querySelector(\'.ride-modal\').remove()" style="width:100%;background:var(--navy);color:#fff;border:none;padding:13px;font-size:11px;font-weight:700;border-radius:11px;cursor:pointer;font-family:var(--fb);margin-top:14px;letter-spacing:1px;text-transform:uppercase;">Fermer</button>' +
@@ -2218,17 +2221,17 @@ function showRideDetails(ref){
 function renderBlockedList(){
   var list = document.getElementById('dispo-list');
   if(!list) return;
-  if(!offDates.size){ list.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun jour bloqu\u00e9.</div>'; return; }
+  if(!offDates.size){ list.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun jour bloqué.</div>'; return; }
   list.innerHTML = Array.from(offDates).sort().map(function(d){
     return '<div style="display:flex;justify-content:space-between;align-items:center;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;padding:10px 13px;margin-bottom:8px;">' +
-      '<span style="font-size:12px;font-weight:600;color:var(--red);">' + d.split('-').reverse().join('/') + ' \u2014 Indisponible</span>' +
+      '<span style="font-size:12px;font-weight:600;color:var(--red);">' + d.split('-').reverse().join('/') + ' — Indisponible</span>' +
       '<button onclick="toggleDay(\'' + d + '\')" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-weight:700;font-family:var(--fb);">Retirer</button></div>';
   }).join('');
 }
 
 async function toggleDay(d){
-  if(offDates.has(d)){await sb.from('unavailable_dates').delete().eq('date',d);offDates.delete(d);toast('Jour d\u00e9bloqu\u00e9');}
-  else{await sb.from('unavailable_dates').insert({date:d});offDates.add(d);toast('Jour bloqu\u00e9');}
+  if(offDates.has(d)){await sb.from('unavailable_dates').delete().eq('date',d);offDates.delete(d);toast('Jour débloqué');}
+  else{await sb.from('unavailable_dates').insert({date:d});offDates.add(d);toast('Jour bloqué');}
   renderDispos();
 }
 
