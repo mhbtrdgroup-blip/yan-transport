@@ -287,17 +287,43 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
-.slide{position:relative;height:56px;border-radius:14px;background:var(--off);border:1.5px solid var(--border);overflow:hidden;margin-top:10px;touch-action:none;user-select:none;}
-.slide-fill{position:absolute;inset:0;width:0;background:var(--blue2);opacity:.16;transition:width .18s;}
-.slide-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800;color:var(--muted);letter-spacing:-.01em;pointer-events:none;padding-left:44px;text-align:center;}
-.slide-knob{position:absolute;top:5px;left:5px;width:46px;height:44px;border-radius:11px;background:var(--blue2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;box-shadow:0 6px 14px -6px rgba(22,104,227,.9);transition:left .18s;}
+.slide{position:relative;height:64px;border-radius:18px;background:#fff;border:1.5px solid var(--border);overflow:hidden;margin-top:12px;touch-action:none;user-select:none;box-shadow:0 1px 2px rgba(8,20,40,.05);}
+.slide-fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,rgba(22,104,227,.06),rgba(22,104,227,.20));transition:width .18s;}
+.slide-arrows{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;gap:1px;pointer-events:none;}
+.slide-arrows i{width:7px;height:7px;border-top:2px solid var(--border2);border-right:2px solid var(--border2);transform:rotate(45deg);opacity:.25;animation:slarr 1.5s infinite;}
+.slide-arrows i:nth-child(2){animation-delay:.15s;}
+.slide-arrows i:nth-child(3){animation-delay:.3s;}
+@keyframes slarr{0%,60%,100%{opacity:.2;}30%{opacity:.85;}}
+@keyframes knobGlow{0%,100%{box-shadow:0 0 0 0 rgba(22,104,227,.42),0 8px 18px -8px rgba(22,104,227,.7);}50%{box-shadow:0 0 0 9px rgba(22,104,227,0),0 8px 18px -8px rgba(22,104,227,.7);}}
+@keyframes knobNudge{0%,72%,100%{transform:translateX(0);}80%{transform:translateX(5px);}88%{transform:translateX(1px);}}
+@keyframes slideSheen{0%{transform:translateX(-60%);}100%{transform:translateX(320%);}}
+.slide.pulse{border-color:var(--blue3);box-shadow:0 0 0 4px rgba(22,104,227,.10),0 10px 26px -16px rgba(22,104,227,.75);}
+.slide.pulse .slide-knob{animation:knobGlow 1.9s ease-out infinite,knobNudge 2.6s ease-in-out infinite;}
+.slide.pulse .slide-sheen{position:absolute;top:0;bottom:0;width:70px;background:linear-gradient(90deg,transparent,rgba(22,104,227,.13),transparent);animation:slideSheen 2.6s ease-in-out infinite;pointer-events:none;}
+.slide.dragging .slide-knob{animation:none !important;}
+.slide-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--navy);letter-spacing:-.015em;pointer-events:none;padding:0 46px 0 62px;text-align:center;line-height:1.25;}
+.slide-knob{position:absolute;top:6px;left:6px;width:52px;height:50px;border-radius:14px;background:var(--blue2);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -8px rgba(22,104,227,.85);transition:left .18s;}
+.slide-knob svg{width:22px;height:22px;}
 .slide.dragging .slide-knob,.slide.dragging .slide-fill{transition:none;}
-.slide.done{border-color:var(--green);background:var(--green-bg);}
-.slide.done .slide-knob{background:var(--green);}
+.slide.done{border-color:var(--green);background:var(--green-bg);box-shadow:none;}
+.slide.done .slide-knob{background:var(--green);animation:none;}
 .slide.done .slide-lbl{color:var(--green);}
-.slide.go .slide-knob{background:var(--green);}
-.slide.warn .slide-knob{background:var(--orange);box-shadow:0 6px 14px -6px rgba(180,83,9,.9);}
-.slide.fin .slide-knob{background:var(--red);box-shadow:0 6px 14px -6px rgba(192,52,47,.8);}
+.slide.done .slide-arrows,.slide.done .slide-sheen{display:none;}
+.slide.go .slide-knob{background:var(--green);box-shadow:0 8px 18px -8px rgba(21,128,61,.85);}
+.slide.warn .slide-knob{background:var(--orange);box-shadow:0 8px 18px -8px rgba(180,83,9,.9);}
+.slide.fin .slide-knob{background:var(--red);box-shadow:0 8px 18px -8px rgba(192,52,47,.8);}
+/* variante sombre — mode course plein écran */
+.slide.dk{height:68px;background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15);box-shadow:none;}
+.slide.dk .slide-lbl{color:rgba(255,255,255,.82);font-size:14.5px;}
+.slide.dk .slide-fill{background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.16));}
+.slide.dk .slide-arrows i{border-color:rgba(255,255,255,.55);}
+.slide.dk .slide-knob{width:56px;height:54px;}
+.slide.dk.pulse{border-color:rgba(120,180,255,.5);box-shadow:0 0 0 4px rgba(78,155,255,.12),0 14px 34px -18px rgba(78,155,255,.9);}
+.slide.dk.pulse .slide-knob{animation:knobGlowDk 1.9s ease-out infinite,knobNudge 2.6s ease-in-out infinite;}
+.slide.dk.pulse .slide-sheen{background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);}
+@keyframes knobGlowDk{0%,100%{box-shadow:0 0 0 0 rgba(120,180,255,.5),0 8px 20px -8px rgba(22,104,227,.9);}50%{box-shadow:0 0 0 11px rgba(120,180,255,0),0 8px 20px -8px rgba(22,104,227,.9);}}
+.slide.dk.done{background:rgba(34,160,90,.18);border-color:var(--green);}
+.slide.dk.done .slide-lbl{color:#8ce0ab;}
 .splist{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;}
 .splist-h{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800;padding:11px 14px 9px;background:var(--off);border-bottom:1px solid var(--border);}
 .sprow{display:flex;align-items:center;gap:12px;padding:11px 12px 11px 14px;border-bottom:1px solid var(--off);}
@@ -4109,16 +4135,23 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
 (function(){
   function el(id){return document.getElementById(id);}
 
+  var SVG={
+    play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg>',
+    pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+    flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>'
+  };
   /* ────────── ÉTAPE SUIVANTE ────────── */
   function nextStep(r){
     if(r.status==='assigned'||r.status==='accepted')
-      return {lbl:'Glissez pour démarrer la course',icon:'→',cls:'',run:function(){dAct(r.ref,'ongoing');}};
+      return {lbl:'Glissez pour démarrer la course',icon:SVG.play,cls:'pulse',run:function(){dAct(r.ref,'ongoing');}};
     if(r.status==='ongoing'){
       var ds=r.driver_status||'en_route';
-      if(ds==='en_route')  return {lbl:'Glissez : je suis sur place',icon:'📍',cls:'warn',run:function(){updateDriverStatus(r.ref,'sur_place');}};
-      if(ds==='sur_place') return {lbl:'Glissez : client à bord',icon:'🧳',cls:'go',run:function(){updateDriverStatus(r.ref,'pickup');}};
-      if(ds==='pickup')    return {lbl:'Glissez : client déposé',icon:'✓',cls:'go',run:function(){updateDriverStatus(r.ref,'dropoff');}};
-      return {lbl:'Glissez pour terminer la course',icon:'✓',cls:'fin',run:function(){dAct(r.ref,'done');}};
+      if(ds==='en_route')  return {lbl:'Glissez : je suis sur place',icon:SVG.pin,cls:'warn',run:function(){updateDriverStatus(r.ref,'sur_place');}};
+      if(ds==='sur_place') return {lbl:'Glissez : client à bord',icon:SVG.user,cls:'go',run:function(){updateDriverStatus(r.ref,'pickup');}};
+      if(ds==='pickup')    return {lbl:'Glissez : client déposé',icon:SVG.check,cls:'go',run:function(){updateDriverStatus(r.ref,'dropoff');}};
+      return {lbl:'Glissez pour terminer la course',icon:SVG.flag,cls:'fin',run:function(){dAct(r.ref,'done');}};
     }
     return null;
   }
@@ -4127,7 +4160,9 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   function makeSlide(step){
     var w=document.createElement('div');
     w.className='slide '+(step.cls||'');
-    w.innerHTML='<div class="slide-fill"></div><div class="slide-lbl">'+step.lbl+'</div><div class="slide-knob">'+step.icon+'</div>';
+    w.innerHTML='<div class="slide-fill"></div><div class="slide-sheen"></div><div class="slide-lbl">'+step.lbl+'</div>'+
+      '<div class="slide-arrows"><i></i><i></i><i></i></div>'+
+      '<div class="slide-knob">'+step.icon+'</div>';
     var knob=w.querySelector('.slide-knob'), fill=w.querySelector('.slide-fill'), lbl=w.querySelector('.slide-lbl');
     var dragging=false, startX=0, max=0, x=0, fired=false;
 
@@ -4138,7 +4173,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     }
     function down(e){
       if(fired)return;
-      dragging=true; w.classList.add('dragging');
+      dragging=true; w.classList.add('dragging'); w.classList.remove('pulse');
       max=w.clientWidth-56;
       startX=(e.touches?e.touches[0].clientX:e.clientX)-x;
       e.preventDefault();
@@ -4154,7 +4189,9 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
       if(x>max*0.82){
         fired=true;
         setX(max);
+        w.classList.remove('pulse');
         w.classList.add('done');
+        knob.innerHTML=SVG.check;
         lbl.textContent='Confirmé';
         if(navigator.vibrate)navigator.vibrate(30);
         setTimeout(step.run,180);
@@ -4263,8 +4300,9 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
             '<span class="chip">'+(r.km||'—')+' km · ~'+estMin(r)+' min</span>'+
             '<span class="chip">'+(r.name||'')+'</span></div>'+
           '<div style="display:flex;gap:7px;margin-top:9px;">'+
-            '<button onclick="openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" class="spbtn a" style="flex:1;padding:10px;">🗺 Naviguer</button>'+
-            '<a href="tel:'+(r.phone||'')+'" class="spbtn" style="flex:1;padding:10px;text-align:center;text-decoration:none;">📞 Client</a>'+
+            '<button onclick="openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" class="spbtn a" style="flex:1;padding:10px;">Naviguer</button>'+
+            '<a href="https://wa.me/'+waNum(r.phone)+'" target="_blank" rel="noopener" class="spbtn" style="flex:1;padding:10px;text-align:center;text-decoration:none;color:#128C4B;border-color:#a7e3c0;">WhatsApp</a>'+
+            '<a href="tel:'+(r.phone||'')+'" class="spbtn" style="flex:0 0 52px;padding:10px;text-align:center;text-decoration:none;">📞</a>'+
           '</div>'+
         '</div></div>';
     });
@@ -4277,7 +4315,19 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
 
   /* ────────── MODE COURSE PLEIN ÉCRAN ────────── */
   var liveRef=null;
-  var DS_LABEL={en_route:'🚗 En route vers le client',sur_place:'📍 Sur place, en attente',pickup:'🧳 Client à bord',dropoff:'✓ Client déposé'};
+  var DS_LABEL={en_route:['En route vers le client','#7fb8ff'],sur_place:['Sur place, en attente','#ffc266'],pickup:['Client à bord','#7ee2a8'],dropoff:['Client déposé','#7ee2a8']};
+  function statusPill(ds){
+    var s=DS_LABEL[ds]||DS_LABEL.en_route;
+    return '<span style="width:9px;height:9px;border-radius:50%;background:'+s[1]+';box-shadow:0 0 0 4px '+s[1]+'22;"></span>'+s[0];
+  }
+
+  window.waNum=function(p){
+    var d=String(p||'').replace(/[^0-9+]/g,'');
+    if(d.indexOf('+')===0) return d.slice(1);
+    if(d.indexOf('00')===0) return d.slice(2);
+    if(d.indexOf('0')===0) return '33'+d.slice(1);
+    return d;
+  };
 
   window.openLiveRide=function(ref){
     var r=drvFindRide(ref);
@@ -4288,7 +4338,9 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     el('dl-to').textContent=r.dropoff;
     el('dl-client').textContent=r.name||'—';
     el('dl-phone').href='tel:'+(r.phone||'');
-    el('dl-status').textContent=DS_LABEL[r.driver_status||'en_route']||DS_LABEL.en_route;
+    el('dl-wa').href='https://wa.me/'+waNum(r.phone)+'?text='+encodeURIComponent(
+      'Bonjour '+(r.name||'')+', Yan Transport — votre chauffeur pour la course '+r.ref+'. Je suis en route.');
+    el('dl-status').innerHTML=statusPill(r.driver_status||'en_route');
     el('dl-chips').innerHTML=[
       (r.vehicle||''),(r.km||'—')+' km',(r.pax||1)+' pax',fmt(r.price||0)+' €',
       (r.flight?'✈ '+r.flight:''),(r.train?'🚄 '+r.train:'')
@@ -4301,7 +4353,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     var step=nextStep(r);
     if(step){
       var s=makeSlide(step);
-      s.style.height='66px';
+      s.classList.add('dk');
       box.appendChild(s);
       if(r.message)box.insertAdjacentHTML('afterbegin','<div style="font-size:13px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:12px;">📝 '+r.message+'</div>');
     }
@@ -4331,7 +4383,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
       document.body.appendChild(bar);
     }
     bar.style.display='block';
-    bar.textContent='🚗 Course en cours · reprendre';
+    bar.innerHTML='<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7ee2a8;margin-right:9px;vertical-align:1px;"></span>Course en cours · reprendre';
     bar.onclick=function(){ openLiveRide(r.ref); };
   }
   window.YT_resumeBar=showResumeBar;
@@ -4401,7 +4453,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
       <button onclick="closeLiveRide()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:999px;padding:10px 15px;font-size:13px;font-weight:800;cursor:pointer;">Réduire</button>
     </div>
 
-    <div id="dl-status" style="display:inline-flex;align-self:flex-start;align-items:center;gap:9px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:800;margin-bottom:24px;">🚗 En route</div>
+    <div id="dl-status" style="display:inline-flex;align-self:flex-start;align-items:center;gap:9px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:9px 15px;font-size:13.5px;font-weight:800;margin-bottom:24px;"><span style="width:9px;height:9px;border-radius:50%;background:#7fb8ff;"></span>En route</div>
 
     <div style="display:flex;gap:14px;margin-bottom:24px;">
       <div style="display:flex;flex-direction:column;align-items:center;padding-top:8px;">
@@ -4424,10 +4476,16 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
         <div style="font-size:11px;color:var(--blue4);text-transform:uppercase;letter-spacing:.1em;font-weight:800;">Passager</div>
         <div id="dl-client" style="font-size:16px;font-weight:800;letter-spacing:-.01em;margin-top:3px;">—</div>
       </div>
-      <a id="dl-phone" href="#" style="background:#fff;color:var(--navy);border-radius:12px;padding:13px 16px;font-size:14px;font-weight:800;text-decoration:none;">📞 Appeler</a>
+      <div style="display:flex;gap:8px;flex-shrink:0;">
+        <a id="dl-wa" href="#" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:7px;background:#25D366;color:#04310f;border-radius:13px;padding:12px 15px;font-size:13.5px;font-weight:800;text-decoration:none;">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M17.5 14.4c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.2-1.4-.8-.7-1.3-1.6-1.5-1.9-.1-.3 0-.4.1-.6.1-.1.3-.4.5-.6.1-.2.2-.3.3-.5 0-.2 0-.3-.1-.5 0-.1-.6-1.6-.9-2.2-.2-.4-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.3.3-1 .9-1 2.3s1 2.7 1.1 2.9c.1.2 1.9 3 4.7 4.1 2.3.9 2.8.8 3.3.7.5-.1 1.6-.7 1.9-1.3.2-.6.2-1.2.2-1.3-.1-.1-.2-.2-.3-.3zM12 22a10 10 0 118.2-4.3L22 22l-4.4-1.4A9.9 9.9 0 0112 22z"/></svg>
+          WhatsApp</a>
+        <a id="dl-phone" href="#" style="background:#fff;color:var(--navy);border-radius:13px;padding:12px 15px;font-size:13.5px;font-weight:800;text-decoration:none;">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z"/></svg></a>
+      </div>
     </div>
 
-    <button id="dl-nav" style="width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:16px;padding:17px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:auto;">🗺 Lancer la navigation</button>
+    <button id="dl-nav" style="width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:16px;padding:17px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:auto;display:flex;align-items:center;justify-content:center;gap:10px;"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Lancer la navigation</button>
 
     <div id="dl-slide" style="margin-top:26px;"></div>
   </div>
