@@ -60,7 +60,7 @@ img,svg,iframe{max-width:100%;}
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
-#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on,#p-booking-choice.on,#p-new-password.on{display:flex;}
+#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on,#p-booking-choice.on,#p-new-password.on,#p-guest.on{display:flex;}
 input,select,textarea,button{font-family:var(--fb);}
 
 /* COMMUNS */
@@ -287,6 +287,10 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
+.open-ride{width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:9px;background:var(--ice);color:var(--blue2);border:1.5px solid var(--blue2);border-radius:13px;padding:14px;font-size:13.5px;font-weight:800;font-family:var(--fb);cursor:pointer;letter-spacing:-.01em;}
+.open-ride.live{background:var(--navy);color:#fff;border-color:var(--navy);box-shadow:0 10px 24px -14px rgba(6,20,43,.9);}
+.open-ride .or-dot{width:8px;height:8px;border-radius:50%;background:#7ee2a8;animation:orPulse 1.6s ease-in-out infinite;}
+@keyframes orPulse{0%,100%{box-shadow:0 0 0 0 rgba(126,226,168,.6);}50%{box-shadow:0 0 0 7px rgba(126,226,168,0);}}
 .slide{position:relative;height:64px;border-radius:18px;background:#fff;border:1.5px solid var(--border);overflow:hidden;margin-top:12px;touch-action:none;user-select:none;box-shadow:0 1px 2px rgba(8,20,40,.05);}
 .slide-fill{position:absolute;inset:0;width:0;background:linear-gradient(90deg,rgba(22,104,227,.06),rgba(22,104,227,.20));transition:width .18s;}
 .slide-arrows{position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;gap:1px;pointer-events:none;}
@@ -379,6 +383,7 @@ input,select,textarea,button{font-family:var(--fb);}
           <button id="lang-en" onclick="setLang('en')"><i>🇬🇧</i>EN</button>
         </div>
         <button class="hadmin" onclick="goClientSpace()">Mon espace</button>
+        <button class="hadmin" onclick="openLogin('driver')">Chauffeur</button>
         
       </div>
     </div>
@@ -481,6 +486,8 @@ input,select,textarea,button{font-family:var(--fb);}
     <div id="cl-err" class="err-box"></div>
     <button class="btn-p" onclick="clientLogin()">Se connecter</button>
     <button class="btn-o" onclick="go('p-client-register')">Créer un compte</button>
+    <div style="text-align:center;margin:14px 0 4px;font-size:12.5px;color:var(--muted);font-weight:700;">Réservé en invité, sans compte ?</div>
+    <button class="btn-o" onclick="go('p-guest')" style="margin-bottom:10px;">Accéder avec mon numéro de réservation</button>
     <button class="btn-navy" onclick="go('p-home')">← Retour à l'accueil</button>
   </div>
 </div>
@@ -744,6 +751,7 @@ input,select,textarea,button{font-family:var(--fb);}
 
     <div id="create-account-banner" style="display:none;background:#fff;border:1.5px solid var(--border2);border-radius:var(--r);padding:18px;margin-bottom:16px;text-align:left;box-shadow:var(--sh);">
       <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:6px;letter-spacing:-.02em;">Créez votre espace client</div>
+      <div style="font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:12px;">Sans compte, vous pourrez toujours retrouver cette course avec son numéro depuis <b onclick="go('p-guest')" style="color:var(--blue2);cursor:pointer;">Ma réservation</b>.</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5;font-weight:600;">Suivez vos courses, accédez à votre historique et réservez en un clic la prochaine fois.</div>
       <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;font-weight:600;">Vous recevrez un lien par e-mail pour choisir votre mot de passe.</div>
       <div id="cab-msg" style="display:none;border-radius:12px;padding:10px;font-size:13px;text-align:center;margin-bottom:10px;font-weight:700;"></div>
@@ -780,13 +788,30 @@ input,select,textarea,button{font-family:var(--fb);}
   </div>
 </div>
 
+
+<!-- ══ ACCÈS INVITÉ PAR RÉFÉRENCE ══ -->
+<div class="page" id="p-guest" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div class="login-card">
+    <div id="guest-lookup">
+      <div class="login-t">Ma réservation</div>
+      <div class="login-s">Retrouvez votre course sans créer de compte.</div>
+      <div class="field"><label>Numéro de réservation</label><input type="text" id="gu-ref" placeholder="YAN-123456" autocomplete="off" style="text-transform:uppercase;"></div>
+      <div class="field" style="margin-bottom:18px;"><label>Téléphone ou e-mail utilisé</label><input type="text" id="gu-id" placeholder="06 12 34 56 78" autocomplete="off"></div>
+      <div id="gu-err" class="err-box"></div>
+      <button class="btn-p" onclick="guestLookup()">Voir ma réservation</button>
+      <button class="btn-navy" onclick="go('p-home')" style="margin-top:10px;">← Retour à l'accueil</button>
+    </div>
+    <div id="guest-detail" style="display:none;"></div>
+  </div>
+</div>
+
 <!-- ══ ADMIN LOGIN ══ -->
 <div class="page" id="p-login" style="align-items:center;justify-content:center;padding:30px 20px;">
   <div class="login-card">
     <div class="login-ico"><svg viewBox="0 0 24 24" fill="none" stroke="#9DC6FF" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
     <div class="login-t">Yan Transport</div>
-    <div class="login-s">Accès sécurisé</div>
-    <div style="display:flex;background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:5px;margin-bottom:18px;">
+    <div class="login-s" id="login-sub">Accès sécurisé</div>
+    <div id="role-switch" style="display:none;background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:5px;margin-bottom:18px;">
       <button id="role-admin-btn" onclick="switchRole('admin')" style="flex:1;padding:11px;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;background:var(--navy);color:#fff;">Admin</button>
       <button id="role-driver-btn" onclick="switchRole('driver')" style="flex:1;padding:11px;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;background:transparent;color:var(--muted);">Chauffeur</button>
     </div>
@@ -1028,7 +1053,7 @@ input,select,textarea,button{font-family:var(--fb);}
   <div style="background:var(--navy);padding:0 16px 16px;display:flex;gap:8px;flex-shrink:0;">
     <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:13px 8px;text-align:center;">
       <div style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-.03em;" id="drv-st-pending">—</div>
-      <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;font-weight:700;">À accepter</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;font-weight:700;">À venir</div>
     </div>
     <div style="flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:13px 8px;text-align:center;">
       <div style="font-size:22px;font-weight:800;color:#FFB86B;letter-spacing:-.03em;" id="drv-st-ongoing">—</div>
@@ -1120,13 +1145,22 @@ function go(id){
 // ── ACCÈS ADMIN SECRET ──
 var secretCount = 0;
 var secretTimer = null;
+function openLogin(role){
+  switchRole(role);
+  var s=document.getElementById('login-sub');
+  if(s)s.textContent = role==='driver' ? 'Connectez-vous pour voir vos courses' : 'Accès sécurisé';
+  var t=document.querySelector('#p-login .login-t');
+  if(t)t.textContent = role==='driver' ? 'Espace chauffeur' : 'Administration';
+  go('p-login');
+}
+
 function secretTap(){
   secretCount++;
   clearTimeout(secretTimer);
   secretTimer = setTimeout(function(){ secretCount = 0; }, 3000);
   if(secretCount >= 5){
     secretCount = 0;
-    go('p-login');
+    openLogin('admin');
     toast('Accès admin');
   }
 }
@@ -1135,7 +1169,7 @@ function secretTap(){
 if(new URLSearchParams(window.location.search).has('admin')){
   window.history.replaceState({}, '', '/');
   window.addEventListener('load', function(){
-    setTimeout(function(){ go('p-login'); }, 400);
+    setTimeout(function(){ openLogin('admin'); }, 400);
   });
 }
 
@@ -4206,27 +4240,35 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     return w;
   }
 
-  /* ────────── REMPLACER LES BOUTONS PAR LE SLIDE ────────── */
+  /* ────────── CARTES : BOUTON D'OUVERTURE (le curseur vit en plein écran) ────────── */
   function enhance(){
     document.querySelectorAll('#p-driver .ride-card').forEach(function(card){
       if(card.dataset.sl)return;
       var refEl=card.querySelector('.rc-ref'); if(!refEl)return;
-      var r=drvFindRide(refEl.textContent.trim());
+      var ref=refEl.textContent.trim();
+      var r=drvFindRide(ref);
       if(!r||!r.status)return;
-      var step=nextStep(r);
-      if(!step)return;
+      if(['assigned','accepted','ongoing'].indexOf(r.status)<0)return;
       card.dataset.sl='1';
 
-      /* on retire les anciens boutons d'état */
+      /* les anciens boutons d'état (Accepter / Démarrer / Terminer) et la grille
+         de statut sont remplacés par le mode course plein écran */
       card.querySelectorAll('.da-btn').forEach(function(b){ b.remove(); });
       Array.prototype.slice.call(card.querySelectorAll('div')).forEach(function(d){
         if(d.textContent.indexOf('Mise à jour statut')===0)d.remove();
       });
       var row=card.querySelector('div[style*="border-top"]');
-      if(row&&!row.querySelector('button'))row.remove();
+      if(row&&!row.querySelector('button')&&!row.querySelector('a'))row.remove();
 
-      var anchor=card.querySelector('div[style*="border-top"]')||card;
-      anchor.parentNode.insertBefore(makeSlide(step),anchor.nextSibling);
+      var live=r.status==='ongoing';
+      var b=document.createElement('button');
+      b.className='open-ride'+(live?' live':'');
+      b.innerHTML=(live?'<span class="or-dot"></span>Course en cours · reprendre'
+                       :'Ouvrir la course')+
+        '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+      b.onclick=function(e){ e.stopPropagation(); openLiveRide(ref); };
+      var anchor=card.querySelector('div[style*="border-top"]')||card.lastElementChild;
+      card.appendChild(b);
     });
   }
   window.YT_enhanceDriver=enhance;
@@ -4290,7 +4332,7 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
       }
       if(gapTxt)html+='<div class="pl-gap'+(conflict||gapTxt.indexOf('seulement')>-1?' bad':'')+'">'+gapTxt+'</div>';
       html+='<div class="pl-row"><div class="pl-time">'+(r.time||'--:--')+'<i>'+hhmm(end)+'</i></div>'+
-        '<div class="pl-card'+(conflict?' conflict':(r.status==='done'?' free':''))+'">'+
+        '<div class="pl-card'+(conflict?' conflict':(r.status==='done'?' free':''))+'" onclick="openLiveRide(\''+r.ref+'\')" style="cursor:pointer;">'+
           '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:7px;">'+
             '<div style="font-size:12px;font-weight:800;color:var(--navy);">'+r.ref+'</div>'+
             '<div style="font-size:16px;font-weight:800;letter-spacing:-.02em;">'+fmt(r.price||0)+' €</div></div>'+
@@ -4300,9 +4342,9 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
             '<span class="chip">'+(r.km||'—')+' km · ~'+estMin(r)+' min</span>'+
             '<span class="chip">'+(r.name||'')+'</span></div>'+
           '<div style="display:flex;gap:7px;margin-top:9px;">'+
-            '<button onclick="openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" class="spbtn a" style="flex:1;padding:10px;">Naviguer</button>'+
-            '<a href="https://wa.me/'+waNum(r.phone)+'" target="_blank" rel="noopener" class="spbtn" style="flex:1;padding:10px;text-align:center;text-decoration:none;color:#128C4B;border-color:#a7e3c0;">WhatsApp</a>'+
-            '<a href="tel:'+(r.phone||'')+'" class="spbtn" style="flex:0 0 52px;padding:10px;text-align:center;text-decoration:none;">📞</a>'+
+            '<button onclick="event.stopPropagation();openNav(\''+encodeURIComponent(r.dropoff)+'\',\''+encodeURIComponent(r.pickup)+'\')" class="spbtn a" style="flex:1;padding:10px;">Naviguer</button>'+
+            '<a href="https://wa.me/'+waNum(r.phone)+'" target="_blank" rel="noopener" onclick="event.stopPropagation();" class="spbtn" style="flex:1;padding:10px;text-align:center;text-decoration:none;color:#128C4B;border-color:#a7e3c0;">WhatsApp</a>'+
+            '<a href="tel:'+(r.phone||'')+'" onclick="event.stopPropagation();" class="spbtn" style="flex:0 0 52px;padding:10px;text-align:center;text-decoration:none;">📞</a>'+
           '</div>'+
         '</div></div>';
     });
@@ -4357,10 +4399,36 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
       box.appendChild(s);
       if(r.message)box.insertAdjacentHTML('afterbegin','<div style="font-size:13px;color:rgba(255,255,255,.6);font-weight:600;margin-bottom:12px;">📝 '+r.message+'</div>');
     }
+    refreshBack(r);
     el('drv-live').style.display='block';
     document.documentElement.style.overflow='hidden';
     var bar=el('drv-resume'); if(bar)bar.style.display='none';
   };
+
+  var BACK={sur_place:['en_route','En route vers le client'],pickup:['sur_place','Sur place, en attente'],dropoff:['pickup','Client à bord']};
+
+  window.stepBack=function(){
+    var r=drvFindRide(liveRef); if(!r)return;
+    if(r.status==='ongoing'){
+      var ds=r.driver_status||'en_route';
+      if(BACK[ds]){
+        if(!confirm('Revenir à l\'étape « '+BACK[ds][1]+' » ?'))return;
+        updateDriverStatus(liveRef,BACK[ds][0]);
+        return;
+      }
+      if(!confirm('Annuler le démarrage de la course ? Elle repassera en « À venir ».'))return;
+      dAct(liveRef,'assigned');
+      setTimeout(closeLiveRide,600);
+    }
+  };
+
+  function refreshBack(r){
+    var b=el('dl-back'); if(!b)return;
+    if(r.status!=='ongoing'){ b.style.display='none'; return; }
+    var ds=r.driver_status||'en_route';
+    b.style.display='block';
+    b.textContent=BACK[ds]?'↩ Revenir à « '+BACK[ds][1]+' »':'↩ Annuler le démarrage de la course';
+  }
 
   window.closeLiveRide=function(){
     el('drv-live').style.display='none';
@@ -4488,7 +4556,142 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     <button id="dl-nav" style="width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:16px;padding:17px;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:auto;display:flex;align-items:center;justify-content:center;gap:10px;"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Lancer la navigation</button>
 
     <div id="dl-slide" style="margin-top:26px;"></div>
+    <button id="dl-back" onclick="stepBack()" style="display:none;width:100%;margin-top:12px;background:none;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.62);border-radius:13px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fb);">↩ Revenir à l'étape précédente</button>
   </div>
 </div>
+
+<script>
+/* ══ ACCÈS INVITÉ : consulter, modifier, annuler avec le n° de réservation ══ */
+(function(){
+  function el(id){return document.getElementById(id);}
+  var GR=null;
+  var SL={new:['À confirmer','#B45309'],assigned:['Confirmée','#1668E3'],accepted:['Confirmée','#1668E3'],
+          ongoing:['Chauffeur en route','#1668E3'],done:['Terminée','#15803D'],
+          cancelled:['Annulée','#C0342F'],noshow:['No-show','#C0342F'],
+          pending_payment:['En attente de paiement','#B45309'],payment_failed:['Paiement échoué','#C0342F']};
+
+  function norm(s){return String(s||'').toLowerCase().replace(/[^a-z0-9@.]/g,'');}
+
+  window.guestLookup=async function(){
+    var ref=(el('gu-ref').value||'').trim().toUpperCase();
+    var id=(el('gu-id').value||'').trim();
+    var err=el('gu-err');
+    err.style.display='none';
+    if(!ref||!id){ err.textContent='Renseignez votre numéro de réservation et votre téléphone ou e-mail.'; err.style.display='block'; return; }
+    if(ref.indexOf('YAN')!==0) ref='YAN-'+ref.replace(/^-/,'');
+    var res=await sb.from('bookings').select('*').eq('ref',ref).limit(1);
+    var r=(res.data||[])[0];
+    if(!r){ err.textContent='Aucune réservation trouvée avec ce numéro.'; err.style.display='block'; return; }
+    if(norm(r.phone).indexOf(norm(id))<0 && norm(r.email)!==norm(id)){
+      err.textContent='Le téléphone ou l\'e-mail ne correspond pas à cette réservation.'; err.style.display='block'; return;
+    }
+    GR=r;
+    renderGuest();
+  };
+
+  function row(label,value){
+    return '<div style="display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--off);">'+
+      '<span style="font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;">'+label+'</span>'+
+      '<span style="font-size:13.5px;font-weight:700;text-align:right;">'+value+'</span></div>';
+  }
+
+  function renderGuest(){
+    var r=GR, st=SL[r.status]||['—','#6B7A90'];
+    var editable=['new','assigned','accepted','pending_payment'].indexOf(r.status)>-1;
+    var html=
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;">'+
+        '<div class="login-t" style="margin:0;">'+r.ref+'</div>'+
+        '<span style="background:'+st[1]+'18;color:'+st[1]+';border-radius:999px;padding:6px 12px;font-size:11.5px;font-weight:800;">'+st[0]+'</span>'+
+      '</div>'+
+      '<div class="login-s" style="text-align:left;">'+(r.date?r.date.split('-').reverse().join('/'):'')+' à '+(r.time||'')+'</div>'+
+      row('Départ',r.pickup||'—')+row('Destination',r.dropoff||'—')+
+      row('Véhicule',(r.vehicle||'')+' · '+(r.pax||1)+' pax')+
+      row('Distance',(r.km||'—')+' km')+
+      row('Prix',fmt(r.price||0)+' €')+
+      row('Paiement',r.paid?'Payé en ligne':(r.payment_method==='account'?'En compte':'À bord'))+
+      (r.driver&&r.status!=='cancelled'?row('Chauffeur',r.driver):'')+
+      (r.message?row('Précisions',r.message):'');
+
+    if(r.status==='cancelled'){
+      html+='<div style="background:var(--red-bg);border:1px solid #ffcdd2;border-radius:12px;padding:13px;margin-top:16px;font-size:13px;font-weight:700;color:var(--red);">Cette réservation est annulée'+(r.cancel_reason?' — '+r.cancel_reason:'')+'.</div>';
+    } else if(editable){
+      html+='<button class="btn-p" style="margin-top:18px;" onclick="guestEdit()">Modifier ma réservation</button>'+
+            '<button class="btn-o" style="margin-top:10px;color:var(--red);border-color:#ffcdd2;" onclick="guestCancel()">Annuler cette réservation</button>';
+    } else if(r.status==='ongoing'){
+      html+='<div style="background:var(--ice);border:1px solid var(--blue3);border-radius:12px;padding:13px;margin-top:16px;font-size:13px;font-weight:700;color:var(--blue2);">Course en cours — contactez-nous au 06 XX XX XX XX pour toute question.</div>';
+    }
+    html+='<button class="btn-navy" style="margin-top:10px;" onclick="guestBack()">← Retour</button>';
+    el('guest-detail').innerHTML=html;
+    el('guest-detail').style.display='block';
+    el('guest-lookup').style.display='none';
+  }
+
+  window.guestBack=function(){
+    el('guest-detail').style.display='none';
+    el('guest-lookup').style.display='block';
+    GR=null;
+  };
+
+  window.guestEdit=function(){
+    var r=GR;
+    el('guest-detail').innerHTML=
+      '<div class="login-t">Modifier '+r.ref+'</div>'+
+      '<div class="login-s">Le tarif sera recalculé et reconfirmé par nos équipes si vous changez d\'adresse.</div>'+
+      '<div class="field"><label>Départ</label><input type="text" id="ge-pickup" value="'+(r.pickup||'').replace(/"/g,'&quot;')+'"></div>'+
+      '<div class="field"><label>Destination</label><input type="text" id="ge-dropoff" value="'+(r.dropoff||'').replace(/"/g,'&quot;')+'"></div>'+
+      '<div style="display:flex;gap:10px;">'+
+        '<div class="field" style="flex:1;"><label>Date</label><input type="date" id="ge-date" value="'+(r.date||'')+'"></div>'+
+        '<div class="field" style="flex:0 0 110px;"><label>Heure</label><input type="time" id="ge-time" value="'+(r.time||'')+'"></div>'+
+      '</div>'+
+      '<div class="field"><label>Téléphone</label><input type="tel" id="ge-phone" value="'+(r.phone||'')+'"></div>'+
+      '<div class="field" style="margin-bottom:18px;"><label>Précisions</label><textarea id="ge-msg" rows="2" style="width:100%;background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:600;resize:vertical;">'+(r.message||'')+'</textarea></div>'+
+      '<div id="ge-err" class="err-box"></div>'+
+      '<button class="btn-p" onclick="guestSave()">Enregistrer les modifications</button>'+
+      '<button class="btn-navy" style="margin-top:10px;" onclick="renderGuestBack()">Annuler</button>';
+    if(window.google&&google.maps&&google.maps.places){
+      ['ge-pickup','ge-dropoff'].forEach(function(id){
+        try{
+          var ac=new google.maps.places.Autocomplete(el(id),{componentRestrictions:{country:'fr'},fields:['formatted_address']});
+          ac.addListener('place_changed',function(){});
+        }catch(e){}
+      });
+    }
+  };
+  window.renderGuestBack=function(){ renderGuest(); };
+
+  window.guestSave=async function(){
+    var r=GR;
+    var up={
+      pickup:el('ge-pickup').value.trim(),
+      dropoff:el('ge-dropoff').value.trim(),
+      date:el('ge-date').value,
+      time:el('ge-time').value,
+      phone:el('ge-phone').value.trim(),
+      message:el('ge-msg').value.trim()
+    };
+    if(!up.pickup||!up.dropoff||!up.date||!up.time){
+      el('ge-err').textContent='Tous les champs de trajet sont obligatoires.';
+      el('ge-err').style.display='block'; return;
+    }
+    var addrChanged = up.pickup!==r.pickup || up.dropoff!==r.dropoff;
+    if(!confirm('Enregistrer ces modifications ?'+(addrChanged?'\n\nLe trajet a changé : le tarif sera revu par nos équipes.':''))) return;
+    if(addrChanged) up.status='new';
+    await sb.from('bookings').update(up).eq('ref',r.ref);
+    Object.assign(GR,up);
+    toast('Réservation modifiée');
+    renderGuest();
+  };
+
+  window.guestCancel=async function(){
+    var r=GR;
+    if(!confirm('Annuler définitivement la réservation '+r.ref+' ?')) return;
+    var why=prompt('Motif de l\'annulation (facultatif) :')||'Annulée par le client';
+    await sb.from('bookings').update({status:'cancelled',cancel_reason:why}).eq('ref',r.ref);
+    GR.status='cancelled'; GR.cancel_reason=why;
+    toast('Réservation annulée');
+    renderGuest();
+  };
+})();
+</script>
 </body>
 </html>
