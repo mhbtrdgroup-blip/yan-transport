@@ -109,7 +109,23 @@ input,select,textarea,button{font-family:var(--fb);}
 
 /* HOME */
 .hbar{background:var(--navy);padding:14px 16px;}
-.hinner{display:flex;align-items:center;gap:11px;}
+.hinner{display:flex;align-items:center;gap:11px;flex-wrap:nowrap;}
+.hname{white-space:nowrap;}
+.hadmin .sm{display:none;}
+@media(max-width:470px){
+  .hbar{padding:12px 13px;}
+  .hinner{gap:8px;}
+  .hname{font-size:13px;}
+  .hsub{display:none;}
+  .hadmin{padding:8px 10px;font-size:11.5px;}
+  .hadmin .lg{display:none;}
+  .hadmin .sm{display:inline;}
+  .langsw button{padding:7px 8px !important;font-size:0 !important;gap:0 !important;}
+  .langsw button i{font-size:14px;}
+}
+@media(max-width:430px){
+  .hbrand{display:none;}
+}
 .hname{font-family:var(--ft);font-size:15px;color:#fff;font-weight:800;line-height:1.1;letter-spacing:-.01em;}
 .hsub{font-size:10px;color:var(--blue4);letter-spacing:.16em;font-weight:700;text-transform:uppercase;margin-top:2px;}
 .hadmin{padding:8px 13px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.82);background:rgba(255,255,255,.06);}
@@ -295,6 +311,34 @@ input,select,textarea,button{font-family:var(--fb);}
 .fav.add{border-style:dashed;color:var(--blue2);border-color:var(--border2);}
 .fav b{font-weight:800;}
 .fav x{color:var(--muted);font-weight:700;font-style:normal;margin-left:2px;}
+.ca-seg{display:flex;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:13px;padding:4px;gap:3px;}
+.ca-seg button{flex:1;background:none;border:none;border-radius:10px;padding:9px 4px;font-family:var(--fb);font-size:12px;font-weight:800;color:rgba(255,255,255,.6);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ca-seg button.on{background:#fff;color:var(--navy);}
+.ca-mini{flex:1;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 6px;}
+.ca-mini b{display:block;font-family:var(--ft);font-size:17px;font-weight:800;color:#fff;letter-spacing:-.02em;}
+.ca-mini u{display:block;font-size:10px;font-weight:800;color:var(--blue4);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;margin-top:2px;}
+/* garage chauffeur */
+/* photos & avis */
+.ph-slot{position:relative;width:100%;aspect-ratio:16/10;background:var(--off);border:1.5px dashed var(--border2);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.ph-slot img{width:100%;height:100%;object-fit:cover;}
+.ph-slot span{font-size:12.5px;color:var(--muted);font-weight:700;text-align:center;padding:0 14px;line-height:1.4;}
+.ph-av{width:76px;height:76px;border-radius:50%;object-fit:cover;border:2.5px solid #fff;box-shadow:0 4px 12px -6px rgba(8,20,40,.4);background:var(--off);}
+.stars{display:flex;gap:5px;justify-content:center;}
+.stars button{background:none;border:none;padding:3px;cursor:pointer;line-height:0;-webkit-tap-highlight-color:transparent;}
+.stars svg{width:34px;height:34px;}
+.rv{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--sh);min-width:250px;flex:0 0 250px;scroll-snap-align:start;}
+.rv-q{font-size:13.5px;line-height:1.55;font-weight:600;color:var(--text);margin:9px 0 12px;}
+.rv-a{font-size:12px;font-weight:800;color:var(--muted);}
+.rv-row{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 8px;-webkit-overflow-scrolling:touch;}
+.rv-row::-webkit-scrollbar{display:none;}
+.veh-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.veh-card.on{border-color:var(--blue2);box-shadow:0 0 0 4px rgba(22,104,227,.1);}
+.veh-radio{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;}
+.veh-card.on .veh-radio{border-color:var(--blue2);background:var(--blue2);}
+.veh-card.on .veh-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#fff;}
+.veh-name{font-size:14.5px;font-weight:800;letter-spacing:-.02em;}
+.veh-meta{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+.veh-del{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 6px;flex-shrink:0;}
 .dp-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .dp-nav{width:46px;height:46px;flex-shrink:0;background:#fff;border:1.5px solid var(--border);border-radius:14px;font-size:20px;font-weight:800;color:var(--blue2);cursor:pointer;box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
 .dp-nav:active{background:var(--ice);}
@@ -403,13 +447,13 @@ input,select,textarea,button{font-family:var(--fb);}
   <div class="hbar">
     <div class="hinner">
       <img src="https://raw.githubusercontent.com/mhbtrdgroup-blip/yan-transport/main/logo.png" onclick="secretTap()" draggable="false" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;cursor:pointer;-webkit-user-select:none;user-select:none;">
-      <div><div class="hname">YAN TRANSPORT</div><div class="hsub">Service Privé</div></div>
+      <div class="hbrand"><div class="hname">YAN TRANSPORT</div><div class="hsub">Service Privé</div></div>
       <div style="margin-left:auto;display:flex;gap:6px;">
         <div class="langsw">
           <button id="lang-fr" onclick="setLang('fr')"><i>🇫🇷</i>FR</button>
           <button id="lang-en" onclick="setLang('en')"><i>🇬🇧</i>EN</button>
         </div>
-        <button class="hadmin" onclick="goClientSpace()">Mon espace</button>
+        <button class="hadmin" onclick="goClientSpace()"><span class="lg">Mon espace</span><span class="sm">Client</span></button>
         <button class="hadmin" onclick="openLogin('driver')">Chauffeur</button>
         
       </div>
@@ -486,6 +530,17 @@ input,select,textarea,button{font-family:var(--fb);}
       <div class="tile"><div style="font-size:15px;font-weight:800;color:var(--blue2);margin-bottom:8px;">02</div><div class="tile-t">Ponctualité</div><div class="tile-s">Toujours à l'heure</div></div>
       <div class="tile"><div style="font-size:15px;font-weight:800;color:var(--blue2);margin-bottom:8px;">03</div><div class="tile-t">Sécurité</div><div class="tile-s">Chauffeurs certifiés</div></div>
       <div class="tile"><div style="font-size:15px;font-weight:800;color:var(--blue2);margin-bottom:8px;">04</div><div class="tile-t">Suivi</div><div class="tile-s">Confirmation e-mail</div></div>
+    </div>
+
+    <div id="home-reviews" style="display:none;margin-bottom:24px;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:12px;">
+        <div>
+          <div style="font-family:var(--ft);font-size:20px;font-weight:800;letter-spacing:-.03em;">Ils nous ont fait confiance</div>
+          <div id="rv-agg" style="font-size:12.5px;color:var(--muted);font-weight:700;margin-top:3px;"></div>
+        </div>
+        <a href="https://g.page/r/Cfk80ClgisrGEBk/review" target="_blank" rel="noopener" style="font-size:12px;font-weight:800;color:var(--blue2);text-decoration:none;white-space:nowrap;">Voir sur Google →</a>
+      </div>
+      <div class="rv-row" id="rv-list"></div>
     </div>
 
     <div style="background:var(--navy);background-image:radial-gradient(90% 120% at 100% 0%,rgba(78,155,255,.3),transparent 60%);border-radius:22px;padding:26px 22px;text-align:center;">
@@ -1109,9 +1164,16 @@ input,select,textarea,button{font-family:var(--fb);}
     </div>
     <div id="drv-pan-done" style="display:none;padding:16px;">
       <div style="background:var(--navy);background-image:radial-gradient(90% 120% at 100% 0%,rgba(78,155,255,.3),transparent 60%);border-radius:18px;padding:20px;margin-bottom:16px;text-align:center;">
-        <div style="font-size:11px;letter-spacing:.12em;color:var(--blue4);text-transform:uppercase;margin-bottom:6px;font-weight:700;">Total gagné</div>
+        <div class="ca-seg">
+          <button type="button" class="on" data-per="day" onclick="drvPeriod('day')">Jour</button>
+          <button type="button" data-per="week" onclick="drvPeriod('week')">Semaine</button>
+          <button type="button" data-per="month" onclick="drvPeriod('month')">Mois</button>
+          <button type="button" data-per="year" onclick="drvPeriod('year')">Année</button>
+        </div>
+        <div style="font-size:11px;letter-spacing:.12em;color:var(--blue4);text-transform:uppercase;margin:14px 0 6px;font-weight:700;" id="drv-ca-label">Aujourd'hui</div>
         <div style="font-size:38px;color:#fff;font-weight:800;letter-spacing:-.035em;" id="drv-ca-total">0.00 €</div>
         <div style="font-size:12px;color:rgba(255,255,255,.45);margin-top:5px;font-weight:600;" id="drv-ca-count">0 course(s) terminée(s)</div>
+        <div id="drv-ca-extra" style="display:flex;gap:8px;margin-top:16px;"></div>
       </div>
       <div id="driver-rides-done"><div class="empty">Chargement…</div></div>
     </div>
@@ -1131,14 +1193,39 @@ input,select,textarea,button{font-family:var(--fb);}
     </div>
 
     <div id="drv-pan-vehicle" style="display:none;padding:16px;">
-      <div class="sec">Mon véhicule</div>
-      <div class="card">
+      <div class="sec">Ma photo</div>
+      <div class="card" style="display:flex;gap:14px;align-items:center;">
+        <img id="drv-photo-img" class="ph-av" alt="" style="display:none;">
+        <div id="drv-photo-empty" class="ph-av" style="display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#98A6BC" stroke-width="2" width="26" height="26"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;font-weight:800;letter-spacing:-.02em;margin-bottom:3px;">Rassurez vos clients</div>
+          <div style="font-size:12px;color:var(--muted);font-weight:600;line-height:1.45;margin-bottom:9px;">Votre photo s'affiche dès que la course vous est assignée.</div>
+          <button class="btn-o" style="padding:10px;font-size:12.5px;" onclick="document.getElementById('drv-photo-in').click()">Changer ma photo</button>
+          <input type="file" id="drv-photo-in" accept="image/*" style="display:none;" onchange="uploadDriverPhoto(this)">
+        </div>
+      </div>
+
+      <div class="sec">Mes véhicules</div>
+      <div style="font-size:12.5px;color:var(--muted);font-weight:600;margin:-6px 0 12px;">Sélectionnez celui que vous conduisez aujourd'hui : il apparaîtra sur vos courses.</div>
+      <div id="veh-list"></div>
+      <div class="card" style="margin-top:4px;">
+        <div style="font-size:13px;font-weight:800;letter-spacing:-.02em;margin-bottom:12px;">Ajouter un véhicule</div>
         <div class="field"><label>Marque & modèle</label><input type="text" id="drv-car" placeholder="Mercedes Classe E"></div>
         <div class="frow">
           <div class="field"><label>Immatriculation</label><input type="text" id="drv-plate" placeholder="AB-123-CD"></div>
           <div class="field"><label>Type</label><select id="drv-type"><option>Berline</option><option>Van</option></select></div>
         </div>
-        <button class="btn-o" onclick="saveVehicle()">Enregistrer mon véhicule</button>
+        <div class="field">
+          <label>Photo du véhicule</label>
+          <div class="ph-slot" onclick="document.getElementById('drv-vph-in').click()">
+            <img id="drv-vph-img" style="display:none;" alt="">
+            <span id="drv-vph-txt">Ajoutez une photo du véhicule<br>(facultatif)</span>
+          </div>
+          <input type="file" id="drv-vph-in" accept="image/*" style="display:none;" onchange="pickVehPhoto(this)">
+        </div>
+        <button class="btn-o" onclick="saveVehicle()">Ajouter ce véhicule</button>
       </div>
     </div>
   </div>
@@ -3034,12 +3121,7 @@ async function updateDriverStatus(ref, dStatus){
   await loadDriverRidesOngoing();
 }
 
-function saveVehicle(){
-  var c=document.getElementById('drv-car').value;
-  var p=document.getElementById('drv-plate').value;
-  if(!c||!p){toast('Complétez les infos');return;}
-  toast('Véhicule enregistré : '+c+' · '+p);
-}
+/* le garage est géré dans le module chauffeur (voir plus bas) */
 
 // ── TOAST ──
 function toast(msg){
@@ -4779,6 +4861,381 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     toast('Réservation annulée');
     renderGuest();
   };
+})();
+</script>
+
+<script>
+/* ══ GARAGE CHAUFFEUR + CHIFFRE D'AFFAIRES PAR PÉRIODE ══ */
+(function(){
+  function el(id){return document.getElementById(id);}
+  function key(){ return 'yt_veh_'+(currentDriverName||'x'); }
+
+  /* ────────── GARAGE ────────── */
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(key())||'{"list":[],"active":0}'); }
+    catch(e){ return {list:[],active:0}; }
+  }
+  function save(g){ localStorage.setItem(key(),JSON.stringify(g)); }
+
+  window.activeVehicle=function(){
+    var g=load();
+    return g.list[g.active]||null;
+  };
+
+  window.renderGarage=function(){
+    var box=el('veh-list'); if(!box)return;
+    var g=load();
+    if(!g.list.length){
+      box.innerHTML='<div class="card" style="text-align:center;padding:26px 18px;"><div style="font-size:14.5px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;">Aucun véhicule</div><div style="font-size:12.5px;color:var(--muted);font-weight:600;">Ajoutez votre premier véhicule ci-dessous.</div></div>';
+      return;
+    }
+    box.innerHTML=g.list.map(function(v,i){
+      return '<div class="veh-card'+(i===g.active?' on':'')+'" onclick="pickVehicle('+i+')">'+
+        '<div class="veh-radio"></div>'+
+        '<div style="flex:1;min-width:0;">'+
+          '<div class="veh-name">'+v.car+'</div>'+
+          '<div class="veh-meta">'+v.plate+' · '+v.type+(i===g.active?' · <b style="color:var(--blue2);">Actif</b>':'')+'</div>'+
+        '</div>'+
+        '<button class="veh-del" onclick="event.stopPropagation();delVehicle('+i+')" aria-label="Supprimer">×</button>'+
+      '</div>';
+    }).join('');
+  };
+
+  window.pickVehicle=function(i){
+    var g=load(); g.active=i; save(g);
+    renderGarage();
+    var v=g.list[i];
+    toast('Véhicule actif : '+v.car);
+    if(currentDriverName)sb.from('drivers').update({vehicle:v.car,plate:v.plate,vehicle_type:v.type}).eq('name',currentDriverName);
+  };
+
+  window.delVehicle=function(i){
+    var g=load();
+    if(!confirm('Supprimer '+g.list[i].car+' ?'))return;
+    g.list.splice(i,1);
+    if(g.active>=g.list.length)g.active=Math.max(0,g.list.length-1);
+    save(g); renderGarage(); toast('Véhicule supprimé');
+  };
+
+  window.saveVehicle=function(){
+    var c=(el('drv-car').value||'').trim();
+    var p=(el('drv-plate').value||'').trim().toUpperCase();
+    var t=el('drv-type').value;
+    if(!c||!p){ toast('Complétez marque et immatriculation'); return; }
+    var g=load();
+    if(g.list.some(function(v){return v.plate===p;})){ toast('Ce véhicule est déjà enregistré'); return; }
+    g.list.push({car:c,plate:p,type:t});
+    if(g.list.length===1)g.active=0;
+    save(g);
+    el('drv-car').value=''; el('drv-plate').value='';
+    renderGarage();
+    toast('Véhicule ajouté');
+  };
+
+  /* ────────── CA PAR PÉRIODE ────────── */
+  var PER='day';
+  var LBL={day:"Aujourd'hui",week:'Cette semaine',month:'Ce mois',year:'Cette année'};
+
+  function range(p){
+    var n=new Date(), s=new Date(n);
+    if(p==='day'){}
+    else if(p==='week'){ s.setDate(n.getDate()-((n.getDay()+6)%7)); }
+    else if(p==='month'){ s=new Date(n.getFullYear(),n.getMonth(),1); }
+    else { s=new Date(n.getFullYear(),0,1); }
+    return [s.toISOString().slice(0,10), n.toISOString().slice(0,10)];
+  }
+
+  window.drvPeriod=function(p){
+    PER=p;
+    document.querySelectorAll('.ca-seg button').forEach(function(b){
+      b.classList.toggle('on', b.dataset.per===p);
+    });
+    var l=el('drv-ca-label'); if(l)l.textContent=LBL[p];
+    refresh();
+  };
+
+  async function refresh(){
+    if(!currentDriverName)return;
+    var caEl=el('drv-ca-total'), cnt=el('drv-ca-count'), ex=el('drv-ca-extra');
+    if(!caEl)return;
+    var r=range(PER);
+    var res=await sb.from('bookings').select('price,km,date').eq('driver',currentDriverName)
+      .eq('status','done').gte('date',r[0]).lte('date',r[1]);
+    var rows=res.data||[];
+    var ca=rows.reduce(function(a,x){return a+(parseFloat(x.price)||0);},0);
+    var km=rows.reduce(function(a,x){return a+(parseFloat(x.km)||0);},0);
+    caEl.textContent=fmt(ca)+' €';
+    cnt.textContent=rows.length+' course'+(rows.length>1?'s':'')+' terminée'+(rows.length>1?'s':'');
+    if(ex){
+      var moy=rows.length?ca/rows.length:0;
+      ex.innerHTML=
+        '<div class="ca-mini"><b>'+fmt(moy)+' €</b><u>Panier moyen</u></div>'+
+        '<div class="ca-mini"><b>'+Math.round(km)+'</b><u>km parcourus</u></div>'+
+        (km?'<div class="ca-mini"><b>'+(ca/km).toFixed(2)+' €</b><u>par km</u></div>':'');
+    }
+  }
+  window.YT_refreshCA=refresh;
+
+  /* la liste des courses terminées ne réécrit plus le total */
+  var _done=window.loadDriverRidesDone;
+  window.loadDriverRidesDone=async function(){
+    var out=await _done.apply(this,arguments);
+    refresh();
+    return out;
+  };
+
+  var _drvTabV=window.drvTab;
+  window.drvTab=function(t){
+    _drvTabV(t);
+    if(t==='vehicle')renderGarage();
+    if(t==='done')drvPeriod(PER);
+  };
+
+  /* véhicule actif visible en plein écran */
+  var _openLive=window.openLiveRide;
+  window.openLiveRide=function(ref){
+    _openLive(ref);
+    var v=activeVehicle();
+    var chips=el('dl-chips');
+    if(v&&chips)chips.insertAdjacentHTML('beforeend',
+      '<span style="background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;">'+v.car+' · '+v.plate+'</span>');
+  };
+})();
+</script>
+
+<script>
+/* ══ CONFIANCE CLIENT : photos, notes, avis Google ══ */
+(function(){
+  function el(id){return document.getElementById(id);}
+  /* ⚠ à remplacer par votre vrai lien d'avis Google Business */
+  var GOOGLE_REVIEW='https://g.page/r/Cfk80ClgisrGEBk/review';
+
+  /* ────────── REDIMENSIONNEMENT IMAGE ────────── */
+  function shrink(file,max,cb){
+    var fr=new FileReader();
+    fr.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var s=Math.min(1,max/Math.max(im.width,im.height));
+        var c=document.createElement('canvas');
+        c.width=Math.round(im.width*s); c.height=Math.round(im.height*s);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        cb(c.toDataURL('image/jpeg',0.78));
+      };
+      im.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+
+  /* ────────── PHOTO DU CHAUFFEUR ────────── */
+  function pkey(){ return 'yt_dphoto_'+(currentDriverName||'x'); }
+
+  window.uploadDriverPhoto=function(inp){
+    if(!inp.files||!inp.files[0])return;
+    shrink(inp.files[0],320,async function(d){
+      localStorage.setItem(pkey(),d);
+      showDriverPhoto(d);
+      if(currentDriverName){
+        try{ await sb.from('drivers').update({photo:d}).eq('name',currentDriverName); }catch(e){}
+      }
+      toast('Photo enregistrée');
+    });
+  };
+
+  function showDriverPhoto(d){
+    var i=el('drv-photo-img'), e=el('drv-photo-empty');
+    if(!i)return;
+    if(d){ i.src=d; i.style.display='block'; if(e)e.style.display='none'; }
+    else { i.style.display='none'; if(e)e.style.display='flex'; }
+  }
+
+  /* ────────── PHOTO DU VÉHICULE ────────── */
+  var pendingVph=null;
+  window.pickVehPhoto=function(inp){
+    if(!inp.files||!inp.files[0])return;
+    shrink(inp.files[0],640,function(d){
+      pendingVph=d;
+      el('drv-vph-img').src=d;
+      el('drv-vph-img').style.display='block';
+      el('drv-vph-txt').style.display='none';
+    });
+  };
+
+  var _saveVeh=window.saveVehicle;
+  window.saveVehicle=function(){
+    var before=(JSON.parse(localStorage.getItem('yt_veh_'+(currentDriverName||'x'))||'{"list":[]}').list||[]).length;
+    _saveVeh();
+    var k='yt_veh_'+(currentDriverName||'x');
+    var g=JSON.parse(localStorage.getItem(k)||'{"list":[],"active":0}');
+    if(g.list.length>before&&pendingVph){
+      g.list[g.list.length-1].photo=pendingVph;
+      localStorage.setItem(k,JSON.stringify(g));
+      renderGarage();
+      pendingVph=null;
+      el('drv-vph-img').style.display='none';
+      el('drv-vph-txt').style.display='block';
+      el('drv-vph-in').value='';
+    }
+  };
+
+  var _pick=window.pickVehicle;
+  window.pickVehicle=function(i){
+    _pick(i);
+    var v=activeVehicle();
+    if(v&&currentDriverName){
+      try{ sb.from('drivers').update({vehicle_photo:v.photo||null}).eq('name',currentDriverName); }catch(e){}
+    }
+  };
+
+  var _garage=window.renderGarage;
+  window.renderGarage=function(){
+    _garage();
+    showDriverPhoto(localStorage.getItem(pkey()));
+    document.querySelectorAll('#veh-list .veh-card').forEach(function(c,i){
+      var g=JSON.parse(localStorage.getItem('yt_veh_'+(currentDriverName||'x'))||'{"list":[]}');
+      var v=g.list[i];
+      if(v&&v.photo){
+        c.insertAdjacentHTML('afterbegin','<img src="'+v.photo+'" alt="" style="width:56px;height:42px;border-radius:9px;object-fit:cover;flex-shrink:0;">');
+      }
+    });
+  };
+
+  /* ────────── CARTE CHAUFFEUR CÔTÉ CLIENT ────────── */
+  var dcache={};
+  async function driverInfo(name){
+    if(!name)return null;
+    if(dcache[name]!==undefined)return dcache[name];
+    try{
+      var r=await sb.from('drivers').select('name,phone,vehicle,plate,photo,vehicle_photo,rating').eq('name',name).limit(1);
+      dcache[name]=(r.data||[])[0]||null;
+    }catch(e){ dcache[name]=null; }
+    return dcache[name];
+  }
+
+  window.YT_enrichDriverCards=async function(){
+    var cards=document.querySelectorAll('[id^="drv-tel-"]');
+    for(var k=0;k<cards.length;k++){
+      var box=cards[k].parentNode;
+      if(box.dataset.rich)continue;
+      var ref=cards[k].id.replace('drv-tel-','');
+      var r=(window._clientRidesCache||[]).find(function(x){return x.ref===ref;});
+      if(!r)continue;
+      var d=await driverInfo(r.driver);
+      if(!d)continue;
+      box.dataset.rich='1';
+      var av=box.querySelector('div[style*="border-radius:50%"]');
+      if(d.photo&&av){
+        av.outerHTML='<img src="'+d.photo+'" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0;">';
+      }
+      if(d.vehicle_photo){
+        box.parentNode.insertAdjacentHTML('beforeend',
+          '<img src="'+d.vehicle_photo+'" alt="Véhicule" style="width:100%;margin-top:9px;border-radius:11px;aspect-ratio:16/9;object-fit:cover;">');
+      }
+    }
+  };
+
+  /* ────────── NOTER LA COURSE ────────── */
+  function star(f){
+    return '<svg viewBox="0 0 24 24" fill="'+(f?'#F5A524':'none')+'" stroke="'+(f?'#F5A524':'#C7D0DD')+'" stroke-width="1.8" stroke-linejoin="round"><polygon points="12 2.6 15 9 22 9.9 17 14.7 18.3 21.6 12 18.2 5.7 21.6 7 14.7 2 9.9 9 9"/></svg>';
+  }
+
+  window.YT_rateBlocks=function(){
+    (window._clientRidesCache||[]).forEach(function(r){
+      if(r.status!=='done'||r.rating)return;
+      var card=document.getElementById('rate-'+r.ref);
+      if(card||!document.querySelector('.client-ride-card'))return;
+    });
+  };
+
+  window.setStars=function(ref,n){
+    var box=el('rate-'+ref); if(!box)return;
+    box.dataset.n=n;
+    box.querySelectorAll('.stars button').forEach(function(b,i){ b.innerHTML=star(i<n); });
+    var s=el('rate-send-'+ref); if(s)s.style.display='block';
+  };
+
+  window.sendRating=async function(ref){
+    var box=el('rate-'+ref);
+    var n=parseInt(box.dataset.n||0);
+    if(!n){ toast('Choisissez une note'); return; }
+    var txt=(el('rate-txt-'+ref).value||'').trim();
+    await sb.from('bookings').update({rating:n,review:txt}).eq('ref',ref);
+    var r=(window._clientRidesCache||[]).find(function(x){return x.ref===ref;});
+    if(r){ r.rating=n; r.review=txt; }
+    if(n>=4){
+      box.innerHTML='<div style="text-align:center;"><div style="font-size:13.5px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px;">Merci pour votre '+n+'/5 !</div>'+
+        '<div style="font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.45;margin-bottom:12px;">Un avis Google nous aide énormément.</div>'+
+        '<a href="'+GOOGLE_REVIEW+'" target="_blank" rel="noopener" style="display:block;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:13px;font-weight:800;color:var(--text);text-decoration:none;">Laisser un avis sur Google</a></div>';
+    } else {
+      box.innerHTML='<div style="text-align:center;font-size:13px;font-weight:700;color:var(--muted);line-height:1.5;">Merci pour votre retour. Nous vous recontactons pour comprendre ce qui n\'a pas fonctionné.</div>';
+    }
+  };
+
+  window.YT_injectRating=function(){
+    (window._clientRidesCache||[]).forEach(function(r){
+      if(r.status!=='done')return;
+      var btn=document.querySelector('[onclick*="downloadClientInvoice(\''+r.ref+'\')"]');
+      if(!btn)return;
+      var card=btn.closest('.client-ride-card');
+      if(!card||card.dataset.rated)return;
+      card.dataset.rated='1';
+      if(r.rating){
+        var f='';
+        for(var i=0;i<5;i++)f+='<span style="color:'+(i<r.rating?'#F5A524':'#C7D0DD')+';">★</span>';
+        card.insertAdjacentHTML('beforeend','<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--off);font-size:12px;font-weight:700;color:var(--muted);">Votre note : '+f+'</div>');
+        return;
+      }
+      card.insertAdjacentHTML('beforeend',
+        '<div id="rate-'+r.ref+'" data-n="0" style="margin-top:12px;padding:14px;background:var(--off);border-radius:14px;">'+
+          '<div style="font-size:13px;font-weight:800;letter-spacing:-.02em;text-align:center;margin-bottom:10px;">Comment s\'est passée votre course ?</div>'+
+          '<div class="stars">'+[1,2,3,4,5].map(function(n){
+            return '<button onclick="setStars(\''+r.ref+'\','+n+')">'+star(false)+'</button>';
+          }).join('')+'</div>'+
+          '<div id="rate-send-'+r.ref+'" style="display:none;margin-top:12px;">'+
+            '<textarea id="rate-txt-'+r.ref+'" rows="2" placeholder="Un mot sur votre chauffeur (facultatif)" style="width:100%;background:#fff;border:1.5px solid var(--border);border-radius:11px;padding:11px;font-size:13px;font-weight:600;font-family:var(--fb);resize:vertical;"></textarea>'+
+            '<button class="btn-p" style="margin-top:9px;" onclick="sendRating(\''+r.ref+'\')">Envoyer ma note</button>'+
+          '</div>'+
+        '</div>');
+    });
+  };
+
+  /* ────────── AVIS SUR L'ACCUEIL ────────── */
+  async function loadReviews(){
+    var box=el('rv-list'), wrap=el('home-reviews'), agg=el('rv-agg');
+    if(!box)return;
+    var res;
+    try{
+      res=await sb.from('bookings').select('name,rating,review,pickup,dropoff,date')
+        .gte('rating',4).not('review','is',null).order('date',{ascending:false}).limit(12);
+    }catch(e){ return; }
+    var rows=(res.data||[]).filter(function(r){return (r.review||'').trim().length>12;});
+    if(!rows.length)return;
+    var allRes=await sb.from('bookings').select('rating').gte('rating',1);
+    var all=allRes.data||[];
+    var avg=all.reduce(function(a,x){return a+x.rating;},0)/(all.length||1);
+    agg.innerHTML='<span style="color:#F5A524;">★</span> '+avg.toFixed(1)+' sur '+all.length+' avis clients';
+    box.innerHTML=rows.map(function(r){
+      var st=''; for(var i=0;i<5;i++)st+='<span style="color:'+(i<r.rating?'#F5A524':'#C7D0DD')+';font-size:13px;">★</span>';
+      var nm=(r.name||'Client').split(' ')[0];
+      return '<div class="rv"><div>'+st+'</div><div class="rv-q">« '+r.review.replace(/</g,'&lt;')+' »</div>'+
+        '<div class="rv-a">'+nm+' · '+(r.pickup||'').split(',')[0]+' → '+(r.dropoff||'').split(',')[0]+'</div></div>';
+    }).join('');
+    wrap.style.display='block';
+    document.querySelectorAll('#home-reviews a').forEach(function(a){ a.href=GOOGLE_REVIEW; });
+  }
+  setTimeout(loadReviews,1200);
+
+  /* hooks */
+  var _lcr=window.loadClientRides;
+  if(typeof _lcr==='function'){
+    window.loadClientRides=async function(){
+      var out=await _lcr.apply(this,arguments);
+      setTimeout(function(){ YT_injectRating(); YT_enrichDriverCards(); },250);
+      return out;
+    };
+  }
+  var _drvTabP=window.drvTab;
+  window.drvTab=function(t){ _drvTabP(t); if(t==='vehicle')showDriverPhoto(localStorage.getItem(pkey())); };
 })();
 </script>
 </body>
