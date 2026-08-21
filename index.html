@@ -4,12 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#06142B">
-<style>html,body{touch-action:pan-y;-webkit-text-size-adjust:100%;}</style>
+<style>
+html,body{-webkit-text-size-adjust:100%;touch-action:manipulation;}
+.hbar,.hinner,.hadmin,.langsw,.langsw button{position:relative;z-index:20;}
+.hbar{pointer-events:auto;}
+</style>
 <script>
 document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
 document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});
-document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});
-(function(){var last=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-last<320){e.preventDefault();}last=n;},{passive:false});})();
+document.addEventListener('touchmove',function(e){if(e.touches.length>1&&e.cancelable)e.preventDefault();},{passive:false});
+(function(){
+  var last=0;
+  document.addEventListener('touchend',function(e){
+    var n=Date.now();
+    /* on ne bloque jamais un élément interactif : sinon iOS annule le clic */
+    var t=e.target.closest&&e.target.closest('button,a,input,select,textarea,label,[onclick],[role="button"],.dp-day,.veh-card,.pl-card,.ride-card,.client-ride-card,.slide,.stat-b,.tile,.chip,.atab,.langsw,.hadmin');
+    if(!t && n-last<320) e.preventDefault();
+    last=n;
+  },{passive:false});
+})();
 document.addEventListener('wheel',function(e){if(e.ctrlKey)e.preventDefault();},{passive:false});
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1300,8 +1313,8 @@ function openLogin(role){
 function secretTap(){
   secretCount++;
   clearTimeout(secretTimer);
-  secretTimer = setTimeout(function(){ secretCount = 0; }, 3000);
-  if(secretCount >= 5){
+  secretTimer = setTimeout(function(){ secretCount = 0; }, 5000);
+  if(secretCount >= 4){
     secretCount = 0;
     openLogin('admin');
     toast('Accès admin');
@@ -5465,6 +5478,50 @@ window.adminFinishRide=async function(ref){
       return out;
     };
   });
+})();
+</script>
+
+<script>
+/* ══ ACCÈS ADMIN : appui long sur le logo (plus fiable que les 5 taps) ══ */
+(function(){
+  var logo=document.querySelector('#p-home .hinner img');
+  if(!logo)return;
+  var timer=null, ring=null, fired=false;
+
+  function start(){
+    fired=false;
+    clearTimeout(timer);
+    /* anneau de progression autour du logo */
+    ring=document.createElement('div');
+    ring.style.cssText='position:absolute;inset:-5px;border-radius:50%;border:2.5px solid rgba(127,184,255,.9);clip-path:inset(0 0 100% 0);transition:clip-path 1.2s linear;pointer-events:none;';
+    logo.parentNode.style.position='relative';
+    logo.parentNode.appendChild(ring);
+    requestAnimationFrame(function(){ ring.style.clipPath='inset(0 0 0 0)'; });
+    timer=setTimeout(function(){
+      fired=true;
+      if(navigator.vibrate)navigator.vibrate(40);
+      cleanup();
+      openLogin('admin');
+      toast('Accès administrateur');
+    },1200);
+  }
+  function cleanup(){
+    clearTimeout(timer);
+    if(ring){ ring.remove(); ring=null; }
+  }
+  function cancel(e){
+    if(fired&&e){ e.preventDefault(); e.stopPropagation(); }
+    cleanup();
+  }
+
+  logo.addEventListener('touchstart',start,{passive:true});
+  logo.addEventListener('touchend',cancel);
+  logo.addEventListener('touchcancel',cancel);
+  logo.addEventListener('touchmove',cancel);
+  logo.addEventListener('mousedown',start);
+  logo.addEventListener('mouseup',cancel);
+  logo.addEventListener('mouseleave',cancel);
+  logo.addEventListener('contextmenu',function(e){ e.preventDefault(); });
 })();
 </script>
 </body>
