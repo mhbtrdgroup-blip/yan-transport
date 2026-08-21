@@ -68,7 +68,7 @@ img,svg,iframe{max-width:100%;}
 .page.on{display:block;}
 .page.flex{display:none;flex-direction:column;}
 .page.flex.on{display:flex;}
-#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on,#p-booking-choice.on,#p-new-password.on,#p-guest.on{display:flex;}
+#p-login.on,#p-success.on,#p-client-login.on,#p-client-register.on,#p-reset.on,#p-booking-choice.on,#p-new-password.on,#p-guest.on,#p-rate.on{display:flex;}
 input,select,textarea,button{font-family:var(--fb);}
 
 /* COMMUNS */
@@ -887,6 +887,15 @@ input,select,textarea,button{font-family:var(--fb);}
   </div>
 </div>
 
+
+<!-- ══ NOTATION PAR LIEN E-MAIL ══ -->
+<div class="page" id="p-rate" style="align-items:center;justify-content:center;padding:30px 20px;">
+  <div class="login-card" id="rate-card">
+    <div class="login-t">Votre course</div>
+    <div class="login-s">Chargement…</div>
+  </div>
+</div>
+
 <!-- ══ ADMIN LOGIN ══ -->
 <div class="page" id="p-login" style="align-items:center;justify-content:center;padding:30px 20px;">
   <div class="login-card">
@@ -1033,12 +1042,18 @@ input,select,textarea,button{font-family:var(--fb);}
 
     <!-- PLANNING -->
     <div id="pan-p" style="display:none;padding:16px;">
-      <div class="card" style="display:flex;gap:10px;align-items:flex-end;">
-        <div class="field" style="flex:1;margin-bottom:0;"><label>Journée</label><input type="date" id="plan-date" onchange="renderPlanning()"></div>
-        <button onclick="planShift(-1)" style="background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;color:var(--muted);">‹</button>
-        <button onclick="planShift(1)" style="background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:13px 15px;font-size:15px;font-weight:800;cursor:pointer;color:var(--muted);">›</button>
+      <div class="dp-head">
+        <button type="button" class="dp-nav" onclick="planShift(-7)" aria-label="Semaine précédente">‹</button>
+        <div style="flex:1;text-align:center;">
+          <div class="dp-month" id="plan-month">—</div>
+          <button type="button" class="dp-today" onclick="planToday()">Aujourd'hui</button>
+        </div>
+        <button type="button" class="dp-nav" onclick="planShift(7)" aria-label="Semaine suivante">›</button>
       </div>
-      <div id="plan-summary" style="display:flex;gap:8px;margin-bottom:14px;"></div>
+      <div class="dp-strip" id="plan-strip"></div>
+      <input type="date" id="plan-date" onchange="renderPlanning()" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+      <div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px;" id="plan-drivers"></div>
+      <div id="plan-summary" style="display:flex;gap:8px;margin-bottom:16px;"></div>
       <div id="plan-body"></div>
     </div>
 
@@ -2124,6 +2139,7 @@ function renderRides(){
         (r.status==='done'?'<button onclick="generateInvoice(\''+r.ref+'\')" style="flex:1;background:var(--green-bg);color:var(--green);border:1px solid var(--green);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">📄 Facture</button>':'')+
         (sa?'<button onclick="cancelRideConfirm(\''+r.ref+'\')" style="flex:1;background:transparent;color:var(--red);border:1px solid #ffcdd2;padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">Annuler</button>':'')+
         (sa?'<button onclick="markNoShowConfirm(\''+r.ref+'\')" style="flex:1;background:transparent;color:var(--orange);border:1px solid #ffe0b2;padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">No-show</button>':'')+
+        (r.status==='ongoing'||r.status==='assigned'||r.status==='accepted'?'<button onclick="adminFinishRide(\''+r.ref+'\')" style="flex:1;background:var(--green);color:#fff;border:1px solid var(--green);padding:8px;font-size:10px;font-weight:700;border-radius:9px;cursor:pointer;font-family:var(--fb);">✓ Terminer</button>':'')+
       '</div>'+
       (r.status==='cancelled'||r.status==='noshow'?
         '<div style="margin-top:8px;padding:10px;background:var(--red-bg);border:1px solid #ffcdd2;border-radius:10px;">'+
@@ -4025,18 +4041,70 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
     i.value=new Date(base.getTime()+d*86400000).toISOString().slice(0,10);
     renderPlanning();
   };
+  window.planToday=function(){
+    var i=el('plan-date'); if(!i)return;
+    i.value=new Date().toISOString().slice(0,10);
+    renderPlanning();
+  };
+  window.planGo=function(iso){
+    var i=el('plan-date'); if(!i)return;
+    i.value=iso; renderPlanning();
+  };
+  var planDriver='all';
+  window.planFilterDriver=function(d){ planDriver=d; renderPlanning(); };
+
+  function planStrip(day){
+    var strip=el('plan-strip'), mo=el('plan-month');
+    if(!strip)return;
+    var d0=new Date(day+'T00:00:00'), dow=(d0.getDay()+6)%7;
+    var mon=new Date(d0.getTime()-dow*86400000);
+    var today=new Date().toISOString().slice(0,10);
+    var N=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+    var all=(window.ridesCache||[]).filter(function(r){return r.status!=='cancelled'&&r.status!=='noshow';});
+    var html='';
+    for(var k=0;k<7;k++){
+      var d=new Date(mon.getTime()+k*86400000);
+      var iso=d.toISOString().slice(0,10);
+      var n=all.filter(function(r){return r.date===iso;}).length;
+      var off=(typeof offDates!=='undefined'&&offDates.has)?offDates.has(iso):false;
+      var dots=''; for(var j=0;j<Math.min(n,3);j++)dots+='<s></s>';
+      html+='<div class="dp-day'+(iso===day?' sel':(iso===today?' today':''))+'" onclick="planGo(\''+iso+'\')" style="'+(off?'opacity:.5;':'')+'">'+
+        '<u>'+N[k]+'</u><b>'+d.getDate()+'</b><i>'+dots+'</i></div>';
+    }
+    strip.innerHTML=html;
+    if(mo)mo.textContent=d0.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})+(
+      (typeof offDates!=='undefined'&&offDates.has&&offDates.has(day))?' · jour bloqué':'');
+  }
+
   window.renderPlanning=function(){
     var i=el('plan-date'); if(!i)return;
     if(!i.value)i.value=new Date().toISOString().slice(0,10);
     var day=i.value;
-    var rides=(window.ridesCache||[]).filter(function(r){return r.date===day&&r.status!=='cancelled'&&r.status!=='noshow';})
+    planStrip(day);
+    var dayAll=(window.ridesCache||[]).filter(function(r){return r.date===day&&r.status!=='cancelled'&&r.status!=='noshow';});
+    var names=[];
+    dayAll.forEach(function(r){ if(r.driver&&names.indexOf(r.driver)<0)names.push(r.driver); });
+    var fb=el('plan-drivers');
+    if(fb){
+      if(names.length>1){
+        fb.style.display='flex';
+        fb.innerHTML=['all'].concat(names).map(function(d){
+          return '<button onclick="planFilterDriver(\''+d+'\')" style="flex-shrink:0;background:'+(planDriver===d?'var(--navy)':'#fff')+';color:'+(planDriver===d?'#fff':'var(--muted)')+';border:1.5px solid '+(planDriver===d?'var(--navy)':'var(--border)')+';border-radius:999px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--fb);">'+(d==='all'?'Tous':d)+'</button>';
+        }).join('');
+      } else { fb.style.display='none'; planDriver='all'; }
+    }
+    var isToday=day===new Date().toISOString().slice(0,10);
+    var rides=dayAll.filter(function(r){return planDriver==='all'||r.driver===planDriver;})
       .sort(function(a,b){return toMin(a.time)-toMin(b.time);});
     var ca=rides.reduce(function(s,r){return s+(parseFloat(r.price)||0);},0);
     var conflicts=0;
     var body=el('plan-body'), sum=el('plan-summary');
     if(!rides.length){
       sum.innerHTML='';
-      body.innerHTML='<div class="empty">Aucune course ce jour-là.</div>';
+      var blocked=(typeof offDates!=='undefined'&&offDates.has)?offDates.has(day):false;
+      body.innerHTML='<div class="card" style="text-align:center;padding:30px 20px;">'+
+        '<div style="font-size:15px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;">'+(blocked?'Journée bloquée':(isToday?'Journée libre':'Aucune course ce jour-là'))+'</div>'+
+        '<div style="font-size:13px;color:var(--muted);font-weight:600;line-height:1.5;">'+(blocked?'Les clients ne peuvent pas réserver ce jour.':'Les annulations et no-shows ne sont pas affichés ici.')+'</div></div>';
       return;
     }
     var html='';
@@ -4052,9 +4120,15 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
         else if(gap<30&&sameDriver){gapTxt='⚠ Seulement '+gap+' min de battement';}
         else gapTxt=Math.floor(gap/60)+'h'+String(gap%60).padStart(2,'0')+' de battement';
       }
+      if(isToday){
+        var nowM=new Date().getHours()*60+new Date().getMinutes();
+        var prevStart=prev?toMin(prev.time):-1;
+        if(nowM<start&&nowM>prevStart)
+          html+='<div class="dp-now"><b>Maintenant '+hhmm(nowM)+'</b><span></span></div>';
+      }
       if(gapTxt)html+='<div class="pl-gap'+(conflict||gapTxt.indexOf('Seulement')>-1?' bad':'')+'">'+gapTxt+'</div>';
       html+='<div class="pl-row"><div class="pl-time">'+(r.time||'--:--')+'<i>'+hhmm(end)+'</i></div>'+
-        '<div class="pl-card'+(conflict?' conflict':(r.driver?'':' free'))+'">'+
+        '<div class="pl-card'+(conflict?' conflict':(r.driver?'':' free'))+'" onclick="showRideDetails(\''+r.ref+'\')" style="cursor:pointer;">'+
           '<div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;margin-bottom:7px;">'+
             '<div style="font-size:12px;font-weight:800;color:var(--navy);">'+r.ref+'</div>'+
             '<div style="font-size:16px;font-weight:800;letter-spacing:-.02em;">'+fmt(r.price||0)+' €</div></div>'+
@@ -5236,6 +5310,126 @@ sb.channel('bookings').on('postgres_changes',{event:'*',schema:'public',table:'b
   }
   var _drvTabP=window.drvTab;
   window.drvTab=function(t){ _drvTabP(t); if(t==='vehicle')showDriverPhoto(localStorage.getItem(pkey())); };
+})();
+</script>
+
+<script>
+/* ══ ADMIN : terminer une course à la place du chauffeur ══ */
+window.adminFinishRide=async function(ref){
+  var r=(window.ridesCache||[]).find(function(x){return x.ref===ref;});
+  var extra=(r&&r.status!=='ongoing')?'\n\nAttention : cette course n\'a jamais été démarrée par le chauffeur.':'';
+  if(!confirm('Marquer la course '+ref+' comme TERMINÉE ?'+extra+'\n\nElle passera dans les courses terminées et la facture sera disponible.'))return;
+  await sb.from('bookings').update({
+    status:'done', driver_status:'done',
+    driver_lat:null, driver_lng:null,
+    finished_by:'admin'
+  }).eq('ref',ref);
+  toast('Course terminée');
+  if(typeof loadRides==='function')await loadRides();
+  if(typeof renderPlanning==='function')renderPlanning();
+};
+</script>
+
+<script>
+/* ══ NOTATION VIA LIEN E-MAIL : index.html?rate=YAN-123456 ══ */
+(function(){
+  var GOOGLE_REVIEW='https://g.page/r/Cfk80ClgisrGEBk/review';
+  function star(f){
+    return '<svg viewBox="0 0 24 24" width="38" height="38" fill="'+(f?'#F5A524':'none')+'" stroke="'+(f?'#F5A524':'#C7D0DD')+'" stroke-width="1.8" stroke-linejoin="round"><polygon points="12 2.6 15 9 22 9.9 17 14.7 18.3 21.6 12 18.2 5.7 21.6 7 14.7 2 9.9 9 9"/></svg>';
+  }
+  var RR=null, RN=0;
+
+  window.rateSetStars=function(n){
+    RN=n;
+    document.querySelectorAll('#rate-card .stars button').forEach(function(b,i){ b.innerHTML=star(i<n); });
+    var s=document.getElementById('rate-go'); if(s)s.style.display='block';
+  };
+
+  window.rateSend=async function(){
+    if(!RN){ toast('Choisissez une note'); return; }
+    var txt=(document.getElementById('rate-comment').value||'').trim();
+    await sb.from('bookings').update({rating:RN,review:txt}).eq('ref',RR.ref);
+    var card=document.getElementById('rate-card');
+    if(RN>=4){
+      card.innerHTML='<div style="text-align:center;">'+
+        '<div style="font-size:44px;margin-bottom:8px;">★</div>'.replace('★','<span style="color:#F5A524;">★</span>')+
+        '<div class="login-t" style="margin-bottom:6px;">Merci pour votre '+RN+'/5 !</div>'+
+        '<div class="login-s" style="margin-bottom:20px;">Votre avis sur Google nous aide énormément à nous faire connaître.</div>'+
+        '<a href="'+GOOGLE_REVIEW+'" target="_blank" rel="noopener" class="btn-p" style="display:block;text-decoration:none;box-sizing:border-box;">Laisser un avis sur Google</a>'+
+        '<button class="btn-navy" style="margin-top:10px;" onclick="go(\'p-home\')">Retour à l\'accueil</button></div>';
+    } else {
+      card.innerHTML='<div style="text-align:center;">'+
+        '<div class="login-t" style="margin-bottom:6px;">Merci pour votre retour</div>'+
+        '<div class="login-s" style="margin-bottom:20px;">Nous prenons ce retour très au sérieux et vous recontactons rapidement pour comprendre ce qui n\'a pas fonctionné.</div>'+
+        '<a href="tel:0465846516" class="btn-p" style="display:block;text-decoration:none;box-sizing:border-box;">Nous appeler maintenant</a>'+
+        '<button class="btn-navy" style="margin-top:10px;" onclick="go(\'p-home\')">Retour à l\'accueil</button></div>';
+    }
+  };
+
+  async function openRatePage(ref){
+    var card=document.getElementById('rate-card');
+    go('p-rate');
+    var res=await sb.from('bookings').select('*').eq('ref',ref).limit(1);
+    var r=(res.data||[])[0];
+    if(!r){ card.innerHTML='<div class="login-t">Course introuvable</div><div class="login-s">Ce lien n\'est plus valide.</div><button class="btn-navy" onclick="go(\'p-home\')">Retour à l\'accueil</button>'; return; }
+    RR=r;
+    if(r.rating){
+      var f=''; for(var i=0;i<5;i++)f+='<span style="color:'+(i<r.rating?'#F5A524':'#C7D0DD')+';font-size:26px;">★</span>';
+      card.innerHTML='<div style="text-align:center;"><div class="login-t" style="margin-bottom:6px;">Déjà noté</div>'+
+        '<div style="margin:10px 0 6px;">'+f+'</div>'+
+        '<div class="login-s" style="margin-bottom:18px;">Merci, vous avez déjà noté cette course.</div>'+
+        (r.rating>=4?'<a href="'+GOOGLE_REVIEW+'" target="_blank" rel="noopener" class="btn-o" style="display:block;text-decoration:none;box-sizing:border-box;margin-bottom:10px;">Laisser un avis sur Google</a>':'')+
+        '<button class="btn-navy" onclick="go(\'p-home\')">Retour à l\'accueil</button></div>';
+      return;
+    }
+    card.innerHTML=
+      '<div style="text-align:center;">'+
+        '<div class="login-t" style="margin-bottom:4px;">Comment s\'est passée<br>votre course ?</div>'+
+        '<div class="login-s" style="margin-bottom:4px;">'+(r.pickup||'').split(',')[0]+' → '+(r.dropoff||'').split(',')[0]+'</div>'+
+        '<div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:20px;">'+(r.date?r.date.split('-').reverse().join('/'):'')+' · '+(r.driver||'')+'</div>'+
+        '<div class="stars">'+[1,2,3,4,5].map(function(n){return '<button onclick="rateSetStars('+n+')">'+star(false)+'</button>';}).join('')+'</div>'+
+        '<div id="rate-go" style="display:none;margin-top:18px;text-align:left;">'+
+          '<textarea id="rate-comment" rows="3" placeholder="Un mot sur votre chauffeur (facultatif)" style="width:100%;background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-weight:600;font-family:var(--fb);resize:vertical;box-sizing:border-box;"></textarea>'+
+          '<button class="btn-p" style="margin-top:10px;" onclick="rateSend()">Envoyer ma note</button>'+
+        '</div>'+
+      '</div>';
+  }
+
+  var p=new URLSearchParams(location.search);
+  if(p.get('rate'))setTimeout(async function(){
+    await openRatePage(p.get('rate').toUpperCase());
+    var n=parseInt(p.get('n')||0);
+    if(n>=1&&n<=5&&document.querySelector('#rate-card .stars'))rateSetStars(n);
+  },400);
+
+  /* ────────── DÉCLENCHEUR : demande d'avis à la fin de la course ────────── */
+  window.sendRatingEmail=async function(ref){
+    var r=null;
+    try{ var res=await sb.from('bookings').select('*').eq('ref',ref).limit(1); r=(res.data||[])[0]; }catch(e){}
+    if(!r||!r.email||r.rating||r.rating_email_sent)return;
+    try{
+      await fetch('https://kxwsvdmnoyxblkvrlgar.supabase.co/functions/v1/send-confirmation',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({type:'rating_request',record:{
+          ref:r.ref,name:r.name,email:r.email,date:r.date,time:r.time,
+          pickup:r.pickup,dropoff:r.dropoff,driver:r.driver,price:r.price,
+          rate_url:location.origin+location.pathname+'?rate='+r.ref
+        }})
+      });
+      await sb.from('bookings').update({rating_email_sent:true}).eq('ref',ref);
+    }catch(e){}
+  };
+
+  ['dAct','adminFinishRide'].forEach(function(fn){
+    var orig=window[fn];
+    if(typeof orig!=='function')return;
+    window[fn]=async function(ref,s){
+      var out=await orig.apply(this,arguments);
+      if(fn==='adminFinishRide'||s==='done')setTimeout(function(){ sendRatingEmail(ref); },1500);
+      return out;
+    };
+  });
 })();
 </script>
 </body>
