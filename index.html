@@ -1106,8 +1106,17 @@ input,select,textarea,button{font-family:var(--fb);}
     </div>
     <!-- RAPPORT -->
     <div id="pan-r" style="display:none;padding:16px;">
+      <div style="background:var(--navy);border-radius:16px;padding:6px;margin-bottom:14px;">
+        <div class="ca-seg">
+          <button type="button" data-rper="day" onclick="repPeriod('day')">Jour</button>
+          <button type="button" data-rper="week" onclick="repPeriod('week')">Semaine</button>
+          <button type="button" class="on" data-rper="month" onclick="repPeriod('month')">Mois</button>
+          <button type="button" data-rper="year" onclick="repPeriod('year')">Année</button>
+          <button type="button" data-rper="all" onclick="repPeriod('all')">Tout</button>
+        </div>
+      </div>
       <div class="stats-g">
-        <div class="stat-b"><div class="stat-bn" style="color:var(--green)" id="rep-ca">—</div><div class="stat-bl">CA mois</div></div>
+        <div class="stat-b"><div class="stat-bn" style="color:var(--green)" id="rep-ca">—</div><div class="stat-bl" id="rep-ca-lbl">CA du mois</div></div>
         <div class="stat-b"><div class="stat-bn" id="rep-nb">—</div><div class="stat-bl">Courses</div></div>
         <div class="stat-b"><div class="stat-bn" id="rep-moy">—</div><div class="stat-bl">Panier moyen</div></div>
         <div class="stat-b"><div class="stat-bn" id="rep-ns" style="color:var(--red)">—</div><div class="stat-bl">No-shows</div></div>
@@ -2623,10 +2632,36 @@ async function toggleDay(d){
 }
 
 // ── RAPPORT ──
+var repPer='month';
+var REP_LBL={day:"CA du jour",week:'CA de la semaine',month:'CA du mois',year:"CA de l'année",all:'CA total'};
+
+function repRange(p){
+  var n=new Date(), s;
+  if(p==='all')return '0000-01-01';
+  if(p==='day')s=n;
+  else if(p==='week'){ s=new Date(n); s.setDate(n.getDate()-((n.getDay()+6)%7)); }
+  else if(p==='month')s=new Date(n.getFullYear(),n.getMonth(),1);
+  else s=new Date(n.getFullYear(),0,1);
+  return s.toISOString().slice(0,10);
+}
+
+function repPeriod(p){
+  repPer=p;
+  document.querySelectorAll('#pan-r .ca-seg button').forEach(function(b){
+    b.classList.toggle('on', b.dataset.rper===p);
+  });
+  var l=document.getElementById('rep-ca-lbl');
+  if(l)l.textContent=REP_LBL[p];
+  renderRapport();
+}
+
 function renderRapport(){
-  var done=ridesCache.filter(function(r){return r.status==='done';});
-  var cancelled=ridesCache.filter(function(r){return r.status==='cancelled';});
-  var noshows=ridesCache.filter(function(r){return r.status==='noshow';});
+  var from=repRange(repPer);
+  var today=new Date().toISOString().slice(0,10);
+  var inPer=function(r){ return r.date&&r.date>=from&&r.date<=today; };
+  var done=ridesCache.filter(function(r){return r.status==='done'&&inPer(r);});
+  var cancelled=ridesCache.filter(function(r){return r.status==='cancelled'&&inPer(r);});
+  var noshows=ridesCache.filter(function(r){return r.status==='noshow'&&inPer(r);});
   var ca=done.reduce(function(a,r){return a+(r.price||0);},0);
   var moy=done.length?ca/done.length:0;
   document.getElementById('rep-ca').textContent=fmt(ca)+' €';
@@ -2642,7 +2677,7 @@ function renderRapport(){
   var tot=bCA+vCA||1;
   document.getElementById('rep-gamme').innerHTML='<div class="bar-wrap"><div class="bar-lbl"><span>Berline</span><span style="font-weight:700">'+fmt(bCA)+'€ ('+Math.round(bCA/tot*100)+'%)</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(bCA/tot*100)+'%"></div></div></div><div class="bar-wrap" style="margin-top:8px"><div class="bar-lbl"><span>Van</span><span style="font-weight:700">'+fmt(vCA)+'€ ('+Math.round(vCA/tot*100)+'%)</span></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(vCA/tot*100)+'%;background:#0a2d55"></div></div></div>';
   document.getElementById('rep-cancel').innerHTML='<div class="rep-row"><span class="rep-k">Annulations</span><span class="rep-v">'+cancelled.length+'</span></div><div class="rep-row"><span class="rep-k">No-shows</span><span class="rep-v" style="color:var(--red)">'+noshows.length+'</span></div><div class="rep-row"><span class="rep-k">Pénalités estimées</span><span class="rep-v pos">'+fmt(noshows.reduce(function(a,r){return a+(r.price||0);},0))+' €</span></div>';
-  var clients={};ridesCache.forEach(function(r){clients[r.name]=(clients[r.name]||0)+1;});
+  var clients={};ridesCache.filter(inPer).forEach(function(r){clients[r.name]=(clients[r.name]||0)+1;});
   var recur=Object.entries(clients).filter(function(e){return e[1]>1;});
   document.getElementById('rep-recurrent').innerHTML=recur.length?recur.map(function(e){return '<div class="rep-row"><span class="rep-k">'+e[0]+'</span><span class="rep-v pos">'+e[1]+' courses</span></div>';}).join(''):'<div style="font-size:11px;color:var(--muted);padding:8px 0;">Aucun client récurrent.</div>';
 }
@@ -5319,11 +5354,11 @@ window.adminFinishRide=async function(ref){
   var r=(window.ridesCache||[]).find(function(x){return x.ref===ref;});
   var extra=(r&&r.status!=='ongoing')?'\n\nAttention : cette course n\'a jamais été démarrée par le chauffeur.':'';
   if(!confirm('Marquer la course '+ref+' comme TERMINÉE ?'+extra+'\n\nElle passera dans les courses terminées et la facture sera disponible.'))return;
-  await sb.from('bookings').update({
+  var res=await sb.from('bookings').update({
     status:'done', driver_status:'done',
-    driver_lat:null, driver_lng:null,
-    finished_by:'admin'
+    driver_lat:null, driver_lng:null
   }).eq('ref',ref);
+  if(res.error){ toast('Erreur : '+res.error.message); console.error(res.error); return; }
   toast('Course terminée');
   if(typeof loadRides==='function')await loadRides();
   if(typeof renderPlanning==='function')renderPlanning();
